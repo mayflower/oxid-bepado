@@ -6,23 +6,21 @@ class mfBepado extends oxUbase {
 
     public function render() {
         parent::render();
-        echo "hallo welt 1";
-        /*
+        echo "hallo welt 1<br>\n";
 
-        $foo = class_exists('Bepado\SDK\ProductFromShop');
-        echo "klasse existiert: ".var_export($foo, true);
+        #$foo = class_exists('bepado\sdk\productfromshop');
+        #echo "klasse existiert: ".var_export($foo, true);
 
-        $from = oxNew('oxidproductfromshop');
-        echo "foobar";
-        $to = oxNew('oxidProductToShop');
+        $from = oxnew('oxidproductfromshop');
+        $to = oxnew('oxidproducttoshop');
         echo var_export(array('ärräh', $from, $to), true);
 
         /* */
-        return $this->_sThisTemplate;
+        return $this->_sthistemplate;
 
     }
 
-    public function doStuff() {
+    public function dostuff() {
         echo "foo bar";
         return "";
     }
