@@ -6,22 +6,31 @@ class mfBepado extends oxUbase {
 
     public function render() {
         parent::render();
-        echo "hallo welt 1<br>\n";
-
-        #$foo = class_exists('bepado\sdk\productfromshop');
-        #echo "klasse existiert: ".var_export($foo, true);
-
-        $from = oxnew('oxidproductfromshop');
-        $to = oxnew('oxidproducttoshop');
-        echo var_export(array('ärräh', $from, $to), true);
-
-        /* */
-        return $this->_sthistemplate;
+        // change this in SDK/DependencyResolver.php if this does not work
+        putenv('_SOCIALNETWORK_HOST', 'sn.server1230-han.de-nserver.de');
+        $this->instantiateSdk();
+        return $this->_sThisTemplate;
 
     }
 
-    public function dostuff() {
-        echo "foo bar";
-        return "";
+    protected function instantiateSdk() {
+        // The page's url you created before
+        $url = 'http://ps-dev-martin/index.php?cl=mfbepado';
+        $pdoConnection = new PDO('mysql:dbname=shop;host=127.0.0.1','root', '');
+        $from = oxnew('oxidproductfromshop');
+        $to = oxnew('oxidproducttoshop');
+
+        $builder = new \Bepado\SDK\SDKBuilder();
+        $builder
+            ->setApiKey('366dc0f6-a9ae-4a99-8d33-894ed2860511')
+            ->setApiEndpointUrl($url)
+            ->configurePDOGateway($pdoConnection)
+            ->setProductToShop($to)
+            ->setProductFromShop($from)
+            ->setPluginSoftwareVersion('no one expects the spanish inquisition!')
+        ;
+        $sdk = $builder->build();
+
+        echo $sdk->handle(file_get_contents('php://input'), $_SERVER);
     }
 }
