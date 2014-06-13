@@ -27,16 +27,11 @@ $aModule = array(
     'files'       => array(
         'mfbepado'      => $aPaths['controllers'] . '/mfBepado.php',
         'mfcmp_bepado'  => $aPaths['components'] . '/mfcmp_bepado.php',
-        'oxidProductFromShop' => $aPaths['models'] . '/productFromShop.php',
+
+        'oxidproductfromshop' => $aPaths['models'] . '/productFromShop.php',
         'oxidProductToShop'   => $aPaths['models'] . '/productToShop.php',
     ),
     'templates' => array(),
 );
 
 
-spl_autoload_register(function ($class) {
-    if (strpos($class, 'Bepado\\SDK') === 0) {
-        $file = __DIR__ . '/Bepado/SDK/' . str_replace('\\', '/', $class) . '.php';
-        require_once($file);
-    }
-});

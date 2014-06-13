@@ -1,5 +1,5 @@
 <?php
-use Bepado\SDK\ProductFromShop;
+use Bepado\SDK\ProductToShop;
 use Bepado\SDK\Struct;
 
 class oxidProductToShop implements ProductToShop
