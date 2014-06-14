@@ -14,16 +14,20 @@ class mfBepado extends oxUbase {
     }
 
     protected function instantiateSdk() {
-        // The page's url you created before
-        $url = 'http://ps-dev-martin/index.php?cl=mfbepado';
+
+        // load global oxid config
+        $oShopConfig = oxRegistry::get('oxConfig');
+
+        $sLocalEndpoint = $oShopConfig->getConfigParam('sBepadoLocalEndpoint');
+        $sApiKey = $oShopConfig->getConfigParam('sBepadoApiKey');
         $pdoConnection = new PDO('mysql:dbname=shop;host=127.0.0.1','root', '');
         $from = oxnew('oxidproductfromshop');
         $to = oxnew('oxidproducttoshop');
 
         $builder = new \Bepado\SDK\SDKBuilder();
         $builder
-            ->setApiKey('366dc0f6-a9ae-4a99-8d33-894ed2860511')
-            ->setApiEndpointUrl($url)
+            ->setApiKey($sApiKey)
+            ->setApiEndpointUrl($sLocalEndpoint)
             ->configurePDOGateway($pdoConnection)
             ->setProductToShop($to)
             ->setProductFromShop($from)

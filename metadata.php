@@ -32,6 +32,10 @@ $aModule = array(
         'oxidProductToShop'   => $aPaths['models'] . '/productToShop.php',
     ),
     'templates' => array(),
+    'settings' => array(
+        array('group' => 'main', 'name' => 'sBepadoLocalEndpoint', 'type' => 'str',  'value' => 'http://xxx.de/index.php?cl=mfbepado'),
+        array('group' => 'main', 'name' => 'sBepadoApiKey',    'type' => 'str', 'value' => 'xxx'),
+    )
 );
 
 
