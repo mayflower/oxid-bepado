@@ -17,10 +17,17 @@ class mfBepado extends oxUbase {
 
         // load global oxid config
         $oShopConfig = oxRegistry::get('oxConfig');
-
+        // module config
         $sLocalEndpoint = $oShopConfig->getConfigParam('sBepadoLocalEndpoint');
         $sApiKey = $oShopConfig->getConfigParam('sBepadoApiKey');
-        $pdoConnection = new PDO('mysql:dbname=shop;host=127.0.0.1','root', '');
+        // database config
+        $sDbType = $oShopConfig->getConfigParam('dbType');
+        $sDbHost = $oShopConfig->getConfigParam('dbHost');
+        $sDbName = $oShopConfig->getConfigParam('dbName');
+        $sDbUser = $oShopConfig->getConfigParam('dbUser');
+        $sDbPwd = $oShopConfig->getConfigParam('dbPwd');
+
+        $pdoConnection = new PDO($sDbType . ':dbname=' . $sDbName . ';host=' . $sDbHost,$sDbUser, $sDbPwd);
         $from = oxnew('oxidproductfromshop');
         $to = oxnew('oxidproducttoshop');
 
