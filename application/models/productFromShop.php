@@ -11,12 +11,31 @@ class oxidProductFromShop implements ProductFromShop
         $sdkProduct = new Product();
 
         // load oxid article
+        /**
+         * @var oxarticle $oxProduct
+         */
         $oxProduct = oxNew('oxarticle');
         $oxProduct->load($id);
 
         // @TODO: check if article is marked for bepado
 
+        /*
+                'shopId',
+                'sourceId',
+                'price',
+                'purchasePrice',
+                'currency',
+                'availability',
+                'relevance',
+        */
         $sdkProduct->vat = $oxProduct->getArticleVat();
+
+        $sdkProduct->sourceId = $id;
+        $sdkProduct->title = $oxProduct->oxarticles__oxtitle->value;
+        $sdkProduct->shortDescription = $oxProduct->oxarticles__oxshortdesc->value;
+        $sdkProduct->longDescription = $oxProduct->getLongDescription();
+        $sdkProduct->vendor = $oxProduct->getVendor()->oxvendor__oxtitle->value;
+
 
         return $sdkProduct;
 
@@ -25,7 +44,6 @@ class oxidProductFromShop implements ProductFromShop
 
     public function getProducts(array $ids)
     {
-
         $sdkProducts = array();
 
         foreach ($ids as $id) {
