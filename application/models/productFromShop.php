@@ -7,6 +7,7 @@ class oxidProductFromShop implements ProductFromShop
 {
     protected function _convertToBepadoSdkProduct($id) {
 
+
         $sdkProduct = new Product();
 
         // load oxid article
@@ -19,17 +20,20 @@ class oxidProductFromShop implements ProductFromShop
 
         return $sdkProduct;
 
+
     }
 
     public function getProducts(array $ids)
     {
-        $sdkProducts = [];
+
+        $sdkProducts = array();
 
         foreach ($ids as $id) {
             $sdkProducts[] = $this->_convertToBepadoSdkProduct($id);
         }
 
         return $sdkProducts;
+
 
     }
     public function getExportedProductIDs()
