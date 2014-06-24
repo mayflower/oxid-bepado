@@ -7,7 +7,7 @@ class mfBepado extends oxUbase {
     public function render() {
         parent::render();
         // change this in SDK/DependencyResolver.php if this does not work
-        putenv('_SOCIALNETWORK_HOST', 'sn.server1230-han.de-nserver.de');
+        putenv('_SOCIALNETWORK_HOST=sn.server1230-han.de-nserver.de');
         $this->instantiateSdk();
         return $this->_sThisTemplate;
 
