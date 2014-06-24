@@ -14,16 +14,27 @@ class mfBepado extends oxUbase {
     }
 
     protected function instantiateSdk() {
-        // The page's url you created before
-        $url = 'http://ps-dev-martin/index.php?cl=mfbepado';
-        $pdoConnection = new PDO('mysql:dbname=shop;host=127.0.0.1','root', '');
+
+        // load global oxid config
+        $oShopConfig = oxRegistry::get('oxConfig');
+        // module config
+        $sLocalEndpoint = $oShopConfig->getConfigParam('sBepadoLocalEndpoint');
+        $sApiKey = $oShopConfig->getConfigParam('sBepadoApiKey');
+        // database config
+        $sDbType = $oShopConfig->getConfigParam('dbType');
+        $sDbHost = $oShopConfig->getConfigParam('dbHost');
+        $sDbName = $oShopConfig->getConfigParam('dbName');
+        $sDbUser = $oShopConfig->getConfigParam('dbUser');
+        $sDbPwd = $oShopConfig->getConfigParam('dbPwd');
+
+        $pdoConnection = new PDO($sDbType . ':dbname=' . $sDbName . ';host=' . $sDbHost,$sDbUser, $sDbPwd);
         $from = oxnew('oxidproductfromshop');
         $to = oxnew('oxidproducttoshop');
 
         $builder = new \Bepado\SDK\SDKBuilder();
         $builder
-            ->setApiKey('366dc0f6-a9ae-4a99-8d33-894ed2860511')
-            ->setApiEndpointUrl($url)
+            ->setApiKey($sApiKey)
+            ->setApiEndpointUrl($sLocalEndpoint)
             ->configurePDOGateway($pdoConnection)
             ->setProductToShop($to)
             ->setProductFromShop($from)
