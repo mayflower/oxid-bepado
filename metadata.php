@@ -11,6 +11,7 @@ $aPaths = array(
     'core'        => $sModuleId . '/application/core',
 //    'utils'       => $sModuleId . '/utils',
 //    'admin'       => $sModuleId . '/application/controllers/admin',
+    'views'       => $sModuleId . '/application/views',
 );
 
 $aModule = array(
@@ -35,6 +36,9 @@ $aModule = array(
         'SDKConfig'           => $aPaths['models'] . '/SDKConfig.php',
 
         'mf_sdk_helper' => $aPaths['core']. '/mf_sdk_helper.php',
+    ),
+    'templates' => array(
+        'mf_module_config.tpl'     => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl'
     ),
     'settings' => array(
         array('group' => 'main', 'name' => 'sBepadoLocalEndpoint', 'type' => 'str',  'value' => 'http://xxx.de/index.php?cl=mfbepado'),
