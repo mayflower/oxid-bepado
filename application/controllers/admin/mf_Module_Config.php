@@ -1,25 +1,22 @@
 <?php
-
-class mfBepado extends oxUbase {
-
-    //protected $_sThisTemplate = 'ajax.tpl';
-
-    /**
-     * @var mf_sdk_helper
-     */
+/**
+ * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
+ */
+class mf_Module_Config extends mf_Module_Config_parent
+{
     private $_oModuleSdkHelper;
 
-    public function render() {
-        parent::render();
+    public function render()
+    {
+        $template = parent::render();
 
         $sdkConfig = $this->getSdkHelper()->createSdkConfigFromOxid();
         $sdk = $this->getSdkHelper()->instantiateSdk($sdkConfig);
-        $sdk->handle(file_get_contents('php://input'), $_SERVER);
+        $sdk->verifyKey($sdkConfig->getApiKey());
 
-        return $this->_sThisTemplate;
-
+        return $template;
     }
-    
+
     /**
      * @return mf_sdk_helper
      */
@@ -32,3 +29,4 @@ class mfBepado extends oxUbase {
         return $this->_oModuleSdkHelper;
     }
 }
+ 

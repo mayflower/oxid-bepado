@@ -4,7 +4,7 @@ use Bepado\SDK\ProductFromShop;
 use Bepado\SDK\Struct\Order;
 use Bepado\SDK\Struct\Product;
 
-class oxidProductFromShop implements ProductFromShop
+class oxProductFromShop implements ProductFromShop
 {
     public function getProducts(array $ids)
     {

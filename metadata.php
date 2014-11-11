@@ -8,7 +8,7 @@ $aPaths = array(
     'controllers' => $sModuleId . '/application/controllers',
     'models'      => $sModuleId . '/application/models',
     'components'  => $sModuleId . '/application/components',
-//    'core'        => $sModuleId . '/core',
+    'core'        => $sModuleId . '/application/core',
 //    'utils'       => $sModuleId . '/utils',
 //    'admin'       => $sModuleId . '/application/controllers/admin',
 );
@@ -23,15 +23,19 @@ $aModule = array(
     'version' => '0.1',
     'author'  => 'Mayflower GmbH',
     'email'   => 'info@mayflower.de',
-    'extend'  => array(),
+    'extend'  => array(
+        'module_config' => $aPaths['controllers'] . '/admin/mf_Module_Config'
+    ),
     'files'       => array(
         'mfbepado'      => $aPaths['controllers'] . '/mfBepado.php',
         'mfcmp_bepado'  => $aPaths['components'] . '/mfcmp_bepado.php',
 
-        'oxidproductfromshop' => $aPaths['models'] . '/productFromShop.php',
-        'oxidProductToShop'   => $aPaths['models'] . '/productToShop.php',
+        'oxidproductfromshop' => $aPaths['models'] . '/oxProductFromShop.php',
+        'oxidProductToShop'   => $aPaths['models'] . '/oxProductToShop.php',
+        'SDKConfig'           => $aPaths['models'] . '/SDKConfig.php',
+
+        'mf_sdk_helper' => $aPaths['core'] . '/mf_sdk_helper.php',
     ),
-    'templates' => array(),
     'settings' => array(
         array('group' => 'main', 'name' => 'sBepadoLocalEndpoint', 'type' => 'str',  'value' => 'http://xxx.de/index.php?cl=mfbepado'),
         array('group' => 'main', 'name' => 'sBepadoApiKey',    'type' => 'str', 'value' => 'xxx'),
