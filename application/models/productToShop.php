@@ -2,7 +2,7 @@
 use Bepado\SDK\ProductToShop;
 use Bepado\SDK\Struct;
 
-class oxProductToShop implements ProductToShop
+class oxidProductToShop implements ProductToShop
 {
 public function insertOrUpdate(Struct\Product $product)
 {

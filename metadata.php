@@ -32,6 +32,9 @@ $aModule = array(
 
         'oxidproductfromshop' => $aPaths['models'] . '/productFromShop.php',
         'oxidProductToShop'   => $aPaths['models'] . '/productToShop.php',
+        'SDKConfig'           => $aPaths['models'] . '/SDKConfig.php',
+
+        'mf_sdk_helper' => $aPaths['core']. '/mf_sdk_helper.php',
     ),
     'settings' => array(
         array('group' => 'main', 'name' => 'sBepadoLocalEndpoint', 'type' => 'str',  'value' => 'http://xxx.de/index.php?cl=mfbepado'),

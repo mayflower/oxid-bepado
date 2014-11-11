@@ -33,6 +33,7 @@ class mf_sdk_helper
     {
         // @todo read host from config
         putenv('_SOCIALNETWORK_HOST=sn.server1230-han.de-nserver.de');
+
         // load global oxid config
         $oShopConfig = oxRegistry::get('oxConfig');
 
