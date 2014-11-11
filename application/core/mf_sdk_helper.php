@@ -44,8 +44,8 @@ class mf_sdk_helper
         $sDbPwd = $oShopConfig->getConfigParam('dbPwd');
 
         $pdoConnection = new PDO($sDbType . ':dbname=' . $sDbName . ';host=' . $sDbHost,$sDbUser, $sDbPwd);
-        $from = oxRegistry::get('oxidproductfromshop');
-        $to = oxRegistry::get('oxidProductToShop');
+        $from = oxnew('oxidproductfromshop');
+        $to = oxnew('oxidproducttoshop');
 
         $builder = new \Bepado\SDK\SDKBuilder();
         $builder

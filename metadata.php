@@ -30,11 +30,8 @@ $aModule = array(
         'mfbepado'      => $aPaths['controllers'] . '/mfBepado.php',
         'mfcmp_bepado'  => $aPaths['components'] . '/mfcmp_bepado.php',
 
-        'oxidproductfromshop' => $aPaths['models'] . '/oxProductFromShop.php',
-        'oxidProductToShop'   => $aPaths['models'] . '/oxProductToShop.php',
-        'SDKConfig'           => $aPaths['models'] . '/SDKConfig.php',
-
-        'mf_sdk_helper' => $aPaths['core'] . '/mf_sdk_helper.php',
+        'oxidproductfromshop' => $aPaths['models'] . '/productFromShop.php',
+        'oxidProductToShop'   => $aPaths['models'] . '/productToShop.php',
     ),
     'settings' => array(
         array('group' => 'main', 'name' => 'sBepadoLocalEndpoint', 'type' => 'str',  'value' => 'http://xxx.de/index.php?cl=mfbepado'),
