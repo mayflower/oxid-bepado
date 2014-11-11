@@ -1,0 +1,12 @@
+{
+    "name": "mayflower/oxid-bepado",
+    "description": "Oxid module implementation of the bepado sdk",
+    "license": "MIT",
+    "require": {
+        "bepado/sdk": "1.4.*"
+    },
+
+    "config": {
+        "bin-dir": "vendor/bin/"
+    }
+}

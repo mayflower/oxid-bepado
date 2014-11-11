@@ -1,0 +1,62 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "8507bc98051efd7908c6132c7ea896fe",
+    "packages": [
+        {
+            "name": "bepado/sdk",
+            "version": "v1.4.39",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ShopwareAG/bepado-sdk.git",
+                "reference": "f1a49725771a69c6cbc79ba908223f9244f98e96"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ShopwareAG/bepado-sdk/zipball/f1a49725771a69c6cbc79ba908223f9244f98e96",
+                "reference": "f1a49725771a69c6cbc79ba908223f9244f98e96",
+                "shasum": ""
+            },
+            "require-dev": {
+                "behat/behat": "2.4.*@stable",
+                "phake/phake": "@stable",
+                "phpunit/phpunit": "@stable"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Bepado\\SDK": [
+                        "src/main",
+                        "test"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "The PHP Software Development Kit for Shop developers.",
+            "time": "2014-07-08 19:35:30"
+        }
+    ],
+    "packages-dev": [
+
+    ],
+    "aliases": [
+
+    ],
+    "minimum-stability": "stable",
+    "stability-flags": [
+
+    ],
+    "prefer-stable": false,
+    "platform": [
+
+    ],
+    "platform-dev": [
+
+    ]
+}

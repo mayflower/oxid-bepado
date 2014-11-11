@@ -41,7 +41,6 @@ class mfBepado extends oxUbase {
             ->setPluginSoftwareVersion('no one expects the spanish inquisition!')
         ;
         $sdk = $builder->build();
-
         echo $sdk->handle(file_get_contents('php://input'), $_SERVER);
     }
 }
