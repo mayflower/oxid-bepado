@@ -13,9 +13,9 @@ class mf_sdk_converter //implements ProductConverter
     {
         $sdkProduct = new Product();
 
-        /** @var \oxConfig $oxShopConfig */
-        $oxShopConfig  = oxRegistry::get('oxConfig');
-        $currencyArray = $oxShopConfig->getCurrencyArray();
+        /** @var \oxConfig $oShopConfig */
+        $oShopConfig  = oxRegistry::get('oxConfig');
+        $currencyArray = $oShopConfig->getCurrencyArray();
 
         $currency      = array_filter($currencyArray, function ($item) {
             return ($item['rate'] == '1.00');
@@ -24,11 +24,10 @@ class mf_sdk_converter //implements ProductConverter
         $sdkProduct->sourceId         = $oxProduct->getId();
         $sdkProduct->title            = $oxProduct->oxarticles__oxtitle->value;
         $sdkProduct->shortDescription = $oxProduct->oxarticles__oxshortdesc->value;
-        $sdkProduct->longDescription  = $oxProduct->getLongDescription();
+        $sdkProduct->longDescription  = $oxProduct->getLongDescription()->getRawValue();
         $sdkProduct->vendor           = $oxProduct->getVendor()->oxvendor__oxtitle->value;
         $sdkProduct->price            = $oxProduct->getPrice()->getNettoPrice();
         $sdkProduct->purchasePrice    = $oxProduct->getBasePrice();
-        //                              $oxProduct->oxarticles__oxunitname->value ??
         $sdkProduct->currency         = $currency[0]['name'];
         $sdkProduct->availability     = $oxProduct->getStockStatus();
         $sdkProduct->vat              = $oxProduct->getArticleVat();
@@ -51,16 +50,18 @@ class mf_sdk_converter //implements ProductConverter
         /** @var oxarticle $oxProduct */
         $oxProduct = oxNew('oxarticle');
 
-        $oxProduct->setId($sdkProduct->sourceId);
-        $oxProduct->oxarticles__oxtitle = $sdkProduct->title;
-        $oxProduct->oxarticles__oxshortdesc = $sdkProduct->shortDescription;
-        // LongDescription
-        $oxProduct->getVendor()->oxvendor__oxtitle = $sdkProduct->vendor;
-        // Price
-        // BasePrice
-        // $oxProduct->oxarticles__oxunitname = $sdkProduct->currency;
-        // StockStatus
-        // Vat
+        // ID: cannot be source ID, which has no representation in oxarticle object
+        // Title; oxarticle has no title or name property
+        // ShortDesc: oxarticle has no shortDesc property
+        $oxProduct->setArticleLongDesc($sdkProduct->longDescription);
+        // Vendor: vendor name no use, only vendorId can load vendor object
+        // Price: first set netto mode, then set price
+        $oxProduct->getPrice()->setNettoPriceMode();
+        $oxProduct->getPrice()->setPrice($sdkProduct->price);
+        // BasePrice: no setter..?
+        // Currency: unit won't initialize currency object
+        // StockStatus: var $_iStockStatus has no setter and is protected
+        // Vat: Vat comes from oxRegistry - not set in oxarticle object
 
 
         return $oxProduct;
@@ -73,7 +74,10 @@ class mf_sdk_converter //implements ProductConverter
      */
     private function mapImages($oxProduct)
     {
-        return array(); // links zu bildern. 1. bild ist hauptbild
+        // not done
+        // return array has wrong structure ([int, string, bool, [], [], bool, []])
+
+        return $oxProduct->getPictureGallery();
     }
 
     /**
@@ -111,8 +115,8 @@ class mf_sdk_converter //implements ProductConverter
             Product::ATTRIBUTE_VOLUME             => $oxProduct->getSize(),
             Product::ATTRIBUTE_DIMENSION          => $dimension,
             Product::ATTRIBUTE_UNIT               => $oxProduct->getUnitName(),
-            // not done
-            Product::ATTRIBUTE_REFERENCE_QUANTITY => '',
+            // reference quantity is always 1 in oxid shop
+            Product::ATTRIBUTE_REFERENCE_QUANTITY => 1,
             Product::ATTRIBUTE_QUANTITY           => $oxProduct->getUnitQuantity(),
         );
         return $attributes;
