@@ -27,9 +27,9 @@ class mf_sdk_converter //implements ProductConverter
         $sdkProduct->longDescription  = $oxProduct->getLongDescription()->getRawValue();
         $sdkProduct->vendor           = $oxProduct->getVendor()->oxvendor__oxtitle->value;
         $sdkProduct->price            = $oxProduct->getPrice()->getNettoPrice();
-        $sdkProduct->purchasePrice    = $oxProduct->getBasePrice();
+        $sdkProduct->purchasePrice    = $oxProduct->oxarticles__oxbprice->value;;
         $sdkProduct->currency         = $currency[0]['name'];
-        $sdkProduct->availability     = $oxProduct->getStockStatus();
+        $sdkProduct->availability     = $oxProduct->oxarticles__oxstock->value;
         $sdkProduct->vat              = $oxProduct->getArticleVat();
 
           /**                 not implemented yet                 */
@@ -58,10 +58,10 @@ class mf_sdk_converter //implements ProductConverter
         // Price: first set netto mode, then set price
         $oxProduct->getPrice()->setNettoPriceMode();
         $oxProduct->getPrice()->setPrice($sdkProduct->price);
+        $oxProduct->getPrice()->setVat($sdkProduct->vat);
         // BasePrice: no setter..?
         // Currency: unit won't initialize currency object
         // StockStatus: var $_iStockStatus has no setter and is protected
-        // Vat: Vat comes from oxRegistry - not set in oxarticle object
 
 
         return $oxProduct;
