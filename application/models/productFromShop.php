@@ -27,7 +27,7 @@ class oxidProductFromShop implements ProductFromShop
 
             // @TODO: check if article is marked for bepado
 
-            $sdkProducts[] = $this->_oModuleDskConverter->oxArticleToBepardo($oxProduct);
+            $sdkProducts[] = $this->_oModuleDskConverter->toBepadoProduct($oxProduct);
         }
 
         return $sdkProducts;
