@@ -9,6 +9,7 @@ $aPaths = array(
     'models'      => $sModuleId . '/application/models',
     'components'  => $sModuleId . '/application/components',
     'core'        => $sModuleId . '/application/core',
+    'out'        => $sModuleId . '/out',
 //    'utils'       => $sModuleId . '/utils',
 //    'admin'       => $sModuleId . '/application/controllers/admin',
     'views'       => $sModuleId . '/application/views',
@@ -25,7 +26,7 @@ $aModule = array(
     'author'  => 'Mayflower GmbH',
     'email'   => 'info@mayflower.de',
     'extend'  => array(
-        'module_config' => $aPaths['controllers'] . '/admin/mf_Module_Config'
+        'module_config' => $aPaths['controllers'] . '/admin/mf_Module_Config',
     ),
     'files'       => array(
         'mfbepado'      => $aPaths['controllers'] . '/mfBepado.php',
@@ -49,6 +50,13 @@ $aModule = array(
     'events' => array(
         'onActivate'   => 'EventListener::onActivate',
     ),
+    'blocks' => array(
+        array(
+            'template' => 'article_extend.tpl',
+            'block'    => 'admin_article_extend_media',
+            'file'     => 'application/views/blocks/article_extend.tpl'
+        ),
+    )
 );
 
 
