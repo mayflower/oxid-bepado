@@ -19,6 +19,15 @@ class oxidProductFromShop implements ProductFromShop
 
     protected function _convertToBepadoSdkProduct($id)
     {
+        /** @var \oxConfig $oxShopConfig */
+        $oxShopConfig = oxRegistry::get('oxConfig');
+        $currencyArray = $oxShopConfig->getCurrencyArray();
+
+        $currency = array_filter($currencyArray, function ($item) {
+            return ($item['rate'] == '1.00');
+        });
+
+
         $sdkProduct = new Product();
 
         // load oxid article
@@ -39,9 +48,13 @@ class oxidProductFromShop implements ProductFromShop
         $sdkProduct->vendor = $oxProduct->getVendor()->oxvendor__oxtitle->value;
 
         //$sdkProduct->price = 1234;// Preis für Endkunden
+        $sdkProduct->price = $oxProduct->getPrice();
         //$sdkProduct->purchasePrice = 1234;// Nettoeinkaufspreis für Händler
+        $sdkProduct->purchasePrice = $oxProduct->getBasePrice();
         //$sdkProduct->currency = 'EUR';
+        $sdkProduct->currency = $currency[0]['name'];
         //$sdkProduct->availability = 0;
+        $sdkProduct->availability = $oxProduct->getStockStatus();
 
         $sdkProduct->images = $this->mapImages($oxProduct);
         $sdkProduct->categories = $this->mapCategories($oxProduct);
