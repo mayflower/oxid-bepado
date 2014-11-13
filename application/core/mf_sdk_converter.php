@@ -14,34 +14,35 @@ class mf_sdk_converter //implements ProductConverter
         $sdkProduct = new Product();
 
         /** @var \oxConfig $oShopConfig */
-        $oShopConfig  = oxRegistry::get('oxConfig');
+        $oShopConfig = oxRegistry::get('oxConfig');
         $currencyArray = $oShopConfig->getCurrencyArray();
 
-        $currency      = array_filter($currencyArray, function ($item) {
-            return ($item['rate'] == '1.00');
+        $currency = array_filter($currencyArray, function ($item) {
+            return ($item->rate === '1.00');
         });
+        $currency = array_shift($currency);
 
-        $sdkProduct->sourceId         = $oxProduct->getId();
-        $sdkProduct->title            = $oxProduct->oxarticles__oxtitle->value;
+        $sdkProduct->sourceId = $oxProduct->getId();
+        $sdkProduct->title = $oxProduct->oxarticles__oxtitle->value;
         $sdkProduct->shortDescription = $oxProduct->oxarticles__oxshortdesc->value;
-        $sdkProduct->longDescription  = $oxProduct->getLongDescription()->getRawValue();
-        $sdkProduct->vendor           = $oxProduct->getVendor()->oxvendor__oxtitle->value;
+        $sdkProduct->longDescription = $oxProduct->getLongDescription()->getRawValue();
+        $sdkProduct->vendor = $oxProduct->getVendor()->oxvendor__oxtitle->value;
+        $sdkProduct->vat = $oxProduct->getArticleVat() / 100;
         // Price is netto or brutto depending on ShopConfig
         if ('oxconfig__blEnterNetPrice' == 1) {
-            $sdkProduct->price         = $oxProduct->oxarticles__oxprice->value * (1 + $oxProduct->getArticleVat());
+            $sdkProduct->price = $oxProduct->oxarticles__oxprice->value * (1 + $sdkProduct->vat);
             $sdkProduct->purchasePrice = $oxProduct->oxarticles__oxbprice->value;
         } else {
-            $sdkProduct->price         = $oxProduct->oxarticles__oxprice->value;
-            $sdkProduct->purchasePrice = $oxProduct->oxarticles__oxbprice->value / (1 + $oxProduct->getArticleVat());
+            $sdkProduct->price = $oxProduct->oxarticles__oxprice->value;
+            $sdkProduct->purchasePrice = $oxProduct->oxarticles__oxbprice->value / (1 + $sdkProduct->vat);
         }
-        $sdkProduct->currency         = $currency[0]['name'];
-        $sdkProduct->availability     = $oxProduct->oxarticles__oxstock->value;
-        $sdkProduct->vat              = $oxProduct->getArticleVat();
+        $sdkProduct->currency = $currency->name;
+        $sdkProduct->availability = $oxProduct->oxarticles__oxstock->value;
 
-          /**               not fully implemented yet               */
-        $sdkProduct->images           = $this->mapImages($oxProduct);
-        $sdkProduct->categories       = $this->mapCategories($oxProduct);
-        $sdkProduct->attributes       = $this->mapAttributes($oxProduct);
+        /**               not fully implemented yet               */
+        $sdkProduct->images = $this->mapImages($oxProduct);
+        $sdkProduct->categories = $this->mapCategories($oxProduct);
+        $sdkProduct->attributes = $this->mapAttributes($oxProduct);
 
         return $sdkProduct;
     }
@@ -70,12 +71,12 @@ class mf_sdk_converter //implements ProductConverter
         } else {
             $aParams['oxarticles__oxprice'] = $sdkProduct->price * (1 + $sdkProduct->vat);
         }
-        $aParams['oxarticles__oxvat'] = $sdkProduct->vat;
+        $aParams['oxarticles__oxvat'] = $sdkProduct->vat * 100;
         // Currency: unit won't initialize currency object
         $aParams['oxarticles__oxstock'] = $sdkProduct->availability;
 
         $oxProduct->assign($aParams);
-        
+
         return $oxProduct;
     }
 
@@ -123,13 +124,13 @@ class mf_sdk_converter //implements ProductConverter
         ]);
 
         $attributes = array(
-            Product::ATTRIBUTE_WEIGHT             => $oxProduct->getWeight(),
-            Product::ATTRIBUTE_VOLUME             => $oxProduct->getSize(),
-            Product::ATTRIBUTE_DIMENSION          => $dimension,
-            Product::ATTRIBUTE_UNIT               => $oxProduct->getUnitName(),
+            Product::ATTRIBUTE_WEIGHT => $oxProduct->getWeight(),
+            Product::ATTRIBUTE_VOLUME => $oxProduct->getSize(),
+            Product::ATTRIBUTE_DIMENSION => $dimension,
+            Product::ATTRIBUTE_UNIT => $oxProduct->getUnitName(),
             // reference quantity is always 1 in oxid shop
             Product::ATTRIBUTE_REFERENCE_QUANTITY => 1,
-            Product::ATTRIBUTE_QUANTITY           => $oxProduct->getUnitQuantity(),
+            Product::ATTRIBUTE_QUANTITY => $oxProduct->getUnitQuantity(),
         );
         return $attributes;
     }
