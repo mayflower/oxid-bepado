@@ -37,6 +37,7 @@ $aModule = array(
 
         'mf_sdk_helper'    => $aPaths['core']. '/mf_sdk_helper.php',
         'mf_sdk_converter' => $aPaths['core']. '/mf_sdk_converter.php',
+        'EventListener'    => $aPaths['core'] .'/EventListener.php'
     ),
     'templates' => array(
         'mf_module_config.tpl'     => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl'
@@ -44,7 +45,10 @@ $aModule = array(
     'settings' => array(
         array('group' => 'main', 'name' => 'sBepadoLocalEndpoint', 'type' => 'str',  'value' => 'http://xxx.de/index.php?cl=mfbepado'),
         array('group' => 'main', 'name' => 'sBepadoApiKey',    'type' => 'str', 'value' => 'xxx'),
-    )
+    ),
+    'events' => array(
+        'onActivate'   => 'EventListener::onActivate',
+    ),
 );
 
 
