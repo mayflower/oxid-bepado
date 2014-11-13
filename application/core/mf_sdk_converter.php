@@ -26,13 +26,19 @@ class mf_sdk_converter //implements ProductConverter
         $sdkProduct->shortDescription = $oxProduct->oxarticles__oxshortdesc->value;
         $sdkProduct->longDescription  = $oxProduct->getLongDescription()->getRawValue();
         $sdkProduct->vendor           = $oxProduct->getVendor()->oxvendor__oxtitle->value;
-        $sdkProduct->price            = $oxProduct->getPrice()->getNettoPrice();
-        $sdkProduct->purchasePrice    = $oxProduct->oxarticles__oxbprice->value;;
+        // Price is netto or brutto depending on ShopConfig
+        if ('oxconfig__blEnterNetPrice' == 1) {
+            $sdkProduct->price         = $oxProduct->oxarticles__oxprice->value * (1 + $oxProduct->getArticleVat());
+            $sdkProduct->purchasePrice = $oxProduct->oxarticles__oxbprice->value;
+        } else {
+            $sdkProduct->price         = $oxProduct->oxarticles__oxprice->value;
+            $sdkProduct->purchasePrice = $oxProduct->oxarticles__oxbprice->value / (1 + $oxProduct->getArticleVat());
+        }
         $sdkProduct->currency         = $currency[0]['name'];
         $sdkProduct->availability     = $oxProduct->oxarticles__oxstock->value;
         $sdkProduct->vat              = $oxProduct->getArticleVat();
 
-          /**                 not implemented yet                 */
+          /**               not fully implemented yet               */
         $sdkProduct->images           = $this->mapImages($oxProduct);
         $sdkProduct->categories       = $this->mapCategories($oxProduct);
         $sdkProduct->attributes       = $this->mapAttributes($oxProduct);
@@ -49,21 +55,30 @@ class mf_sdk_converter //implements ProductConverter
     {
         /** @var oxarticle $oxProduct */
         $oxProduct = oxNew('oxarticle');
+        $aParams = [];
 
-        // ID: cannot be source ID, which has no representation in oxarticle object
-        // Title; oxarticle has no title or name property
-        // ShortDesc: oxarticle has no shortDesc property
-        $oxProduct->setArticleLongDesc($sdkProduct->longDescription);
+        $aParams['oxarticles__oxshopid'] = $sdkProduct->shopId;
+        $aParams['oxarticles__oxtitle'] = $sdkProduct->title;
+        $aParams['oxarticles__oxlongdesc'] = $sdkProduct->longDescription;
+        $aParams['oxarticles__oxshortdesc'] = $sdkProduct->shortDescription;
         // Vendor: vendor name no use, only vendorId can load vendor object
-        // Price: first set netto mode, then set price
-        $oxProduct->getPrice()->setNettoPriceMode();
-        $oxProduct->getPrice()->setPrice($sdkProduct->price);
-        $oxProduct->getPrice()->setVat($sdkProduct->vat);
-        // BasePrice: no setter..?
+
+        // Price is netto or brutto depending on ShopConfig
+        // PurchasePrice is calculated accordingly by Shop
+        if ('oxconfig__blEnterNetPrice' == 1) {
+            $aParams['oxarticles__oxprice'] = $sdkProduct->price;
+        } else {
+            $aParams['oxarticles__oxprice'] = $sdkProduct->price * (1 + $sdkProduct->vat);
+        }
+        $aParams['oxarticles__oxvat'] = $sdkProduct->vat;
         // Currency: unit won't initialize currency object
-        // StockStatus: var $_iStockStatus has no setter and is protected
+        $aParams['oxarticles__oxstock'] = $sdkProduct->availability;
 
-
+        $oxProduct->assign($aParams);
+        $oxProduct->setArticleLongDesc($this->_processLongDesc($aParams['oxarticles__oxlongdesc']));
+        $oxProduct = oxRegistry::get("oxUtilsFile")->processFiles($oxProduct);
+        $oxProduct->save();
+        
         return $oxProduct;
     }
 
