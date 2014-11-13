@@ -26,7 +26,9 @@ $aModule = array(
     'author'  => 'Mayflower GmbH',
     'email'   => 'info@mayflower.de',
     'extend'  => array(
-        'module_config' => $aPaths['controllers'] . '/admin/mf_Module_Config',
+        'module_config'  => $aPaths['controllers'] . '/admin/mf_Module_Config',
+        'article_extend' => $aPaths['controllers'] . '/admin/mf_bepado_Article_Extend',
+        'oxarticle'      => $aPaths['models'] . '/mf_bepado_oxarticle'
     ),
     'files'       => array(
         'mfbepado'      => $aPaths['controllers'] . '/mfBepado.php',
@@ -41,7 +43,7 @@ $aModule = array(
         'EventListener'    => $aPaths['core'] .'/EventListener.php'
     ),
     'templates' => array(
-        'mf_module_config.tpl'     => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl'
+        'mf_module_config.tpl'     => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl',
     ),
     'settings' => array(
         array('group' => 'main', 'name' => 'sBepadoLocalEndpoint', 'type' => 'str',  'value' => 'http://xxx.de/index.php?cl=mfbepado'),
