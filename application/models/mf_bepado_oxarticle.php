@@ -27,11 +27,14 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
 
         $config  = $this->getSdkHelper()->createSdkConfigFromOxid();
         $sdk = $this->getSdkHelper()->instantiateSdk($config);
-        $sdkProduct = new \Bepado\SDK\Struct\Verificator\Product(); # todo fix when converter is ready $this->getSdkProduktConverter();
-        if ($this->readyForExportToBepado()) {
+        $sdkProduct = $this->getSdkProduktConverter()->toBepadoProduct($this);
+
+        if ($this->readyForExportToBepado() && $this->productIsKnown($sdk, $sdkProduct)) {
             // todo look for existing products in the sdk
             $sdk->recordUpdate($sdkProduct);
-        } else {
+        } elseif (!$this->readyForExportToBepado() && $this->productIsKnown($sdk, $sdkProduct)) {
+            $sdk->recordDelete($sdkProduct);
+        } elseif ($this->readyForExportToBepado() && !$this->productIsKnown($sdk, $sdkProduct)) {
             $sdk->recordInsert($sdkProduct);
         }
 
@@ -60,13 +63,21 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         return $this->_oModuleSdkHelper;
     }
 
+    /**
+     * @return mf_sdk_converter
+     */
     private function getSdkProduktConverter()
     {
         if ($this->_oProductConverter === null) {
-            $this->_oModuleSdkHelper = oxNew('mf_sdk_converter');
+            $this->_oProductConverter = oxNew('mf_sdk_converter');
         }
 
+        return $this->_oProductConverter;
+    }
 
+    private function productIsKnown($sdk, $sdkProduct)
+    {
+        return true;
     }
 }
  

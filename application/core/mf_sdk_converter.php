@@ -17,8 +17,8 @@ class mf_sdk_converter //implements ProductConverter
         $oShopConfig = oxRegistry::get('oxConfig');
         $currencyArray = $oShopConfig->getCurrencyArray();
 
-        $currency = array_filter($currencyArray, function ($item) {
-            return ($item->rate === '1.00');
+        $currency     = array_filter($currencyArray, function ($item) {
+            return $item->rate === '1.00';
         });
         $currency = array_shift($currency);
 
