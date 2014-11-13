@@ -75,9 +75,6 @@ class mf_sdk_converter //implements ProductConverter
         $aParams['oxarticles__oxstock'] = $sdkProduct->availability;
 
         $oxProduct->assign($aParams);
-        $oxProduct->setArticleLongDesc($this->_processLongDesc($aParams['oxarticles__oxlongdesc']));
-        $oxProduct = oxRegistry::get("oxUtilsFile")->processFiles($oxProduct);
-        $oxProduct->save();
         
         return $oxProduct;
     }
