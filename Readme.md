@@ -21,6 +21,11 @@ sei [Composer-Doku]("https://getcomposer.org/doc/00-intro.md") zu empfehlen.
 
 Um den composer autoloader benutzen zu können muss man in der `functions.php` folgende Zeile hinzufügen:
 
+## 4 Module im Backend aktivieren
+
+Mit dem Aktivieren im Backend werden gleichzeitig die Tabellen, die das SDK benötigt und auch Änderungen an den Tabellen
+des Oxid Shops vorgenommen. Darum ist es danach von Nöten die Views zu updaten. (Services->Tools)
+
 ``` php
     require_once __DIR__."/bepado/vendor/autoload.php";
 ```
