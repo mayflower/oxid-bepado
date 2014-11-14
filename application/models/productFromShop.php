@@ -68,8 +68,16 @@ class oxidProductFromShop implements ProductFromShop
         $sdkShop = $order->orderShop;
 
         $orderValues = array();
+
+        // create the address data
         array_merge($orderValues, $this->convertAddress($order->billingAddress, 'bill'));
         array_merge($orderValues, $this->convertAddress($order->deliveryAddress, 'del'));
+
+        // create payment type
+        $oxPayment = oxRegistry::get('oxpayments');
+        $select = $oxPayment->buildSelectString(array('bepadopaymenttype' => $order->paymentType));
+        $result = $oxPayment->assignRecord($select);
+        $orderValues['oxorder_oxpaymentid'] = $result ? $result->getOxID() : null;
 
         // set shop id or handle for that
         // check if the providing shop is the current one
