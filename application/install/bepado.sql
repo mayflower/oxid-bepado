@@ -59,4 +59,5 @@ ALTER TABLE `bepado_shipping_costs`
     DROP PRIMARY KEY,
     ADD PRIMARY KEY (`sc_from_shop`, `sc_to_shop`);
 
-ALTER TABLE  oxarticles ADD exporttobepado BOOLEAN;
+ALTER TABLE oxarticles ADD exporttobepado BOOLEAN;
+ALTER TABLE oxpayments ADD bepadopaymenttype VARCHAR(100);
