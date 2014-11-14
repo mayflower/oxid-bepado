@@ -41,6 +41,18 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         return $return;
     }
 
+    public function delete($oxId = null)
+    {
+        $config  = $this->getSdkHelper()->createSdkConfigFromOxid();
+        $sdk = $this->getSdkHelper()->instantiateSdk($config);
+
+        if ($this->productIsKnown($oxId)) {
+            $sdk->recordDelete($oxId);
+        }
+
+        return parent::delete($oxId);
+    }
+
     /**
      * Decider if an article marked as "export to bebado" or not.
      *
