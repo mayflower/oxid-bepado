@@ -59,7 +59,9 @@ class oxidProductFromShop implements ProductFromShop
      */
     public function buy(Order $order)
     {
-        $products = $order->g
+        // Hier muss die Bepado Order in eine Oxid Bestellung umgewandelt
+        // werden. Rückgabewert ist die ID der Bestellung
+        //
         $oxOrder = oxNew('oxorder'); // ??
 
         return $oxOrder->getOxID();

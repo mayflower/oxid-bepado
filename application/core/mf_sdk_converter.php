@@ -43,11 +43,23 @@ class mf_sdk_converter //implements ProductConverter
         $sdkProduct->title = $oxProduct->oxarticles__oxtitle->value;
         $sdkProduct->shortDescription = $oxProduct->oxarticles__oxshortdesc->value;
         $sdkProduct->longDescription = $oxProduct->getLongDescription()->getRawValue();
-        $sdkProduct->vendor = $oxProduct->getVendor()->oxvendor__oxtitle->value;
+
+        $oShop = oxNew('oxshop');
+        $oShop->load($oShopConfig->getShopId());
+
+        // if no defined vendor, self is vendor
+        $vendorName = $oxProduct->getVendor()->oxvendor__oxtitle->value;
+        if ($vendorName) {
+            $sdkProduct->vendor = $vendorName;
+        } else {
+            $sdkProduct->vendor = $oShop->oxshops__oxname->value;
+        }
+
         $sdkProduct->vat = $oxProduct->getArticleVat() / 100;
         // Price is netto or brutto depending on ShopConfig
+        // PurchasePrice is not yet configured in Oxid so net price is taken
         $priceValue = (float) $oxProduct->oxarticles__oxprice->value;
-        if ('oxconfig__blEnterNetPrice' == 1) {
+        if ($oShopConfig->getConfigParam('blEnterNetPrice')) {
             $sdkProduct->price = $priceValue  * (1 + $sdkProduct->vat);
             $sdkProduct->purchasePrice = $priceValue;
         } else {
@@ -83,12 +95,12 @@ class mf_sdk_converter //implements ProductConverter
         // Vendor: vendor name no use, only vendorId can load vendor object
 
         // Price is netto or brutto depending on ShopConfig
-        // PurchasePrice is calculated accordingly by Shop
-        if ('oxconfig__blEnterNetPrice' == 1) {
+        if (oxRegistry::get('oxConfig')->getConfigParam('blEnterNetPrice')) {
             $aParams['oxarticles__oxprice'] = $sdkProduct->price;
         } else {
             $aParams['oxarticles__oxprice'] = $sdkProduct->price * (1 + $sdkProduct->vat);
         }
+        // PurchasePrice not yet configured in Oxid
         $aParams['oxarticles__oxvat'] = $sdkProduct->vat * 100;
         // Currency: unit won't initialize currency object
         $aParams['oxarticles__oxstock'] = $sdkProduct->availability;
@@ -144,7 +156,7 @@ class mf_sdk_converter //implements ProductConverter
 
         $attributes = array(
             Product::ATTRIBUTE_WEIGHT => $oxProduct->getWeight(),
-            Product::ATTRIBUTE_VOLUME => $oxProduct->getSize(),
+            Product::ATTRIBUTE_VOLUME => (string) $oxProduct->getSize(),
             Product::ATTRIBUTE_DIMENSION => $dimension,
             Product::ATTRIBUTE_UNIT => isset($this->oxidUnitMapper[$oxProduct->getUnitName()])
                 ? $this->oxidUnitMapper[$oxProduct->getUnitName()]
