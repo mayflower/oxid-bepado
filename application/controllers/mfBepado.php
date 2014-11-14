@@ -14,7 +14,12 @@ class mfBepado extends oxUbase {
 
         $sdkConfig = $this->getSdkHelper()->createSdkConfigFromOxid();
         $sdk = $this->getSdkHelper()->instantiateSdk($sdkConfig);
-        $sdk->handle(file_get_contents('php://input'), $_SERVER);
+        try {
+            echo $sdk->handle(file_get_contents('php://input'), $_SERVER);
+        } catch (\Exception $e) {
+            // todo do something
+        }
+
 
         return $this->_sThisTemplate;
     }
