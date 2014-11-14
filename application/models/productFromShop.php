@@ -5,9 +5,6 @@ use Bepado\SDK\Struct\Order;
 
 class oxidProductFromShop implements ProductFromShop
 {
-    /** @var  mf_sdk_converter */
-    private $_oModuleDskConverter;
-
     /**
      * @param array $ids
      *
@@ -16,6 +13,8 @@ class oxidProductFromShop implements ProductFromShop
     public function getProducts(array $ids)
     {
         $sdkProducts = array();
+        /** @var mf_sdk_converter $oModuleSDKConverter */
+        $oModuleSDKConverter = oxNew('mf_sdk_converter');
 
         foreach ($ids as $id) {
             // load oxid article
@@ -25,9 +24,11 @@ class oxidProductFromShop implements ProductFromShop
             $oxProduct = oxNew('oxarticle');
             $oxProduct->load($id);
 
-            // @TODO: check if article is marked for bepado
+            if (!$oxProduct->readyForExportToBepado()) {
+                continue;
+            }
 
-            $sdkProducts[] = $this->_oModuleDskConverter->toBepadoProduct($oxProduct);
+            $sdkProducts[] = $oModuleSDKConverter->toBepadoProduct($oxProduct);
         }
 
         return $sdkProducts;

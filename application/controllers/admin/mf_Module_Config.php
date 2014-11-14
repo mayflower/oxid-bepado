@@ -7,6 +7,7 @@ class mf_Module_Config extends mf_Module_Config_parent
     const API_KEY_SETTING_NAME = 'sBepadoApiKey';
 
     const MODULE_ID = 'bepado';
+    const API_URL_SETTING_NAME = 'sBepadoLocalEndpoint';
 
     private $_oModuleSdkHelper;
 
@@ -44,6 +45,8 @@ class mf_Module_Config extends mf_Module_Config_parent
                 foreach ($aConfVars as $sName => $sValue) {
                     if (self::API_KEY_SETTING_NAME === $sName) {
                         $sdkConfig->setApiKey($sValue);
+                    } elseif (self::API_URL_SETTING_NAME === $sValue) {
+                        $sdkConfig->setApiEndpointUrl($sValue);
                     }
                 }
             }
