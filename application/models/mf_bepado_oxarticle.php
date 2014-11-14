@@ -1,5 +1,6 @@
 <?php
 use Bepado\SDK\SDK;
+use Bepado\SDK\Struct\Product;
 
 /**
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
@@ -27,15 +28,14 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
 
         $config  = $this->getSdkHelper()->createSdkConfigFromOxid();
         $sdk = $this->getSdkHelper()->instantiateSdk($config);
-        $sdkProduct = $this->getSdkProduktConverter()->toBepadoProduct($this);
+        $oxProductId = $this->getFieldData('oxid');
 
-        if ($this->readyForExportToBepado() && $this->productIsKnown($sdk, $sdkProduct)) {
-            // todo look for existing products in the sdk
-            $sdk->recordUpdate($sdkProduct);
-        } elseif (!$this->readyForExportToBepado() && $this->productIsKnown($sdk, $sdkProduct)) {
-            $sdk->recordDelete($sdkProduct);
-        } elseif ($this->readyForExportToBepado() && !$this->productIsKnown($sdk, $sdkProduct)) {
-            $sdk->recordInsert($sdkProduct);
+        if ($this->readyForExportToBepado() && $this->productIsKnown($oxProductId)) {
+            $sdk->recordUpdate($oxProductId);
+        } elseif (!$this->readyForExportToBepado() && $this->productIsKnown($oxProductId)) {
+            $sdk->recordDelete($oxProductId);
+        } elseif ($this->readyForExportToBepado() && !$this->productIsKnown($oxProductId)) {
+            $sdk->recordInsert($oxProductId);
         }
 
         return $return;
@@ -48,7 +48,7 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
      */
     public function readyForExportToBepado()
     {
-        return 1 === $this->getFieldData(self::FIELDNAME_BEPADO_EXPORT);
+        return "1" === $this->getFieldData(self::FIELDNAME_BEPADO_EXPORT);
     }
 
     /**
@@ -63,21 +63,12 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         return $this->_oModuleSdkHelper;
     }
 
-    /**
-     * @return mf_sdk_converter
-     */
-    private function getSdkProduktConverter()
+    private function productIsKnown($oxProductId)
     {
-        if ($this->_oProductConverter === null) {
-            $this->_oProductConverter = oxNew('mf_sdk_converter');
-        }
+        $sql = "SELECT * FROM bepado_product WHERE `p_source_id` LIKE '" . $oxProductId."'";
+        $result = oxDb::getDb(true)->execute($sql);
 
-        return $this->_oProductConverter;
-    }
-
-    private function productIsKnown($sdk, $sdkProduct)
-    {
-        return true;
+        return count($result->getArray()) > 0;
     }
 }
  
