@@ -16,6 +16,7 @@ $aLang = array(
     'ARTICLE_MAIN_BEPADO'              => 'Artikel zum Export freigeben',
     'BEPADO_SETTINGS'                  => 'Einstellungen für Bepado',
     'HELP_ARTICLE_BEPADO_SETTINGS'     => 'Hier können Sie dieses Produkt zum Export nach Bepado freigeben.',
+
     'BEPADO_PAYMENT_TYPE'              => 'Bepado Zahlungsart',
     'HELP_BEPADO_PAYMENT_TYPE'         => 'Bitte wählen Sie eine Zahlungsart derer diese in Bepado entspricht',
 
@@ -26,4 +27,8 @@ $aLang = array(
     'BEPADO_PAYMENT_TYPE_'.Order::PAYMENT_PROVIDER     => 'Provider',
     'BEPADO_PAYMENT_TYPE_'.Order::PAYMENT_OTHER        => 'Sonstiges',
     'BEPADO_PAYMENT_TYPE_'.Order::PAYMENT_UNKNOWN      => 'Unbekannt',
+
+    'BEPADO_CATEGORY'                  => 'Bepado-Kategorie',
+    'HELP_BEPADO_CATEGORY'             => 'Hier stellen Sie ein, welche Bepado-Kategorie Ihrer Shop-Kategorie entspricht.'
 );
+

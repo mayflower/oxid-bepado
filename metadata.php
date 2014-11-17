@@ -46,7 +46,29 @@ $aModule = array(
         'VersionLayer460'       => $aPaths['core'] . '/VersionLayer460.php',
         'VersionLayer470'       => $aPaths['core'] . '/VersionLayer470.php',
         'VersionLayer500'       => $aPaths['core'] . '/VersionLayer500.php',
-        'VersionLayerFactory'   => $aPaths['core'] . '/VersionLayerFactory.php'
+        'VersionLayerFactory'   => $aPaths['core'] . '/VersionLayerFactory.php',
+    ),
+    'blocks' => array(
+        array(
+            'template' => 'article_extend.tpl',
+            'block'    => 'admin_article_extend_media',
+            'file'     => $aPaths['blocks'] . '/article_extend.tpl'
+        ),
+        array(
+            'template' => 'article_list.tpl',
+            'block'    => 'admin_article_list_item',
+            'file'     => $aPaths['blocks'] . '/article_list.tpl'
+        ),
+        array(
+            'template' => 'category_main.tpl',
+            'block'    => 'admin_category_main_form',
+            'file'     => $aPaths['blocks'] . '/category_main.tpl'
+        ),
+        array(
+            'template' => 'payment_main.tpl',
+            'block'    => 'admin_payment_main_fields',
+            'file'     => 'application/views/blocks/payment_main.tpl'
+        ),
     ),
     'templates' => array(
         'mf_module_config.tpl'  => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl',
@@ -74,23 +96,6 @@ $aModule = array(
     'events' => array(
         'onActivate'   => 'EventListener::onActivate',
     ),
-    'blocks' => array(
-        array(
-            'template' => 'article_extend.tpl',
-            'block'    => 'admin_article_extend_media',
-            'file'     => 'application/views/blocks/article_extend.tpl'
-        ),
-        array(
-            'template' => 'article_list.tpl',
-            'block'    => 'admin_article_list_item',
-            'file'     => $aPaths['blocks'] . '/article_list.tpl'
-        ),
-        array(
-            'template' => 'payment_main.tpl',
-            'block'    => 'admin_payment_main_fields',
-            'file'     => 'application/views/blocks/payment_main.tpl'
-        ),
-    )
 );
 
 

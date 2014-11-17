@@ -72,3 +72,5 @@ ALTER TABLE oxpayments ADD bepadopaymenttype VARCHAR(100);
 INSERT INTO oxgroups (`OXID`, `OXACTIVE`, `OXTITLE`) VALUES ('bepadoshopgroup', '0', 'Bepado Remote Shop');
 
 ALTER TABLE oxuser ADD bepadoshopid VARCHAR(100);
+
+
