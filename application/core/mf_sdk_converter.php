@@ -131,8 +131,9 @@ class mf_sdk_converter //implements ProductConverter
     {
         // not done
         // return array has wrong structure ([int, string, bool, [], [], bool, []])
+        // return $oxProduct->getPictureGallery();
 
-        return array(); // todo implement: $oxProduct->getPictureGallery();
+        return array(); // todo implement
     }
 
     /**
