@@ -16,7 +16,7 @@ $aLang = array(
     'BEPADO_SETTINGS'                  => 'Einstellungen für Bepado',
     'HELP_ARTICLE_BEPADO_SETTINGS'     => 'Hier können Sie dieses Produkt zum Export nach Bepado freigeben.',
     'BEPADO_PAYMENT_TYPE'              => 'Bepado Zahlungsart',
-    'HELP_BEPADO_PAYMENT_TYPE'         => 'Bitte tragen Sie hier einen der Shortcuts ein, die in Bepado als Zahlungtypen existieren.',
+    'HELP_BEPADO_PAYMENT_TYPE'         => 'Bitte wählen Sie eine Zahlungsart derer diese in Bepado entspricht',
 
     'BEPADO_PAYMENT_TYPE_'.Order::PAYMENT_ADVANCE      => 'Advanced',
     'BEPADO_PAYMENT_TYPE_'.Order::PAYMENT_INVOICE      => 'Rechnung',
