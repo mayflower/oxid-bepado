@@ -29,6 +29,6 @@ $aLang = array(
     'BEPADO_PAYMENT_TYPE_'.Order::PAYMENT_UNKNOWN      => 'Unbekannt',
 
     'BEPADO_CATEGORY'                  => 'Bepado-Kategorie',
-    'HELP_BEPADO_CATEGORY'             => 'Hier stellen Sie ein, welche Bepado-Kategorie Ihrer Shop-Kategorie entspricht.'
+    'HELP_BEPADO_CATEGORY'             => 'Hier stellen Sie ein, welche Bepado-Kategorie Ihrer Shop-Kategorie entspricht.',
+    'BEPADO_CATEGORY_SELECT'           => '-- keine --',
 );
-

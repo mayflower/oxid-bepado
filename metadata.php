@@ -28,7 +28,8 @@ $aModule = array(
         'module_config'         => $aPaths['controllers'] . '/admin/mf_Module_Config',
         'article_extend'        => $aPaths['controllers'] . '/admin/mf_article_extend',
         'article_list'          => $aPaths['controllers'] . '/admin/mf_article_list',
-        'oxarticle'             => $aPaths['models'] . '/mf_bepado_oxarticle'
+        'category_main'         => $aPaths['controllers'] . '/admin/mf_category_main',
+        'oxarticle'             => $aPaths['models'] . '/mf_bepado_oxarticle',
     ),
     'files'   => array(
         'mfbepado'              => $aPaths['controllers'] . '/mfBepado.php',
@@ -62,7 +63,7 @@ $aModule = array(
         array(
             'template' => 'category_main.tpl',
             'block'    => 'admin_category_main_form',
-            'file'     => $aPaths['blocks'] . '/category_main.tpl'
+            'file'     => $aPaths['blocks'] . '/mf_category_main.tpl'
         ),
         array(
             'template' => 'payment_main.tpl',

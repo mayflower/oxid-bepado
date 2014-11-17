@@ -73,4 +73,3 @@ INSERT INTO oxgroups (`OXID`, `OXACTIVE`, `OXTITLE`) VALUES ('bepadoshopgroup', 
 
 ALTER TABLE oxuser ADD bepadoshopid VARCHAR(100);
 
-
