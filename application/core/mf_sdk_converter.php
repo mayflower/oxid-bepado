@@ -70,11 +70,12 @@ class mf_sdk_converter //implements ProductConverter
         }
         $sdkProduct->currency = $currency->name;
         $sdkProduct->availability = $oxProduct->oxarticles__oxstock->value;
+
         $sdkProduct->categories = $oxProduct->getCategory()->oxcategories__bepadocategory->value;
+        $sdkProduct->attributes = $this->mapAttributes($oxProduct);
 
         /**               not fully implemented yet               */
         $sdkProduct->images = $this->mapImages($oxProduct);
-        $sdkProduct->attributes = $this->mapAttributes($oxProduct);
 
         return $sdkProduct;
     }
