@@ -9,7 +9,7 @@
 <td valign="top" class="[{ $listclass}][{if $listitem->oxarticles__oxactive->value == 1}] active[{/if}]" height="15">
     <div class="listitemfloating">
         [{if $listitem->oxarticles__exporttobepado->value == 1}]
-            <img src="[{$oViewConf->getModuleUrl("bepado")}]application/out/src/img/bepado.gif"
+            <img src="[{$oViewConf->getModuleUrl("bepado")}]application/out/src/img/bepado.png"
                  alt="Bepado"
                  height="13px"
                  align="center"/>

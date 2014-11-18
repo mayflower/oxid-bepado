@@ -40,9 +40,9 @@ class mf_sdk_converter //implements ProductConverter
             return $item->rate === '1.00';
         });
         $currency = array_shift($currency);
-
         $sdkProduct->sourceId = $oxProduct->getId();
         $sdkProduct->ean = $oxProduct->oxarticles__oxean->value;
+        $sdkProduct->url = $oxProduct->getLink();
         $sdkProduct->title = $oxProduct->oxarticles__oxtitle->value;
         $sdkProduct->shortDescription = $oxProduct->oxarticles__oxshortdesc->value;
         $sdkProduct->longDescription = $oxProduct->getLongDescription()->getRawValue();
@@ -76,7 +76,6 @@ class mf_sdk_converter //implements ProductConverter
         $sdkProduct->categories = $this->mapCategories($oxProduct);
         $sdkProduct->attributes = $this->mapAttributes($oxProduct);
 
-        // articleUrl?
         // deliveryDate
         // deliveryWorkDays
 

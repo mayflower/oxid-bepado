@@ -53,12 +53,12 @@ $aModule = array(
         array(
             'template' => 'article_extend.tpl',
             'block'    => 'admin_article_extend_media',
-            'file'     => $aPaths['blocks'] . '/article_extend.tpl'
+            'file'     => $aPaths['blocks'] . '/mf_article_extend.tpl'
         ),
         array(
             'template' => 'article_list.tpl',
             'block'    => 'admin_article_list_item',
-            'file'     => $aPaths['blocks'] . '/article_list.tpl'
+            'file'     => $aPaths['blocks'] . '/mf_article_list.tpl'
         ),
         array(
             'template' => 'category_main.tpl',
