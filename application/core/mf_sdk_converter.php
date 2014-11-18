@@ -42,6 +42,7 @@ class mf_sdk_converter //implements ProductConverter
         $currency = array_shift($currency);
 
         $sdkProduct->sourceId = $oxProduct->getId();
+        $sdkProduct->ean = $oxProduct->oxarticles__oxean->value;
         $sdkProduct->title = $oxProduct->oxarticles__oxtitle->value;
         $sdkProduct->shortDescription = $oxProduct->oxarticles__oxshortdesc->value;
         $sdkProduct->longDescription = $oxProduct->getLongDescription()->getRawValue();
@@ -71,11 +72,13 @@ class mf_sdk_converter //implements ProductConverter
         $sdkProduct->currency = $currency->name;
         $sdkProduct->availability = $oxProduct->oxarticles__oxstock->value;
 
-        $sdkProduct->categories = $oxProduct->getCategory()->oxcategories__bepadocategory->value;
+        $sdkProduct->images = $this->mapImages($oxProduct);
+        $sdkProduct->categories = $this->mapCategories($oxProduct);
         $sdkProduct->attributes = $this->mapAttributes($oxProduct);
 
-        /**               not fully implemented yet               */
-        $sdkProduct->images = $this->mapImages($oxProduct);
+        // articleUrl?
+        // deliveryDate
+        // deliveryWorkDays
 
         return $sdkProduct;
     }
@@ -91,16 +94,27 @@ class mf_sdk_converter //implements ProductConverter
         $oxProduct = oxNew('oxarticle');
         $aParams = [];
 
+        /** @var \oxConfig $oShopConfig */
+        $oShopConfig = oxRegistry::get('oxConfig');
+        $currencyArray = $oShopConfig->getCurrencyArray();
+
+        $currency     = array_filter($currencyArray, function ($item, $sdkProduct) {
+            return $item->unit === $sdkProduct->currency;
+        });
+        $currency = array_shift($currency);
+        $rate = $currency->rate;
+
         $aParams['oxarticles__oxshopid'] = $sdkProduct->shopId;
+        $aParams['oxarticles__oxean'] = $sdkProduct->ean;
+        $aParams['oxarticles__oxexturl'] = $sdkProduct->url;
         $aParams['oxarticles__oxtitle'] = $sdkProduct->title;
-        $aParams['oxarticles__oxlongdesc'] = $sdkProduct->longDescription;
         $aParams['oxarticles__oxshortdesc'] = $sdkProduct->shortDescription;
 
         // Price is netto or brutto depending on ShopConfig
-        if ($this->getVersionLayer()->getConfig()->getConfigParam('blEnterNetPrice')) {
-            $aParams['oxarticles__oxprice'] = $sdkProduct->price;
+        if (oxRegistry::get('oxConfig')->getConfigParam('blEnterNetPrice')) {
+            $aParams['oxarticles__oxprice'] = $sdkProduct->price * $rate;
         } else {
-            $aParams['oxarticles__oxprice'] = $sdkProduct->price * (1 + $sdkProduct->vat);
+            $aParams['oxarticles__oxprice'] = $sdkProduct->price * (1 + $sdkProduct->vat) * $rate;
         }
         $aParams['oxarticles__oxvat'] = $sdkProduct->vat * 100;
         $aParams['oxarticles__oxstock'] = $sdkProduct->availability;
@@ -108,12 +122,22 @@ class mf_sdk_converter //implements ProductConverter
             $aParams['oxarticles__oxunitname'] = $sdkProduct->attributes[Product::ATTRIBUTE_UNIT];
         }
 
+        //attributes
+        $aParams['oxarticles__oxunitname'] = $sdkProduct->attributes['unit'];
+        $aParams['oxarticles__oxunitquantity'] = $sdkProduct->attributes['quantity'];
+        $aParams['oxarticles__oxweight'] = $sdkProduct->attributes['weight'];
+
+        $aDimension = explode('x', $sdkProduct->attributes['dimension']);
+        $aParams['oxarticles__oxlength'] = $aDimension[0];
+        $aParams['oxarticles__oxwidth'] = $aDimension[1];
+        $aParams['oxarticles__oxheight'] = $aDimension[2];
+
+
         /**
          * Vendor: vendor name no use, only id can load vendor object
          * PurchasePrice has no equivalent in oxid
-         * Currency: unit won't initialize currency object
+         * LongDescription not part of oxarticle but of oxartextends
          * Images
-         * Attributes
          * Category: category name no use id can load category object
          */
 
@@ -129,11 +153,37 @@ class mf_sdk_converter //implements ProductConverter
      */
     private function mapImages($oxProduct)
     {
-        // not done
-        // return array has wrong structure ([int, string, bool, [], [], bool, []])
-        // return $oxProduct->getPictureGallery();
+        $aImage = [];
 
-        return array(); // todo implement
+        for ($i = 1; $i <= 12; $i++) {
+            if ($oxProduct->{"oxarticles__oxpic$i"}->value) {
+                $aImage[] = $oxProduct->getPictureUrl($i);
+            }
+        }
+
+        return $aImage;
+    }
+
+    /**
+     * @param oxarticle $oxProduct
+     *
+     * @return array
+     */
+    private function mapCategories($oxProduct)
+    {
+        $aCategory = [];
+
+        $category = oxNew('oxcategory');
+        $aIds = $oxProduct->getCategoryIds();
+
+
+        foreach ($aIds as $id) {
+            $category->load($id);
+
+            $aCategory[] = $category->oxcategories__bepadocategory->value;
+        }
+
+        return $aCategory;
     }
 
     /**
