@@ -7,12 +7,7 @@ class mf_category_main extends mf_category_main_parent
 
     public function render()
     {
-        $sdkConfig = $this->getSdkHelper()->createSdkConfigFromOxid();
-        $sdk = $this->getSdkHelper()->instantiateSdk($sdkConfig);
-        $categories = $sdk->getCategories();
-
-        // placeholder till functionality above has results
-        $categories = ['home', 'garden', 'hobby', 'work'];
+        $categories = $this->getGoogleCategories();
 
         if (!isset($categories)) {
             $categories = [];
@@ -34,5 +29,9 @@ class mf_category_main extends mf_category_main_parent
         }
 
         return $this->_oModuleSdkHelper;
+    }
+
+    private function getGoogleCategories() {
+        return file(__DIR__."/../../install/taxonomy.de_DE.txt");
     }
 }
