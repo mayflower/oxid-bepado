@@ -1,11 +1,16 @@
 <?php
 
 use Bepado\SDK\ProductFromShop;
+use Bepado\SDK\SDK;
+use Bepado\SDK\SecurityException;
 use Bepado\SDK\Struct\Address;
 use Bepado\SDK\Struct\Order;
+use Bepado\SDK\Struct\OrderItem;
 
 class oxidProductFromShop implements ProductFromShop
 {
+    const BEPADO_USERGROUP_ID = 'bepadoshopgroup';
+
     /**
      * @param array $ids
      *
@@ -35,6 +40,28 @@ class oxidProductFromShop implements ProductFromShop
         return $sdkProducts;
     }
 
+    public function getShopProducts(array $ids)
+    {
+        $shopProducts = array();
+
+        foreach ($ids as $id) {
+            // load oxid article
+            /**
+             * @var oxarticle $oxProduct
+             */
+            $oxProduct = oxNew('oxarticle');
+            $oxProduct->load($id);
+
+            if (!$oxProduct->readyForExportToBepado() || !$oxProduct->isLoaded()) {
+                continue;
+            }
+
+            $shopProducts[] = $oxProduct;
+        }
+
+        return $shopProducts;
+    }
+
     /**
      * @throws \BadMethodCallException
      *
@@ -60,34 +87,45 @@ class oxidProductFromShop implements ProductFromShop
      */
     public function buy(Order $order)
     {
-        // Hier muss die Bepado Order in eine Oxid Bestellung umgewandelt
-        // werden. Rückgabewert ist die ID der Bestellung
-        //
-        $oxOrder = oxNew('oxorder'); // ??
-        $products = $order->orderItems;
-        $sdkShop = $order->orderShop;
+        /** @var mf_sdk_helper $sdkHelper */
+        $sdkHelper = oxNew('mf_sdk_helper');
+        $sdkConfig = $sdkHelper->createSdkConfigFromOxid();
+        $sdk = $sdkHelper->instantiateSdk($sdkConfig);
 
-        $orderValues = array();
+        // create user and "login" - create a session entry
+        $shopUser = $this->getOrCreateUser($order, $sdk);
 
-        // create the address data
-        array_merge($orderValues, $this->convertAddress($order->billingAddress, 'bill'));
-        array_merge($orderValues, $this->convertAddress($order->deliveryAddress, 'del'));
+        // assign the delivery address to the shop user
+        $deliveryAddress = $this->convertAddress($order->deliveryAddress);
+        $oxDeliveryAddress = oxNew('oxaddress');
+        $oxDeliveryAddress->assign($deliveryAddress);
+        $oxDeliveryAddress->oxaddress__oxuserid = new oxField($shopUser->getId(), oxField::T_RAW);
+        $oxDeliveryAddress->oxaddress__oxcountry = $shopUser->getUserCountry($deliveryAddress['oxaddress__oxcountry']);
+        $oxDeliveryAddress->save();
+        $_POST['sDeliveryAddressMD5'] = $shopUser->getEncodedDeliveryAddress().$oxDeliveryAddress->getEncodedDeliveryAddress();
+        $_POST['deladrid'] = $oxDeliveryAddress->getId();
 
-        // create payment type
-        $oxPayment = oxRegistry::get('oxpayments');
-        $select = $oxPayment->buildSelectString(array('bepadopaymenttype' => $order->paymentType));
-        $result = $oxPayment->assignRecord($select);
-        $orderValues['oxorder_oxpaymentid'] = $result ? $result->getOxID() : null;
+        // add all order items to a basket
+        $oxBasket = $this->getSession()->getBasket();
+        $this->addToBasket($order->orderItems, $oxBasket);
 
-        // set shop id or handle for that
-        // check if the providing shop is the current one
-        // handle provided id????
+        $oxPaymentID = $this->createPaymentID($order);
+        if (!$oxPaymentID) {
+            return false;
+        }
 
+        $oxBasket->setPayment($oxPaymentID);
 
         $oxOrder = oxNew('oxorder');
-        $oxOrder->assign($orderValues);
+        try {
+            $iSuccess = $oxOrder->finalizeOrder($oxBasket, $shopUser);
 
-        return $oxOrder->getOxID();
+            $shopUser->onOrderExecute($oxBasket, $iSuccess);
+
+            return $oxOrder->getId();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
@@ -99,39 +137,159 @@ class oxidProductFromShop implements ProductFromShop
      *
      * @return array
      */
-    private function convertAddress(Address $address, $type)
+    private function convertAddress(Address $address, $type = 'oxaddress__ox')
     {
         $oxCountry = oxRegistry::get('oxcountry');
         $select = $oxCountry->buildSelectString(array('OXISOALPHA3' => $address->country, 'OXACTIVE' => 1));
-        $result =$oxCountry->assignRecord($select);
-        $oxCountryId = $result ? $result->getOxID(): null;
+        $countryID = oxDb::getDb(true)->getOne($select);
+        $oxCountryId = $countryID ?: null;
 
         $oxState = oxRegistry::get('oxstate');
         $select = $oxState->buildSelectString(array('OXTITLE' => $address->state));
-        $result = $oxState->assignRecord($select);
-        $oxStateId = $oxState ? $result->getOxID() : null;
+        $stateID = oxDb::getDb(true)->getOne($select);
+        $oxStateId = $stateID ?: null;
 
         $oxAddress = array(
-            'oxorder__ox'.$type.'company'   => $address->company,
-            'oxorder__oxxbilfname'     => $address->firstName.(
+            $type.'company'   => $address->company,
+            $type.'fname'     => $address->firstName.(
                 strlen($address->middleName) > 0
                     ? ' '.$address->middleName
                     : ''
                 ),
-            'oxorder__ox'.$type.'name'      => $address->surName,
-            'oxorder__ox'.$type.'street'    => $address->street,
-            'oxorder__ox'.$type.'streetnr'  => $address->streetNumber,
-            'oxorder__ox'.$type.'addinfo'   => $address->additionalAddressLine,
-            'oxorder__ox'.$type.'ustid'     => null,
-            'oxorder__ox'.$type.'city'      => $address->city,
-            'oxorder__ox'.$type.'countryid' => $oxCountryId,
-            'oxorder__ox'.$type.'stateid'   => $oxStateId,
-            'oxorder__ox'.$type.'zip'       => $address->zip,
-            'oxorder__ox'.$type.'fax'       => null,
-            'oxorder__ox'.$type.'sal'       => null,
+            $type.'lname'      => $address->surName,
+            $type.'street'    => $address->street,
+            $type.'streetnr'  => $address->streetNumber,
+            $type.'addinfo'   => $address->additionalAddressLine,
+            $type.'ustid'     => null,
+            $type.'city'      => $address->city,
+            $type.'countryid' => $oxCountryId,
+            $type.'stateid'   => $oxStateId,
+            $type.'zip'       => $address->zip,
+            $type.'fax'       => null,
+            $type.'sal'       => null,
+            $type.'fon'       => $address->phone,
+            $type.'email'     => $address->email,
         );
 
         return $oxAddress;
+    }
+
+    /**
+     * Create the payment ID from the mapped payment data.
+     *
+     * @param Order $order
+     *
+     * @return array
+     */
+    private function createPaymentID(Order $order)
+    {
+        $oxPayment = oxRegistry::get('oxpayment');
+        $select = $oxPayment->buildSelectString(array('bepadopaymenttype' => $order->paymentType));
+        $paymentID = oxDb::getDb(true)->getOne($select);
+
+        return $paymentID ?: null;
+    }
+
+    /**
+     * By using the convertet this method creates a set of oxArticles.
+     *
+     * @param OrderItem[]|array $orderItems
+     *
+     * @param oxBasket $oxBasket
+     *
+     * @throws Exception
+     * @throws null
+     * @throws oxArticleInputException
+     * @throws oxNoArticleException
+     * @throws oxOutOfStockException
+     * @return array|oxArticle[]
+     */
+    private function addToBasket(array $orderItems, oxBasket $oxBasket)
+    {
+        $products = array();
+        foreach ($orderItems as $item) {
+            $products[$item->product->sourceId] = array(
+                'product' => $item->product,
+                'count'   => $item->count,
+            );
+        }
+
+
+        $oxProducts = $this->getShopProducts(array_keys($products));
+        foreach ($oxProducts as $oxProduct) {
+            $amount = $products[$oxProduct->getId()]['count'];
+            $oxBasket->addToBasket($oxProduct->getId(), $amount);
+            $oxBasket->calculateBasket(true);
+        }
+    }
+
+    /**
+     * @param Order $order
+     * @param SDK $sdk
+     *
+     * @return oxUser
+     */
+    private function getOrCreateUser(Order $order, SDK $sdk)
+    {
+        $shopId = $order->providerShop;
+        $shop = $sdk->getShop($shopId);
+
+        if (!$shop) {
+            throw new SecurityException(sprintf('Shop with id %s not known', $shopId));
+        }
+
+        $oxGroup = oxNew('oxgroups');
+        if (!$oxGroup->load(self::BEPADO_USERGROUP_ID)) {
+            throw new \RuntimeException('No user group for bepado remote shop found.');
+        }
+
+        /** @var oxUser $oxUser */
+        $oxUser = oxNew('oxuser');
+        $select = $oxUser->buildSelectString(array('bepadoshopid' => $shopId, 'OXACTIVE' => 1));
+        $oxUser->assignRecord($select);
+
+        // creates the shop as an user if it does not exist
+        if (!$oxUser->isLoaded()) {
+            $values = array(
+                'oxuser__oxusername' => $shopId,
+                'oxuser__oxurl'      => $shop->url,
+                'bepadoshopid'       => $shopId,
+                'oxuser__oxactive'   => true,
+            );
+            $values = array_merge($values, $this->convertAddress($order->billingAddress, 'oxuser__ox'));
+            $oxUser->assign($values);
+            $oxUser->addToGroup(self::BEPADO_USERGROUP_ID);
+
+            $oxUser->save();
+        }
+
+        return $oxUser;
+    }
+
+    /**
+     * Creates the session object.
+     *
+     * @return oxSession
+     */
+    private function getSession()
+    {
+        return oxRegistry::getSession();
+    }
+
+    /**
+     * @return oxbasket
+     */
+    private function getBasket()
+    {
+        return $this->getSession()->getBasket();
+    }
+
+    /**
+     * @return oxConfig
+     */
+    private function getConfig()
+    {
+        return oxRegistry::getConfig();
     }
 }
 

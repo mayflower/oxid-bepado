@@ -29,7 +29,9 @@ $aModule = array(
         'oxarticle'      => $aPaths['models'] . '/mf_bepado_oxarticle'
     ),
     'files'       => array(
-        'mfbepado'      => $aPaths['controllers'] . '/mfBepado.php',
+        'mfbepado'       => $aPaths['controllers'] . '/mfBepado.php',
+        'testController' => $aPaths['controllers'] . '/testController.php',
+
         'mfcmp_bepado'  => $aPaths['components'] . '/mfcmp_bepado.php',
 
         'oxidproductfromshop' => $aPaths['models'] . '/productFromShop.php',
@@ -65,6 +67,11 @@ $aModule = array(
             'template' => 'article_extend.tpl',
             'block'    => 'admin_article_extend_media',
             'file'     => 'application/views/blocks/article_extend.tpl'
+        ),
+        array(
+            'template' => 'article_list.tpl',
+            'block'    => 'admin_article_list_item',
+            'file'     => $aPaths['blocks'] . '/article_list.tpl'
         ),
         array(
             'template' => 'payment_main.tpl',
