@@ -87,6 +87,8 @@ class oxidProductFromShop implements ProductFromShop
      */
     public function buy(Order $order)
     {
+        $this->getSession()->delBasket();
+
         /** @var mf_sdk_helper $sdkHelper */
         $sdkHelper = oxNew('mf_sdk_helper');
         $sdkConfig = $sdkHelper->createSdkConfigFromOxid();
@@ -116,12 +118,20 @@ class oxidProductFromShop implements ProductFromShop
 
         $oxBasket->setPayment($oxPaymentID);
 
+        // create shipping costs
+        $shippingCosts = $sdk->calculateShippingCosts($order);
+        $oxBasket->setDeliveryPrice($shippingCosts->shippingCosts);
+        /** @var oxPrice $oxPrice */
+        $oxPrice = oxNew('oxPrice');
+        $oxPrice->setPrice($shippingCosts->grossShippingCosts, ((100*$shippingCosts->grossShippingCosts/$shippingCosts->shippingCosts))/100 - 1);
+        $oxBasket->setCost('oxdelivery', $oxPrice);
         $oxOrder = oxNew('oxorder');
         try {
             $iSuccess = $oxOrder->finalizeOrder($oxBasket, $shopUser);
 
             $shopUser->onOrderExecute($oxBasket, $iSuccess);
 
+            $this->cleanUp();
             return $oxOrder->getId();
         } catch (\Exception $e) {
             return false;
@@ -290,6 +300,12 @@ class oxidProductFromShop implements ProductFromShop
     private function getConfig()
     {
         return oxRegistry::getConfig();
+    }
+
+    private function cleanUp()
+    {
+        $this->getSession()->delBasket();
+        unset($_POST['sDeliveryAddressMD5'], $_POST['deladrid']);
     }
 }
 

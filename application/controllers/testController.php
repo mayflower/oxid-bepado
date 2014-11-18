@@ -1,4 +1,6 @@
 <?php
+use Bepado\SDK\ShippingCosts\Rule\WeightDecorator;
+
 /**
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
@@ -11,6 +13,7 @@ class testController extends oxUbase
         $order->shippingCosts = 100;
         $order->grossShippingCosts = 119;
         $order->providerShop = 'test_shop';
+        $order->shippingRule = new WeightDecorator();
 
         $billAddress = new \Bepado\SDK\Struct\Address();
         $billAddress->state = 'bavaria';
@@ -33,6 +36,9 @@ class testController extends oxUbase
         $product->shopId = 'test_shop';
         $product->currency = 'EUR';
         $product->price = 99.99;
+        $product->purchasePrice = 80.99;
+        $product->availability = 10;
+        $product->vendor = 'mine';
         $product->title = 'Great article';
         $product->shortDescription = 'This is a short Description';
         $product->url = "http://www.some-url.de";
