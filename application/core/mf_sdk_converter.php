@@ -193,17 +193,17 @@ class mf_sdk_converter //implements ProductConverter
      */
     private function mapAttributes($oxProduct)
     {
-        $dimension = sprintf(
+        $sDimension = sprintf(
             '%sx%sx%s',
             $oxProduct->oxarticles__oxlength->value,
             $oxProduct->oxarticles__oxwidth->value,
             $oxProduct->oxarticles__oxheight->value
         );
 
-        $attributes = array(
+        $aAttributes = array(
             Product::ATTRIBUTE_WEIGHT => $oxProduct->getWeight(),
             Product::ATTRIBUTE_VOLUME => (string) $oxProduct->getSize(),
-            Product::ATTRIBUTE_DIMENSION => $dimension,
+            Product::ATTRIBUTE_DIMENSION => $sDimension,
             // reference quantity is always 1 in oxid shop
             Product::ATTRIBUTE_REFERENCE_QUANTITY => 1,
             Product::ATTRIBUTE_QUANTITY => $oxProduct->getUnitQuantity(),
@@ -215,7 +215,7 @@ class mf_sdk_converter //implements ProductConverter
         }
 
 
-        return $attributes;
+        return $aAttributes;
     }
 
     /**
