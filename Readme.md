@@ -30,8 +30,11 @@ Um den composer autoloader benutzen zu können muss man in der `functions.php` f
 Mit dem Aktivieren im Backend werden gleichzeitig die Tabellen, die das SDK benötigt und auch Änderungen an den Tabellen
 des Oxid Shops vorgenommen. Darum ist es danach von Nöten die Views zu updaten. (Services->Tools)
 
+## 5 Produktiv/DemoMode
 
-## 4 Alte Doku (TODO fix that)
+Frisch installiert kommuniziert die SDK mit der Sandbox von Bepado. Um auf Live umzustellen kann man dies in den allg. ModuleSettings tun.
+
+## 6 Alte Doku (TODO fix that)
 
 2. $this->aUserComponents['mfcmp_bepado'] = 0
 3. $this->iDebug = true
