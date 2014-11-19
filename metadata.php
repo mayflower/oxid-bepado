@@ -27,6 +27,7 @@ $aModule = array(
     'extend'  => array(
         'module_config'         => $aPaths['controllers'] . '/admin/mf_Module_Config',
         'article_extend'        => $aPaths['controllers'] . '/admin/mf_article_extend',
+        'article_list'          => $aPaths['controllers'] . '/admin/mf_article_list',
         'oxarticle'             => $aPaths['models'] . '/mf_bepado_oxarticle'
     ),
     'files'   => array(

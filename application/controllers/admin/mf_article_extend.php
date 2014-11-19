@@ -53,7 +53,7 @@ class mf_article_extend extends mf_article_extend_parent
         /** @var oxBase $oBepadoProductState */
         $oBepadoProductState = oxNew('oxbase');
         $oBepadoProductState->init('bepado_product_state');
-        $select = $oBepadoProductState->buildSelectString(array('p_source_id' => $oxArticleId, 'shop_id' => self::SHOP_ID_LOCAL));
+        $select = $oBepadoProductState->buildSelectString(array('p_source_id' => $oxArticleId, 'shop_id' => SDKConfig::SHOP_ID_LOCAL));
         $id = $this->getVersionLayer()->getDb(true)->getOne($select);
         $oBepadoProductState->load($id);
 

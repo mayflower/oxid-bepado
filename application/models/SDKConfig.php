@@ -8,6 +8,8 @@ class SDKConfig
 
     const ARTICLE_STATE_IMPORTED = 2;
 
+    const SHOP_ID_LOCAL = '_self_';
+
     /**
      * @var
      */

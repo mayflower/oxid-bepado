@@ -12,8 +12,6 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
      */
     private $_oVersionLayer;
 
-    const FIELDNAME_BEPADO_EXPORT = 'exporttobepado';
-
     /**
      * @var mf_sdk_helper
      */
@@ -65,7 +63,15 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
      */
     public function readyForExportToBepado()
     {
-        return "1" === $this->getFieldData(self::FIELDNAME_BEPADO_EXPORT);
+        $id = $this->getId();
+        /** @var oxBase $oBepadoProductState */
+        $oBepadoProductState = oxNew('oxbase');
+        $oBepadoProductState->init('bepado_product_state');
+        $select = $oBepadoProductState->buildSelectString(array('p_source_id' => $id, 'shop_id' => SDKConfig::SHOP_ID_LOCAL));
+        $id = $this->getVersionLayer()->getDb(true)->getOne($select);
+        $oBepadoProductState->load($id);
+
+        return $oBepadoProductState->isLoaded();
     }
 
     /**
