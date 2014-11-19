@@ -15,6 +15,11 @@ class SDKConfig
     private $apiEndpointUrl;
 
     /**
+     * @var string
+     */
+    private $prodMode;
+
+    /**
      * @return mixed
      */
     public function getApiEndpointUrl()
@@ -44,6 +49,22 @@ class SDKConfig
     public function setApiKey($apiKey)
     {
         $this->apiKey = $apiKey;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProdMode()
+    {
+        return $this->prodMode;
+    }
+
+    /**
+     * @param string $urlHost
+     */
+    public function setProdMode($urlHost)
+    {
+        $this->prodMode = $urlHost;
     }
 }
  
