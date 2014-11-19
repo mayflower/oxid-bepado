@@ -62,6 +62,12 @@ $aModule = array(
             'type'  => 'str',
             'value' => 'xxx'
         ),
+        array(
+            'group' => 'main',
+            'name'  => 'prodMode',
+            'type'  => 'bool',
+            'value' => false,
+        ),
     ),
     'events' => array(
         'onActivate'   => 'EventListener::onActivate',

@@ -42,8 +42,9 @@ class mf_Module_Config extends mf_Module_Config_parent
      */
     public function saveConfVars()
     {
+        parent::saveConfVars();
         if (!$this->isBepadoModule()) {
-            parent::saveConfVars();
+            return;
         }
 
         $oConfig = $this->getConfig();
@@ -64,12 +65,9 @@ class mf_Module_Config extends mf_Module_Config_parent
 
         if ($this->verifyAtSdk($sdkConfig)) {
             $this->isVerified = true;
-            parent::saveConfVars();
         } else {
             $this->isVerified = false;
         }
-
-
     }
 
     /**
