@@ -73,11 +73,29 @@ class oxidProductFromShop implements ProductFromShop
     }
 
     /**
+     * Oxid does not support reservations at all, so we will just check the order
+     * and validates its stocks.
+     *
      * @param Order $order
+     *
+     * @throws Exception
      */
     public function reserve(Order $order)
     {
-        // not using explicit reservation handling.
+        /** @var oxBasket $oxBasket */
+        $oxBasket = oxNew('oxbasket');
+        $this->addToBasket($order->orderItems, $oxBasket);
+        if ($oxBasket->getProductsCount() === 0) {
+            throw new Exception('No valid products in basket');
+        }
+
+        /** @var oxOrder $oxOrder */
+        $oxOrder = oxNew('oxorder');
+        $stockValidation = $oxOrder->validateStock($oxBasket);
+
+        if (!$stockValidation) {
+            throw new Exception('Stock of articles is not valid');
+        }
     }
 
     /**
@@ -96,8 +114,6 @@ class oxidProductFromShop implements ProductFromShop
      */
     public function buy(Order $order)
     {
-        $this->getSession()->delBasket();
-
         /** @var mf_sdk_helper $sdkHelper */
         $sdkHelper = oxNew('mf_sdk_helper');
         $sdkConfig = $sdkHelper->createSdkConfigFromOxid();
@@ -106,8 +122,8 @@ class oxidProductFromShop implements ProductFromShop
         // create user and "login" - create a session entry
         $shopUser = $this->getOrCreateUser($order, $sdk);
 
-        // add all order items to a basket
-        $oxBasket = $this->getSession()->getBasket();
+        /** @var oxBasket $oxBasket */
+        $oxBasket = oxNew('oxbasket');
         $this->addToBasket($order->orderItems, $oxBasket);
         if ($oxBasket->getProductsCount() === 0) {
             throw new Exception('No valid products in basket');
