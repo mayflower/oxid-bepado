@@ -4,6 +4,10 @@
  */
 class SDKConfig
 {
+    const ARTICLE_STATE_EXPORTED = 1;
+
+    const ARTICLE_STATE_IMPORTED = 2;
+
     /**
      * @var
      */

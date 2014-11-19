@@ -26,6 +26,7 @@ $aModule = array(
     'email'   => 'info@mayflower.de',
     'extend'  => array(
         'module_config'         => $aPaths['controllers'] . '/admin/mf_Module_Config',
+        'article_extend'        => $aPaths['controllers'] . '/admin/mf_article_extend',
         'oxarticle'             => $aPaths['models'] . '/mf_bepado_oxarticle'
     ),
     'files'   => array(

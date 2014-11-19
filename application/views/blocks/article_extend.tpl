@@ -17,8 +17,8 @@
                 [{ oxmultilang ident="ARTICLE_MAIN_BEPADO" }]
             </td>
             <td class="edittext">
-                <input type="hidden" name="editval[oxarticles__exporttobepado]" value="0">
-                <input class="edittext" type="checkbox" name="editval[oxarticles__exporttobepado]" value='1' [{if $edit->oxarticles__exporttobepado->value == 1}]checked[{/if}] [{ $readonly }]>
+                <input type="hidden" name="editval[export_to_bepado]" value="0">
+                <input class="edittext" type="checkbox" name="editval[export_to_bepado]" value='1' [{if $export_to_bepado == 1}]checked[{/if}] [{ $readonly }]>
 
             </td>
         </tr>

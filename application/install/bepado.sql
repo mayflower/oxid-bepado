@@ -59,7 +59,14 @@ ALTER TABLE `bepado_shipping_costs`
     DROP PRIMARY KEY,
     ADD PRIMARY KEY (`sc_from_shop`, `sc_to_shop`);
 
-ALTER TABLE oxarticles ADD exporttobepado BOOLEAN;
+CREATE TABLE IF NOT EXISTS `bepado_product_state` (
+  `OXID` VARCHAR(32),
+  `p_source_id` VARCHAR(64) NOT NULL,
+  `shop_id` VARCHAR(64) NOT NULL,
+  `state` TINYINT NOT NULL,
+  CONSTRAINT pk_p_state PRIMARY KEY (p_source_id, shop_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 ALTER TABLE oxpayments ADD bepadopaymenttype VARCHAR(100);
 
 INSERT INTO oxgroups (`OXID`, `OXACTIVE`, `OXTITLE`) VALUES ('bepadoshopgroup', '0', 'Bepado Remote Shop');
