@@ -30,7 +30,6 @@ $aModule = array(
     ),
     'files'       => array(
         'mfbepado'       => $aPaths['controllers'] . '/mfBepado.php',
-        'testController' => $aPaths['controllers'] . '/testController.php',
 
         'mfcmp_bepado'  => $aPaths['components'] . '/mfcmp_bepado.php',
 
