@@ -3,35 +3,48 @@
 
 class mf_category_main extends mf_category_main_parent
 {
-    private $_oModuleSdkHelper;
-
     public function render()
     {
-        $categories = $this->getGoogleCategories();
+        $aCategories = $this->getGoogleCategories();
 
-        if (!isset($categories)) {
-            $categories = [];
+        $soxId = parent::getEditObjectId();
+        if (!isset($aCategories)) {
+            $aCategories = [];
         }
 
-        $this->_aViewData['bepadoCategories'] = $categories;
+        $oCat = oxNew('oxbase');
+        $oCat->init('bepado_categories');
+        if ($soxId != "-1" && isset($soxId)){
+            try {
+                $oCat->load($soxId);
+            } catch (\Exception $e) {
+                // do nothing
+            }
+        }
 
+        $this->_aViewData['googleCategories'] = $aCategories;
+        $this->_aViewData['bepardoCategory'] = $oCat;
 
         return parent::render();
     }
 
-    /**
-     * @return mf_sdk_helper
-     */
-    private function getSdkHelper()
+    public function save()
     {
-        if ($this->_oModuleSdkHelper === null) {
-            $this->_oModuleSdkHelper = oxNew('mf_sdk_helper');
-        }
+        parent::save();
+        $myConfig = parent::getConfig();
 
-        return $this->_oModuleSdkHelper;
+        $aParams = parent::_parseRequestParametersForSave(
+            $myConfig->getRequestParameter("mf_editval")
+        );
+        $oCat = oxNew('oxbase');
+        $oCat->init('bepado_categories');
+        $oCat->assign($aParams);
+        $oCat->save();
+
     }
 
     private function getGoogleCategories() {
-        return file(__DIR__."/../../install/taxonomy.de_DE.txt");
+
+        return file(__DIR__."/../../install/taxonomy.de_DE.txt", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     }
 }

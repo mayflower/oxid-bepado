@@ -73,3 +73,9 @@ INSERT INTO oxgroups (`OXID`, `OXACTIVE`, `OXTITLE`) VALUES ('bepadoshopgroup', 
 
 ALTER TABLE oxuser ADD bepadoshopid VARCHAR(100);
 
+CREATE TABLE IF NOT EXISTS `bepado_categories` (
+  `oxid` CHAR(32) NOT NULL,
+  `title` VARCHAR(255),
+  PRIMARY KEY (`oxid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
