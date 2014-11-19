@@ -81,7 +81,16 @@ class oxidProductFromShop implements ProductFromShop
     }
 
     /**
+     * Bepado sends an order object. Depending on that we
+     * will fetch the products from its OrderItems, create a user
+     * out for the remote shop.
+     *
+     * With the mapped payment method and the shipping costs a basket
+     * will be created which will finalize an order inside of oxid.
+     *
      * @param Order $order
+     *
+     * @throws Exception
      *
      * @return string
      */
@@ -97,25 +106,18 @@ class oxidProductFromShop implements ProductFromShop
         // create user and "login" - create a session entry
         $shopUser = $this->getOrCreateUser($order, $sdk);
 
-        // assign the delivery address to the shop user
-        $deliveryAddress = $this->convertAddress($order->deliveryAddress);
-        $oxDeliveryAddress = oxNew('oxaddress');
-        $oxDeliveryAddress->assign($deliveryAddress);
-        $oxDeliveryAddress->oxaddress__oxuserid = new oxField($shopUser->getId(), oxField::T_RAW);
-        $oxDeliveryAddress->oxaddress__oxcountry = $shopUser->getUserCountry($deliveryAddress['oxaddress__oxcountry']);
-        $oxDeliveryAddress->save();
-        $_POST['sDeliveryAddressMD5'] = $shopUser->getEncodedDeliveryAddress().$oxDeliveryAddress->getEncodedDeliveryAddress();
-        $_POST['deladrid'] = $oxDeliveryAddress->getId();
-
         // add all order items to a basket
         $oxBasket = $this->getSession()->getBasket();
         $this->addToBasket($order->orderItems, $oxBasket);
-
-        $oxPaymentID = $this->createPaymentID($order);
-        if (!$oxPaymentID) {
-            return false;
+        if ($oxBasket->getProductsCount() === 0) {
+            throw new Exception('No valid products in basket');
         }
 
+        // create and set the payment method
+        $oxPaymentID = $this->createPaymentID($order);
+        if (!$oxPaymentID) {
+            throw new Exception('No Payment method found.');
+        }
         $oxBasket->setPayment($oxPaymentID);
 
         // create shipping costs
@@ -126,16 +128,13 @@ class oxidProductFromShop implements ProductFromShop
         $oxPrice->setPrice($shippingCosts->grossShippingCosts, ((100*$shippingCosts->grossShippingCosts/$shippingCosts->shippingCosts))/100 - 1);
         $oxBasket->setCost('oxdelivery', $oxPrice);
         $oxOrder = oxNew('oxorder');
-        try {
-            $iSuccess = $oxOrder->finalizeOrder($oxBasket, $shopUser);
 
-            $shopUser->onOrderExecute($oxBasket, $iSuccess);
+        // finalize order and do a cleanup
+        $iSuccess = $oxOrder->finalizeOrder($oxBasket, $shopUser);
+        $shopUser->onOrderExecute($oxBasket, $iSuccess);
+        $this->cleanUp();
 
-            $this->cleanUp();
-            return $oxOrder->getId();
-        } catch (\Exception $e) {
-            return false;
-        }
+        return $oxOrder->getId();
     }
 
     /**
@@ -204,7 +203,6 @@ class oxidProductFromShop implements ProductFromShop
      * By using the convertet this method creates a set of oxArticles.
      *
      * @param OrderItem[]|array $orderItems
-     *
      * @param oxBasket $oxBasket
      *
      * @throws Exception
@@ -212,6 +210,7 @@ class oxidProductFromShop implements ProductFromShop
      * @throws oxArticleInputException
      * @throws oxNoArticleException
      * @throws oxOutOfStockException
+     *
      * @return array|oxArticle[]
      */
     private function addToBasket(array $orderItems, oxBasket $oxBasket)
@@ -234,6 +233,9 @@ class oxidProductFromShop implements ProductFromShop
     }
 
     /**
+     * When a shop is registered as an user it will be fetched from database, created if not.
+     * The bepado bill address will be used as the users address, the delivery address added to the user.
+     *
      * @param Order $order
      * @param SDK $sdk
      *
@@ -253,13 +255,13 @@ class oxidProductFromShop implements ProductFromShop
             throw new \RuntimeException('No user group for bepado remote shop found.');
         }
 
-        /** @var oxUser $oxUser */
-        $oxUser = oxNew('oxuser');
-        $select = $oxUser->buildSelectString(array('bepadoshopid' => $shopId, 'OXACTIVE' => 1));
-        $oxUser->assignRecord($select);
+        /** @var oxUser $shopUser */
+        $shopUser = oxNew('oxuser');
+        $select = $shopUser->buildSelectString(array('bepadoshopid' => $shopId, 'OXACTIVE' => 1));
+        $shopUser->assignRecord($select);
 
         // creates the shop as an user if it does not exist
-        if (!$oxUser->isLoaded()) {
+        if (!$shopUser->isLoaded()) {
             $values = array(
                 'oxuser__oxusername' => $shopId,
                 'oxuser__oxurl'      => $shop->url,
@@ -267,13 +269,23 @@ class oxidProductFromShop implements ProductFromShop
                 'oxuser__oxactive'   => true,
             );
             $values = array_merge($values, $this->convertAddress($order->billingAddress, 'oxuser__ox'));
-            $oxUser->assign($values);
-            $oxUser->addToGroup(self::BEPADO_USERGROUP_ID);
+            $shopUser->assign($values);
+            $shopUser->addToGroup(self::BEPADO_USERGROUP_ID);
 
-            $oxUser->save();
+            $shopUser->save();
         }
 
-        return $oxUser;
+        // assign the delivery address to the shop user
+        $deliveryAddress = $this->convertAddress($order->deliveryAddress);
+        $oxDeliveryAddress = oxNew('oxaddress');
+        $oxDeliveryAddress->assign($deliveryAddress);
+        $oxDeliveryAddress->oxaddress__oxuserid = new oxField($shopUser->getId(), oxField::T_RAW);
+        $oxDeliveryAddress->oxaddress__oxcountry = $shopUser->getUserCountry($deliveryAddress['oxaddress__oxcountry']);
+        $oxDeliveryAddress->save();
+        $_POST['sDeliveryAddressMD5'] = $shopUser->getEncodedDeliveryAddress().$oxDeliveryAddress->getEncodedDeliveryAddress();
+        $_POST['deladrid'] = $oxDeliveryAddress->getId();
+
+        return $shopUser;
     }
 
     /**
@@ -287,21 +299,8 @@ class oxidProductFromShop implements ProductFromShop
     }
 
     /**
-     * @return oxbasket
+     * Some clean ups after the buy process
      */
-    private function getBasket()
-    {
-        return $this->getSession()->getBasket();
-    }
-
-    /**
-     * @return oxConfig
-     */
-    private function getConfig()
-    {
-        return oxRegistry::getConfig();
-    }
-
     private function cleanUp()
     {
         $this->getSession()->delBasket();
