@@ -7,6 +7,11 @@ use Bepado\SDK\Struct\Product;
  */
 class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
 {
+    /**
+     * @var VersionLayerInterface
+     */
+    private $_oVersionLayer;
+
     const FIELDNAME_BEPADO_EXPORT = 'exporttobepado';
 
     /**
@@ -78,9 +83,25 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     private function productIsKnown($oxProductId)
     {
         $sql = "SELECT * FROM bepado_product WHERE `p_source_id` LIKE '" . $oxProductId."'";
-        $result = oxDb::getDb(true)->execute($sql);
+        $result = $this->getVersionLayer()->getDb(true)->execute($sql);
 
         return count($result->getArray()) > 0;
+    }
+
+    /**
+     * Create and/or returns the VersionLayer.
+     *
+     * @return VersionLayerInterface
+     */
+    private function getVersionLayer()
+    {
+        if (null == $this->_oVersionLayer) {
+            /** @var VersionLayerFactory $factory */
+            $factory = oxNew('VersionLayerFactory');
+            $this->_oVersionLayer = $factory->create();
+        }
+
+        return $this->_oVersionLayer;
     }
 }
  

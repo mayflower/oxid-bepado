@@ -9,6 +9,11 @@ use Bepado\SDK\Struct\OrderItem;
 
 class oxidProductFromShop implements ProductFromShop
 {
+    /**
+    * @var VersionLayerInterface
+    */
+    private $_oVersionLayer;
+
     const BEPADO_USERGROUP_ID = 'bepadoshopgroup';
 
     /**
@@ -164,14 +169,14 @@ class oxidProductFromShop implements ProductFromShop
      */
     private function convertAddress(Address $address, $type = 'oxaddress__ox')
     {
-        $oxCountry = oxRegistry::get('oxcountry');
+        $oxCountry = oxNew('oxcountry');
         $select = $oxCountry->buildSelectString(array('OXISOALPHA3' => $address->country, 'OXACTIVE' => 1));
-        $countryID = oxDb::getDb(true)->getOne($select);
+        $countryID = $this->getVersionLayer()->getDb(true)->getOne($select);
         $oxCountryId = $countryID ?: null;
 
-        $oxState = oxRegistry::get('oxstate');
+        $oxState = oxNew('oxstate');
         $select = $oxState->buildSelectString(array('OXTITLE' => $address->state));
-        $stateID = oxDb::getDb(true)->getOne($select);
+        $stateID = $this->getVersionLayer()->getDb(true)->getOne($select);
         $oxStateId = $stateID ?: null;
 
         $oxAddress = array(
@@ -208,7 +213,7 @@ class oxidProductFromShop implements ProductFromShop
      */
     private function createPaymentID(Order $order)
     {
-        $oxPayment = oxRegistry::get('oxpayment');
+        $oxPayment = oxNew('oxpayment');
         $select = $oxPayment->buildSelectString(array('bepadopaymenttype' => $order->paymentType));
         $paymentID = oxDb::getDb(true)->getOne($select);
 
@@ -305,22 +310,28 @@ class oxidProductFromShop implements ProductFromShop
     }
 
     /**
-     * Creates the session object.
-     *
-     * @return oxSession
-     */
-    private function getSession()
-    {
-        return oxRegistry::getSession();
-    }
-
-    /**
      * Some clean ups after the buy process
      */
     private function cleanUp()
     {
-        $this->getSession()->delBasket();
+        $this->getVersionLayer()->getSession()->delBasket();
         unset($_POST['sDeliveryAddressMD5'], $_POST['deladrid']);
+    }
+
+    /**
+     * Create and/or returns the VersionLayer.
+     *
+     * @return VersionLayerInterface
+     */
+    private function getVersionLayer()
+    {
+        if (null == $this->_oVersionLayer) {
+            /** @var VersionLayerFactory $factory */
+            $factory = oxNew('VersionLayerFactory');
+            $this->_oVersionLayer = $factory->create();
+        }
+
+        return $this->_oVersionLayer;
     }
 }
 

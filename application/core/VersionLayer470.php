@@ -38,7 +38,7 @@ class VersionLayer470 implements VersionLayerInterface
      * Returns the OxDb
      *
      * @param boolean $bAssoc Should the mode be switched to assoc?
-     * @return mixed
+     * @return oxLegacyDb
      */
     public function getDb($bAssoc = false)
     {
