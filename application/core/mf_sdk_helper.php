@@ -5,14 +5,19 @@
 class mf_sdk_helper
 {
     /**
+     * @var VersionLayerInterface
+     */
+    private $_oVersionLayer;
+
+    /**
      * @return SDKConfig
      */
     public function createSdkConfigFromOxid()
     {
         /** @var SDKConfig $config */
-        $config = oxRegistry::get('SDKConfig');
+        $config = oxNew('SDKConfig');
         // load global oxid config
-        $oShopConfig = oxRegistry::get('oxConfig');
+        $oShopConfig = $this->getVersionLayer()->getConfig();
         // module config
         $sLocalEndpoint = $oShopConfig->getConfigParam('sBepadoLocalEndpoint');
         $sApiKey = $oShopConfig->getConfigParam('sBepadoApiKey');
@@ -35,7 +40,7 @@ class mf_sdk_helper
         putenv('_SOCIALNETWORK_HOST=sn.server1230-han.de-nserver.de');
 
         // load global oxid config
-        $oShopConfig = oxRegistry::get('oxConfig');
+        $oShopConfig = $this->getVersionLayer()->getConfig();
 
         // database config
         $sDbType = $oShopConfig->getConfigParam('dbType');
@@ -60,6 +65,22 @@ class mf_sdk_helper
         $sdk = $builder->build();
 
         return $sdk;
+    }
+
+    /**
+     * Create and/or returns the VersionLayer.
+     *
+     * @return VersionLayerInterface
+     */
+    private function getVersionLayer()
+    {
+        if (null == $this->_oVersionLayer) {
+            /** @var VersionLayerFactory $factory */
+            $factory = oxNew('VersionLayerFactory');
+            $this->_oVersionLayer = $factory->create();
+        }
+
+        return $this->_oVersionLayer;
     }
 }
  

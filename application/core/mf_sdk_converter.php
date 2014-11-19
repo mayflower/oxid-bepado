@@ -6,6 +6,11 @@ class mf_sdk_converter //implements ProductConverter
 {
     const DEFAULT_UNIT = 'kg';
 
+    /**
+     * @var VersionLayerInterface
+     */
+    private $_oVersionLayer;
+
     private $oxidUnitMapper = array(
         '-' => self::DEFAULT_UNIT,
         '_UNIT_KG' => 'kg',
@@ -30,8 +35,8 @@ class mf_sdk_converter //implements ProductConverter
     {
         $sdkProduct = new Product();
 
-        /** @var \oxConfig $oShopConfig */
-        $oShopConfig = oxRegistry::get('oxConfig');
+        /** @var oxConfig $oShopConfig */
+        $oShopConfig = $this->getVersionLayer()->getConfig();
         $currencyArray = $oShopConfig->getCurrencyArray();
 
         $currency     = array_filter($currencyArray, function ($item) {
@@ -95,7 +100,7 @@ class mf_sdk_converter //implements ProductConverter
         // Vendor: vendor name no use, only vendorId can load vendor object
 
         // Price is netto or brutto depending on ShopConfig
-        if (oxRegistry::get('oxConfig')->getConfigParam('blEnterNetPrice')) {
+        if ($this->getVersionLayer()->getConfig()->getConfigParam('blEnterNetPrice')) {
             $aParams['oxarticles__oxprice'] = $sdkProduct->price;
         } else {
             $aParams['oxarticles__oxprice'] = $sdkProduct->price * (1 + $sdkProduct->vat);
@@ -168,5 +173,21 @@ class mf_sdk_converter //implements ProductConverter
 
 
         return $attributes;
+    }
+
+    /**
+     * Create and/or returns the VersionLayer.
+     *
+     * @return VersionLayerInterface
+     */
+    private function getVersionLayer()
+    {
+        if (null == $this->_oVersionLayer) {
+            /** @var VersionLayerFactory $factory */
+            $factory = oxNew('VersionLayerFactory');
+            $this->_oVersionLayer = $factory->create();
+        }
+
+        return $this->_oVersionLayer;
     }
 } 

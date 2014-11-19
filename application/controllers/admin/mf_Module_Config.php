@@ -18,6 +18,12 @@ class mf_Module_Config extends mf_Module_Config_parent
         $this->isVerified = null;
     }
 
+    /**
+     * The overwritten render method creates a little flag caused by the api key
+     * validation.
+     *
+     * @return string
+     */
     public function render()
     {
         $template = parent::render();
@@ -30,6 +36,10 @@ class mf_Module_Config extends mf_Module_Config_parent
         return 'mf_module_config.tpl';
     }
 
+    /**
+     * We need to override this method to validate the api key before
+     * persisting it.
+     */
     public function saveConfVars()
     {
         if (!$this->isBepadoModule()) {

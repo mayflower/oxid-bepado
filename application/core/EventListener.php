@@ -4,6 +4,11 @@
  */
 class EventListener
 {
+    /**
+     * @var VersionLayerInterface
+     */
+    private $_oVersionLayer;
+
     public function onActivate()
     {
         $schemaDir = __DIR__ . '/../install';
@@ -23,13 +28,29 @@ class EventListener
                     continue;
                 }
                 try {
-                    oxDb::getDb()->execute($query);
+                    $this->getVersionLayer()->getDb()->execute($query);
                 } catch (\Exception $e) {
                     // todo log if possible
                 }
 
             }
         }
+    }
+
+    /**
+     * Create and/or returns the VersionLayer.
+     *
+     * @return VersionLayerInterface
+     */
+    private function getVersionLayer()
+    {
+        if (null == $this->_oVersionLayer) {
+            /** @var VersionLayerFactory $factory */
+            $factory = oxNew('VersionLayerFactory');
+            $this->_oVersionLayer = $factory->create();
+        }
+
+        return $this->_oVersionLayer;
     }
 }
  

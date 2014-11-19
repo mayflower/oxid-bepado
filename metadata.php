@@ -25,24 +25,29 @@ $aModule = array(
     'author'  => 'Mayflower GmbH',
     'email'   => 'info@mayflower.de',
     'extend'  => array(
-        'module_config'  => $aPaths['controllers'] . '/admin/mf_Module_Config',
-        'oxarticle'      => $aPaths['models'] . '/mf_bepado_oxarticle'
+        'module_config'         => $aPaths['controllers'] . '/admin/mf_Module_Config',
+        'oxarticle'             => $aPaths['models'] . '/mf_bepado_oxarticle'
     ),
-    'files'       => array(
-        'mfbepado'       => $aPaths['controllers'] . '/mfBepado.php',
+    'files'   => array(
+        'mfbepado'              => $aPaths['controllers'] . '/mfBepado.php',
 
-        'mfcmp_bepado'  => $aPaths['components'] . '/mfcmp_bepado.php',
+        'mfcmp_bepado'          => $aPaths['components'] . '/mfcmp_bepado.php',
 
-        'oxidproductfromshop' => $aPaths['models'] . '/productFromShop.php',
-        'oxidProductToShop'   => $aPaths['models'] . '/productToShop.php',
-        'SDKConfig'           => $aPaths['models'] . '/SDKConfig.php',
+        'oxidproductfromshop'   => $aPaths['models'] . '/productFromShop.php',
+        'oxidProductToShop'     => $aPaths['models'] . '/productToShop.php',
+        'SDKConfig'             => $aPaths['models'] . '/SDKConfig.php',
 
-        'mf_sdk_helper'    => $aPaths['core'] . '/mf_sdk_helper.php',
-        'mf_sdk_converter' => $aPaths['core'] . '/mf_sdk_converter.php',
-        'EventListener'    => $aPaths['core'] .'/EventListener.php'
+        'mf_sdk_helper'         => $aPaths['core'] . '/mf_sdk_helper.php',
+        'mf_sdk_converter'      => $aPaths['core'] . '/mf_sdk_converter.php',
+        'EventListener'         => $aPaths['core'] . '/EventListener.php',
+        'VersionLayerInterface' => $aPaths['core'] . '/interface/VersionLayerInterface.php',
+        'VersionLayer460'       => $aPaths['core'] . '/VersionLayer460.php',
+        'VersionLayer470'       => $aPaths['core'] . '/VersionLayer470.php',
+        'VersionLayer500'       => $aPaths['core'] . '/VersionLayer500.php',
+        'VersionLayerFactory'   => $aPaths['core'] . '/VersionLayerFactory.php'
     ),
     'templates' => array(
-        'mf_module_config.tpl' => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl',
+        'mf_module_config.tpl'  => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl',
     ),
     'settings' => array(
         array(
