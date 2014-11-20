@@ -28,7 +28,7 @@ class EventListener
                     continue;
                 }
                 try {
-                    $this->getVersionLayer()->getDb()->execute($query);
+                    self::getVersionLayer()->getDb()->execute($query);
                 } catch (\Exception $e) {
                     // todo log if possible
                 }
@@ -44,13 +44,11 @@ class EventListener
      */
     private function getVersionLayer()
     {
-        if (null == $this->_oVersionLayer) {
-            /** @var VersionLayerFactory $factory */
-            $factory = oxNew('VersionLayerFactory');
-            $this->_oVersionLayer = $factory->create();
-        }
+        /** @var VersionLayerFactory $factory */
+        $factory = oxNew('VersionLayerFactory');
+        $oVersionLayer = $factory->create();
 
-        return $this->_oVersionLayer;
+        return $oVersionLayer;
     }
 }
  
