@@ -130,10 +130,10 @@ class mf_sdk_converter //implements ProductConverter
         $aParams['oxarticles__oxlength'] = $aDimension[0];
         $aParams['oxarticles__oxwidth'] = $aDimension[1];
         $aParams['oxarticles__oxheight'] = $aDimension[2];
-        
+
         foreach ($sdkProduct->images as $key => $image) {
             do {
-                $aParams['oxarticles__oxpic' . ($key + 1)];
+                $aParams['oxarticles__oxpic' . ($key + 1)] = $image;
             } while ($key < 12);
         }
 
