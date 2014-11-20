@@ -72,3 +72,10 @@ ALTER TABLE oxpayments ADD bepadopaymenttype VARCHAR(100);
 INSERT INTO oxgroups (`OXID`, `OXACTIVE`, `OXTITLE`) VALUES ('bepadoshopgroup', '0', 'Bepado Remote Shop');
 
 ALTER TABLE oxuser ADD bepadoshopid VARCHAR(100);
+
+CREATE TABLE IF NOT EXISTS `bepado_categories` (
+  `oxid` CHAR(32) NOT NULL,
+  `title` VARCHAR(255),
+  PRIMARY KEY (`oxid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

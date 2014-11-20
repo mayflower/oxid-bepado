@@ -61,7 +61,7 @@ class mf_sdk_helper
         $sDbHost = $oShopConfig->getConfigParam('dbHost');
         $sDbName = $oShopConfig->getConfigParam('dbName');
         $sDbUser = $oShopConfig->getConfigParam('dbUser');
-        $sDbPwd = $oShopConfig->getConfigParam('dbPwd');
+        $sDbPwd  = $oShopConfig->getConfigParam('dbPwd');
 
         $pdoConnection = new PDO($sDbType . ':dbname=' . $sDbName . ';host=' . $sDbHost,$sDbUser, $sDbPwd);
         $from = oxnew('oxidproductfromshop');

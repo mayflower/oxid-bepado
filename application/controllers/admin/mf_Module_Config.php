@@ -7,6 +7,7 @@ class mf_Module_Config extends mf_Module_Config_parent
     const API_KEY_SETTING_NAME = 'sBepadoApiKey';
 
     const MODULE_ID = 'bepado';
+
     const API_URL_SETTING_NAME = 'sBepadoLocalEndpoint';
 
     private $_oModuleSdkHelper;
@@ -67,16 +68,6 @@ class mf_Module_Config extends mf_Module_Config_parent
             $this->isVerified = true;
         } else {
             $this->isVerified = false;
-        }
-    }
-
-    /**
-     * Resolves the interaction from the verify button
-     */
-    public function verifyApiKey()
-    {
-        if (!$this->isBepadoModule()) {
-
         }
     }
 
