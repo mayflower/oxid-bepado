@@ -45,7 +45,7 @@ require_once 'test_utils.php';
 require_once OX_BASE_PATH . 'core/oxfunctions.php';
 
 // As in new bootstrap to get db instance.
-$oConfigFile = new OxConfigFile(OX_BASE_PATH . "config.inc.php");
+$oConfigFile = new OxConfigFile(__DIR__."/../config.inc.php");
 OxRegistry::set("OxConfigFile", $oConfigFile);
 oxRegistry::set("oxConfig", new oxConfig());
 
