@@ -97,7 +97,7 @@ class mf_sdk_converter //implements ProductConverter
         $oShopConfig = oxRegistry::get('oxConfig');
         $currencyArray = $oShopConfig->getCurrencyArray();
 
-        $currency     = array_filter($currencyArray, function ($item, $sdkProduct) {
+        $currency = array_filter($currencyArray, function ($item, $sdkProduct) {
             return $item->unit === $sdkProduct->currency;
         });
         $currency = array_shift($currency);
@@ -117,12 +117,12 @@ class mf_sdk_converter //implements ProductConverter
         }
         $aParams['oxarticles__oxvat'] = $sdkProduct->vat * 100;
         $aParams['oxarticles__oxstock'] = $sdkProduct->availability;
-        if (isset($sdkProduct->attributes[Product::ATTRIBUTE_UNIT])) {
-            $aParams['oxarticles__oxunitname'] = $sdkProduct->attributes[Product::ATTRIBUTE_UNIT];
-        }
 
         //attributes
-        $aParams['oxarticles__oxunitname'] = $sdkProduct->attributes['unit'];
+        $aUnitMapping = array_flip($this->oxidUnitMapper);
+        if (isset($aUnitMapping[$sdkProduct->attributes[Product::ATTRIBUTE_UNIT]])) {
+            $aParams['oxarticles__oxunitname'] = $aUnitMapping[$sdkProduct->attributes[Product::ATTRIBUTE_UNIT]];
+        }
         $aParams['oxarticles__oxunitquantity'] = $sdkProduct->attributes['quantity'];
         $aParams['oxarticles__oxweight'] = $sdkProduct->attributes['weight'];
 
