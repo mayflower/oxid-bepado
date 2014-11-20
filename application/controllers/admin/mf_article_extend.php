@@ -35,6 +35,7 @@ class mf_article_extend extends mf_article_extend_parent
         } elseif (!$oBepadoProductState->isLoaded() && $articleState) {
             $oBepadoProductState->assign(array(
                     'p_source_id' => $this->getEditObjectId(),
+                    'OXID' => $this->getEditObjectId(),
                     'shop_id'     => '_self_',
                     'state'       => SDKConfig::ARTICLE_STATE_EXPORTED,
                 )
