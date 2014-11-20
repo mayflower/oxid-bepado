@@ -185,6 +185,5 @@ class VersionLayer460 implements VersionLayerInterface
     {
         return oxUtilsCount::getInstance();
     }
-
 }
 
