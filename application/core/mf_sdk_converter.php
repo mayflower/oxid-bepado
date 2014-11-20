@@ -130,13 +130,17 @@ class mf_sdk_converter //implements ProductConverter
         $aParams['oxarticles__oxlength'] = $aDimension[0];
         $aParams['oxarticles__oxwidth'] = $aDimension[1];
         $aParams['oxarticles__oxheight'] = $aDimension[2];
-
+        
+        foreach ($sdkProduct->images as $key => $image) {
+            do {
+                $aParams['oxarticles__oxpic' . ($key + 1)];
+            } while ($key < 12);
+        }
 
         /**
          * Vendor: vendor name no use, only id can load vendor object
          * PurchasePrice has no equivalent in oxid
          * LongDescription not part of oxarticle but of oxartextends
-         * Images
          * Category: category name no use id can load category object
          */
 
