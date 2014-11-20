@@ -175,11 +175,16 @@ class mf_sdk_converter //implements ProductConverter
         $category = oxNew('oxcategory');
         $aIds = $oxProduct->getCategoryIds();
 
+        $oCat = oxNew('oxlist');
+        $oCat->init('oxbase', 'bepado_categories');
+        $oCat->getBaseObject();
+        $oCat->getList();
+        $oCat = $oCat->getArray();
 
         foreach ($aIds as $id) {
-            $category->load($id);
-
-            $aCategory[] = $category->oxcategories__bepadocategory->value;
+            if (array_key_exists($id, $oCat)) {
+                $aCategory[] = $oCat[$id]->bepado_categories__title->rawValue;
+            }
         }
 
         return $aCategory;
