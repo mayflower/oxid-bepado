@@ -110,6 +110,7 @@ class mf_sdk_converter //implements ProductConverter
         $aParams['oxarticles__oxshortdesc'] = $sdkProduct->shortDescription;
 
         // Price is netto or brutto depending on ShopConfig
+        // PurchasePrice has no equivalent in oxid
         if (oxRegistry::get('oxConfig')->getConfigParam('blEnterNetPrice')) {
             $aParams['oxarticles__oxprice'] = $sdkProduct->price * $rate;
         } else {
@@ -137,14 +138,11 @@ class mf_sdk_converter //implements ProductConverter
             } while ($key < 12);
         }
 
-        /**
-         * Vendor: vendor name no use, only id can load vendor object
-         * PurchasePrice has no equivalent in oxid
-         * LongDescription not part of oxarticle but of oxartextends
-         * Category: category name no use id can load category object
-         */
+        // Vendor: vendor name no use, only id can load vendor object
+        // Category: category name no use id can load category object
 
         $oxProduct->assign($aParams);
+        $oxProduct->setArticleLongDesc($sdkProduct->longDescription);
 
         return $oxProduct;
     }
