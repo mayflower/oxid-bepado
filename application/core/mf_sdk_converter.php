@@ -132,13 +132,12 @@ class mf_sdk_converter //implements ProductConverter
         $aParams['oxarticles__oxwidth'] = $aDimension[1];
         $aParams['oxarticles__oxheight'] = $aDimension[2];
 
-        /*
         foreach ($sdkProduct->images as $key => $image) {
-            do {
+            if ($key < 12){
                 $aParams['oxarticles__oxpic' . ($key + 1)] = $image;
-            } while ($key < 12);
+            }
         }
-        */
+
 
         // Vendor: vendor name no use, only id can load vendor object
         // Category: category name no use id can load category object
