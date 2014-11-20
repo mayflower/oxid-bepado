@@ -1,9 +1,7 @@
 <?php
 
-class mfBepado extends oxUbase {
-
-    //protected $_sThisTemplate = 'ajax.tpl';
-
+class mfBepado extends oxUbase
+{
     /**
      * @var mf_sdk_helper
      */
@@ -19,7 +17,6 @@ class mfBepado extends oxUbase {
         } catch (\Exception $e) {
             // todo do something
         }
-
 
         return $this->_sThisTemplate;
     }
