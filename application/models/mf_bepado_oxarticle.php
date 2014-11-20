@@ -67,11 +67,35 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         /** @var oxBase $oBepadoProductState */
         $oBepadoProductState = oxNew('oxbase');
         $oBepadoProductState->init('bepado_product_state');
-        $select = $oBepadoProductState->buildSelectString(array('p_source_id' => $id, 'shop_id' => SDKConfig::SHOP_ID_LOCAL));
+        $select = $oBepadoProductState->buildSelectString(array(
+            'p_source_id' => $id,
+            'shop_id'     => SDKConfig::SHOP_ID_LOCAL,
+            'state'       => SDKConfig::ARTICLE_STATE_EXPORTED
+        ));
         $id = $this->getVersionLayer()->getDb(true)->getOne($select);
         $oBepadoProductState->load($id);
 
         return $oBepadoProductState->isLoaded();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getState()
+    {
+        $id = $this->getId();
+        /** @var oxBase $oBepadoProductState */
+        $oBepadoProductState = oxNew('oxbase');
+        $oBepadoProductState->init('bepado_product_state');
+        $oBepadoProductState->load($id);
+
+        $state = $oBepadoProductState->bepado_product_state__state->rawValue;
+
+        if (!$state) {
+            $state = SDKConfig::ARTICLE_STATE_NONE;
+        }
+
+        return $state;
     }
 
     /**

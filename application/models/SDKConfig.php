@@ -4,6 +4,8 @@
  */
 class SDKConfig
 {
+    const ARTICLE_STATE_NONE = 0;
+
     const ARTICLE_STATE_EXPORTED = 1;
 
     const ARTICLE_STATE_IMPORTED = 2;

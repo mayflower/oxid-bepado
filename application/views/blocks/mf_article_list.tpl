@@ -8,8 +8,8 @@
 [{/if}]
 <td valign="top" class="[{ $listclass}][{if $listitem->oxarticles__oxactive->value == 1}] active[{/if}]" height="15">
     <div class="listitemfloating">
-        [{if $listitem->oxarticles__exporttobepado->value == 1}]
-            <img src="[{$oViewConf->getModuleUrl("bepado")}]application/out/src/img/bepado.png"
+        [{if ($listitem->oxarticles__state->value)}]
+            <img src="[{$oViewConf->getModuleUrl("bepado")}][{$listitem->oxarticles__state->value}]"
                  alt="Bepado"
                  height="13px"
                  align="center"/>
