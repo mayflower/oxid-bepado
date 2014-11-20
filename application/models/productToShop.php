@@ -53,7 +53,8 @@ class oxidProductToShop implements ProductToShop
         }
 
         if (!$oBepadoProductState->isLoaded()) {
-            // create a new article
+            // create a new article, make sure that is isn't active by default
+            $oxArticle->assign(array('oxarticles__oxactive' => 0));
             $oxArticle->save();
 
             // insert into mapping/state table
