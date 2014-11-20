@@ -4,15 +4,12 @@ use Bepado\SDK\Struct\Product;
 
 class mf_sdk_converter //implements ProductConverter
 {
-    const DEFAULT_UNIT = 'kg';
-
     /**
      * @var VersionLayerInterface
      */
     private $_oVersionLayer;
 
     private $oxidUnitMapper = array(
-        '-' => self::DEFAULT_UNIT,
         '_UNIT_KG' => 'kg',
         '_UNIT_G' => 'g',
         '_UNIT_L' => 'l',
@@ -23,7 +20,7 @@ class mf_sdk_converter //implements ProductConverter
         '_UNIT_M2' => 'm^2',
         '_UNIT_M3' => 'm^3',
         '_UNIT_PIECE' => 'piece',
-        '_UNIT_ITEM' => self::DEFAULT_UNIT,
+        '_UNIT_ITEM' => 'piece',
     );
 
     /**
@@ -109,6 +106,9 @@ class mf_sdk_converter //implements ProductConverter
         $aParams['oxarticles__oxvat'] = $sdkProduct->vat * 100;
         // Currency: unit won't initialize currency object
         $aParams['oxarticles__oxstock'] = $sdkProduct->availability;
+        if (isset($sdkProduct->attributes[Product::ATTRIBUTE_UNIT])) {
+            $aParams['oxarticles__oxunitname'] = $sdkProduct->attributes[Product::ATTRIBUTE_UNIT];
+        }
 
         $oxProduct->assign($aParams);
 
@@ -163,13 +163,15 @@ class mf_sdk_converter //implements ProductConverter
             Product::ATTRIBUTE_WEIGHT => $oxProduct->getWeight(),
             Product::ATTRIBUTE_VOLUME => (string) $oxProduct->getSize(),
             Product::ATTRIBUTE_DIMENSION => $dimension,
-            Product::ATTRIBUTE_UNIT => isset($this->oxidUnitMapper[$oxProduct->getUnitName()])
-                ? $this->oxidUnitMapper[$oxProduct->getUnitName()]
-                : self::DEFAULT_UNIT,
             // reference quantity is always 1 in oxid shop
             Product::ATTRIBUTE_REFERENCE_QUANTITY => 1,
             Product::ATTRIBUTE_QUANTITY => $oxProduct->getUnitQuantity(),
         );
+
+        // set optional unit
+        if (isset($this->oxidUnitMapper[$oxProduct->getUnitName()])) {
+            $attributes[Product::ATTRIBUTE_UNIT] = $this->oxidUnitMapper[$oxProduct->getUnitName()];
+        }
 
 
         return $attributes;
