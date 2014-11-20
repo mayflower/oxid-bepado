@@ -47,6 +47,7 @@ $aModule = array(
         'VersionLayerInterface' => $aPaths['core'] . '/interface/VersionLayerInterface.php',
         'VersionLayer460'       => $aPaths['core'] . '/VersionLayer460.php',
         'VersionLayer470'       => $aPaths['core'] . '/VersionLayer470.php',
+        'VersionLayer490'       => $aPaths['core'] . '/VersionLayer490.php',
         'VersionLayer500'       => $aPaths['core'] . '/VersionLayer500.php',
         'VersionLayerFactory'   => $aPaths['core'] . '/VersionLayerFactory.php',
     ),
@@ -69,7 +70,7 @@ $aModule = array(
         array(
             'template' => 'payment_main.tpl',
             'block'    => 'admin_payment_main_fields',
-            'file'     => 'application/views/blocks/payment_main.tpl'
+            'file'     => $aPaths['blocks'] . '/payment_main.tpl'
         ),
     ),
     'templates' => array(
