@@ -56,7 +56,7 @@ class oxidProductToShop implements ProductToShop
             // create a new article, make sure that is isn't active by default
             $oxArticle->assign(array('oxarticles__oxactive' => 0));
             $oxArticle->save();
-
+            
             // insert into mapping/state table
             $oBepadoProductState->assign(array(
                     'p_source_id' => $product->sourceId,
