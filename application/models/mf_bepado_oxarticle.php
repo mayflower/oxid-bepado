@@ -115,10 +115,10 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
      */
     public function getSdkProduct()
     {
-        /** @var mf_sdk_converter $oModuleSDKConverter */
-        $oModuleSDKConverter = oxNew('mf_sdk_converter');
+        /** @var mf_sdk_converter $sdkConverter */
+        $sdkConverter = oxNew('mf_sdk_converter');
 
-        $sdkProduct = $oModuleSDKConverter->toBepadoProduct($this);
+        $sdkProduct = $sdkConverter->toBepadoProduct($this);
 
         return $sdkProduct;
     }
