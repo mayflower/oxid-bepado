@@ -35,7 +35,6 @@ class mf_sdk_converter //implements ProductConverter
 
         /** @var oxConfig $oShopConfig */
         $oShopConfig = $this->getVersionLayer()->getConfig();
-        $currencyArray = $oShopConfig->getCurrencyArray();
 
         $currency     = array_filter($currencyArray, function ($item) {
             return $item->rate === '1.00';
@@ -47,7 +46,6 @@ class mf_sdk_converter //implements ProductConverter
         $sdkProduct->title = $oxArticle->oxarticles__oxtitle->value;
         $sdkProduct->shortDescription = $oxArticle->oxarticles__oxshortdesc->value;
         $sdkProduct->longDescription = $oxArticle->getLongDescription()->getRawValue();
-
         // if no defined vendor, self is vendor
         if (null !== $oxArticle->getVendor()) {
             $sdkProduct->vendor = $oxArticle->getVendor()->oxvendor__oxtitle->value;

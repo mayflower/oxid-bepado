@@ -69,10 +69,8 @@ class mf_oxbasket extends mf_oxbasket_parent
     {
         $oxProduct = oxNew('oxarticle');
         $oxProduct->load($sProductID);
-        /** @var mf_sdk_converter $oModuleSDKConverter */
-        $oModuleSDKConverter = oxNew('mf_sdk_converter');
 
-        $sdkProduct = $oModuleSDKConverter->toBepadoProduct($oxProduct);
+        $sdkProduct = $oxProduct->getSdkProduct();
 
         $oState = oxNew('oxbase');
         $oState->init('bepado_product_state');
@@ -102,7 +100,7 @@ class mf_oxbasket extends mf_oxbasket_parent
             $result = $results[0];
 
         } catch (\Exception $e) {
-            // do nothing
+            var_dump($e);
         }
 
         return $result;
