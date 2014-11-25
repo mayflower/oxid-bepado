@@ -45,6 +45,5 @@ if [[ ! $TARGET ]] ; then
 fi;
 
 oxPATH=$oxPATH oxMETADATA=$oxMETADATA \
-php -d 'memory_limit=1024M' \
-/usr/bin/phpunit --verbose --bootstrap $TESTDIR/bootstrap.php $COVERAGE \
+php -d 'memory_limit=1024M' -d "xdebug.remote_autostart=on" phpunit.phar --verbose --bootstrap $TESTDIR/bootstrap.php $COVERAGE \
 $TESTDIR/$TARGET
