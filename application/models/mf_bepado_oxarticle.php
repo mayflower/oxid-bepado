@@ -104,10 +104,10 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
      */
     public function isImportedFromBepado()
     {
-        if ($this->getState() != 2) {
-            return false;
+        if ($this->getState() == 2) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
