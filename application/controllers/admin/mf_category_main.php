@@ -5,7 +5,7 @@ class mf_category_main extends mf_category_main_parent
 {
     public function render()
     {
-        $aCategories = $this->getGoogleCategories();
+        $aCategories = $this->getSdkCategories();
 
         $soxId = parent::getEditObjectId();
         if (!isset($aCategories)) {
@@ -43,8 +43,16 @@ class mf_category_main extends mf_category_main_parent
 
     }
 
-    private function getGoogleCategories() {
+    /**
+     * @return array
+     */
+    private function getSdkCategories()
+    {
+        /** @var mf_sdk_helper $sdkHelper */
+        $sdkHelper = oxNew('mf_sdk_helper');
+        $sdkConfig = $sdkHelper->createSdkConfigFromOxid();
+        $sdk = $sdkHelper->instantiateSdk($sdkConfig);
 
-        return file(__DIR__."/../../install/taxonomy.de_DE.txt", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        return $sdk->getCategories();
     }
 }
