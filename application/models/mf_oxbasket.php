@@ -30,7 +30,7 @@ class mf_oxbasket extends mf_oxbasket_parent
         $oxProduct->load($sProductID);
 
         // check if product is imported Bepado product
-        if ($oxProduct->getState() != 2) {
+        if (!$oxProduct->isImportedFromBepado()) {
             return parent::addToBasket(
                 $sProductID,
                 $dAmount,
@@ -43,6 +43,8 @@ class mf_oxbasket extends mf_oxbasket_parent
         }
 
         $checked = $oxProduct->checkProductWithBepardo();
+
+        // change Product according to check?
 
         return parent::addToBasket(
             $sProductID,

@@ -100,42 +100,6 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     }
 
     /**
-     * @return mf_sdk_helper
-     */
-    private function getSdkHelper()
-    {
-        if ($this->_oModuleSdkHelper === null) {
-            $this->_oModuleSdkHelper = oxNew('mf_sdk_helper');
-        }
-
-        return $this->_oModuleSdkHelper;
-    }
-
-    private function productIsKnown($oxProductId)
-    {
-        $sql = "SELECT * FROM bepado_product WHERE `p_source_id` LIKE '" . $oxProductId."'";
-        $result = $this->getVersionLayer()->getDb(true)->execute($sql);
-
-        return count($result->getArray()) > 0;
-    }
-
-    /**
-     * Create and/or returns the VersionLayer.
-     *
-     * @return VersionLayerInterface
-     */
-    private function getVersionLayer()
-    {
-        if (null == $this->_oVersionLayer) {
-            /** @var VersionLayerFactory $factory */
-            $factory = oxNew('VersionLayerFactory');
-            $this->_oVersionLayer = $factory->create();
-        }
-
-        return $this->_oVersionLayer;
-    }
-
-    /**
      * @return bool
      */
     public function isImportedFromBepado()
@@ -191,6 +155,42 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         }
 
         return $result;
+    }
+
+    private function productIsKnown($oxProductId)
+    {
+        $sql = "SELECT * FROM bepado_product WHERE `p_source_id` LIKE '" . $oxProductId."'";
+        $result = $this->getVersionLayer()->getDb(true)->execute($sql);
+
+        return count($result->getArray()) > 0;
+    }
+
+    /**
+     * @return mf_sdk_helper
+     */
+    private function getSdkHelper()
+    {
+        if ($this->_oModuleSdkHelper === null) {
+            $this->_oModuleSdkHelper = oxNew('mf_sdk_helper');
+        }
+
+        return $this->_oModuleSdkHelper;
+    }
+
+    /**
+     * Create and/or returns the VersionLayer.
+     *
+     * @return VersionLayerInterface
+     */
+    private function getVersionLayer()
+    {
+        if (null == $this->_oVersionLayer) {
+            /** @var VersionLayerFactory $factory */
+            $factory = oxNew('VersionLayerFactory');
+            $this->_oVersionLayer = $factory->create();
+        }
+
+        return $this->_oVersionLayer;
     }
 }
  
