@@ -120,7 +120,7 @@ class oxidProductFromShop implements ProductFromShop
     public function buy(Order $order)
     {
         /** @var mf_sdk_helper $sdkHelper */
-        $sdkHelper = oxNew('mf_sdk_helper');
+        $sdkHelper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
         $sdkConfig = $sdkHelper->createSdkConfigFromOxid();
         $sdk = $sdkHelper->instantiateSdk($sdkConfig);
 
@@ -128,7 +128,7 @@ class oxidProductFromShop implements ProductFromShop
         $shopUser = $this->getOrCreateUser($order, $sdk);
 
         /** @var oxBasket $oxBasket */
-        $oxBasket = oxNew('oxbasket');
+        $oxBasket = $this->getVersionLayer()->createNewObject('oxbasket');
         $this->addToBasket($order->orderItems, $oxBasket);
         if ($oxBasket->getProductsCount() === 0) {
             throw new Exception('No valid products in basket');
@@ -145,10 +145,11 @@ class oxidProductFromShop implements ProductFromShop
         $shippingCosts = $sdk->calculateShippingCosts($order);
         $oxBasket->setDeliveryPrice($shippingCosts->shippingCosts);
         /** @var oxPrice $oxPrice */
-        $oxPrice = oxNew('oxPrice');
+        $oxPrice = $this->getVersionLayer()->createNewObject('oxPrice');
         $oxPrice->setPrice($shippingCosts->grossShippingCosts, ((100*$shippingCosts->grossShippingCosts/$shippingCosts->shippingCosts))/100 - 1);
         $oxBasket->setCost('oxdelivery', $oxPrice);
-        $oxOrder = oxNew('oxorder');
+        /** @var oxOrder $oxOrder */
+        $oxOrder = $this->getVersionLayer()->createNewObject('oxorder');
 
         // finalize order and do a cleanup
         $iSuccess = $oxOrder->finalizeOrder($oxBasket, $shopUser);
@@ -332,6 +333,14 @@ class oxidProductFromShop implements ProductFromShop
         }
 
         return $this->_oVersionLayer;
+    }
+
+    /**
+     * @param VersionLayerInterface $versionLayer
+     */
+    public function setVersionLayer(VersionLayerInterface $versionLayer)
+    {
+        $this->_oVersionLayer = $versionLayer;
     }
 }
 

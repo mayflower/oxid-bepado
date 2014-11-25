@@ -185,5 +185,17 @@ class VersionLayer460 implements VersionLayerInterface
     {
         return oxUtilsCount::getInstance();
     }
+
+    /**
+     * Little Wrapper for the oxNew() function.
+     *
+     * @param $className
+     *
+     * @return object
+     */
+    public function createNewObject($className)
+    {
+        return oxNew($className);
+    }
 }
 

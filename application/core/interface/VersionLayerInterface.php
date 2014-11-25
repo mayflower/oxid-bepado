@@ -125,4 +125,12 @@ interface VersionLayerInterface
      * @return oxDeliverySetList
      */
     public function getDeliverySetList();
+
+    /**
+     * Little Wrapper for the oxNew() function.
+     *
+     * @param $className
+     * @return object
+     */
+    public function createNewObject($className);
 }

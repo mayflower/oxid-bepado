@@ -190,4 +190,15 @@ class VersionLayer470 implements VersionLayerInterface
     {
         return oxRegistry::get('oxUtilsCount');
     }
+
+    /**
+     * Little Wrapper for the oxNew() function.
+     *
+     * @param $className
+     * @return object
+     */
+    public function createNewObject($className)
+    {
+        return oxNew($className);
+    }
 }
