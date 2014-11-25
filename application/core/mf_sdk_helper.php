@@ -96,5 +96,13 @@ class mf_sdk_helper
 
         return $this->_oVersionLayer;
     }
+
+    /**
+     * @param VersionLayerInterface $versionLayer
+     */
+    public function setVersionHelper(VersionLayerInterface $versionLayer)
+    {
+        $this->_oVersionLayer = $versionLayer;
+    }
 }
  

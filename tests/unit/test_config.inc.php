@@ -45,7 +45,7 @@ require_once 'test_utils.php';
 require_once OX_BASE_PATH . 'core/oxfunctions.php';
 
 // As in new bootstrap to get db instance.
-$oConfigFile = new OxConfigFile(__DIR__."/../config.inc.php");
+$oConfigFile = new OxConfigFile(getShopBasePath() . '/config.inc.php');
 OxRegistry::set("OxConfigFile", $oConfigFile);
 oxRegistry::set("oxConfig", new oxConfig());
 
@@ -121,6 +121,17 @@ function initDbDump()
 
     return sprintf("%.2f", (microtime(true) - $iTime));
 }
+
+function createBepadoTables()
+{
+    $oDb = oxDb::getDb();
+    /** @var EventListener $listener Just do the same as for activation. */
+    $listener = oxRegistry::get('EventListener');
+    $listener->onActivate();
+}
+
+// inserted cause oxid seems to delete the data for some reasons
+createBepadoTables();
 
 echo "\nDB dump time: " . initDbDump() . " seconds\n\n\n";
 
