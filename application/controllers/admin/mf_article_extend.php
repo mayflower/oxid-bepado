@@ -17,8 +17,14 @@ class mf_article_extend extends mf_article_extend_parent
     {
         $template = parent::render();
 
-        $oBepadoProductState = $this->createBepadoProductState();
-        $this->_aViewData['export_to_bepado'] = $oBepadoProductState->isLoaded() ? 1 : 0;
+        $oxArticle = oxNew('oxarticle');
+        $oxArticle->load($this->getEditObjectId());
+        (int) $state = $oxArticle->getState();
+
+        if ($state != 2) {
+            $this->_aViewData['export_to_bepado'] = $state;
+            $this->_aViewData['no_bepado_import'] = 1;
+        }
 
         return $template;
     }

@@ -80,7 +80,7 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getState()
     {
@@ -136,6 +136,17 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     }
 
     /**
+     * @return bool
+     */
+    public function isImportedFromBepado()
+    {
+        if ($this->getState() != 2) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * @return Product
      */
     public function getSdkProduct()
@@ -143,7 +154,43 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         /** @var mf_sdk_converter $oModuleSDKConverter */
         $oModuleSDKConverter = oxNew('mf_sdk_converter');
 
-        return $oModuleSDKConverter->toBepadoProduct($this);
+        $sdkProduct = $oModuleSDKConverter->toBepadoProduct($this);
+
+        return $sdkProduct;
+    }
+
+    /**
+     * @return bool|array
+     * @throws Exception
+     */
+    public function checkProductWithBepardo()
+    {
+        $sdkProduct = $this->getSdkProduct();
+
+        if (!$this->isImportedFromBepado()) {
+            throw new Exception("Product is not imported from Bepado.");
+        }
+
+        $oState = oxNew('oxbase');
+        $oState->init('bepado_product_state');
+        $oState->load($this->getId());
+
+        $sdkProduct->shopId = $oState->bepado_product_state__shop_id->rawValue;
+
+        $config  = $this->getSdkHelper()->createSdkConfigFromOxid();
+        $sdk = $this->getSdkHelper()->instantiateSdk($config);
+
+        $result = null;
+
+        try {
+            $results = $sdk->checkProducts(array($sdkProduct));
+            $result = $results[0];
+
+        } catch (\Exception $e) {
+            # var_dump($e);
+        }
+
+        return $result;
     }
 }
  
