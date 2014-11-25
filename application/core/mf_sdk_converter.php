@@ -132,12 +132,15 @@ class mf_sdk_converter //implements ProductConverter
         $aParams['oxarticles__oxwidth'] = $aDimension[1];
         $aParams['oxarticles__oxheight'] = $aDimension[2];
 
-        foreach ($sdkProduct->images as $key => $image) {
+        foreach ($sdkProduct->images as $key => $imagePath) {
             if ($key < 12){
-                $aParams['oxarticles__oxpic' . ($key + 1)] = $image;
+                $aImagePath = explode('/', $imagePath);
+                $sImageName = $aImagePath[(count($aImagePath) - 1)];
+                $aParams['oxarticles__oxpic' . ($key + 1)] = $sImageName;
+
+                copy($imagePath, $oShopConfig->getMasterPictureDir() . 'product/' . ($key + 1) . '/' . $sImageName);
             }
         }
-
 
         // Vendor: vendor name no use, only id can load vendor object
         // Category: category name no use id can load category object
