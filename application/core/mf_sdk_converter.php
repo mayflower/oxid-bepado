@@ -209,14 +209,17 @@ class mf_sdk_converter //implements ProductConverter
             $oxProduct->oxarticles__oxwidth->value,
             $oxProduct->oxarticles__oxheight->value
         );
+        $size = $oxProduct->oxarticles__oxlength->value *
+            $oxProduct->oxarticles__oxwidth->value *
+            $oxProduct->oxarticles__oxheight->value;
 
         $aAttributes = array(
-            Product::ATTRIBUTE_WEIGHT => $oxProduct->getWeight(),
-            Product::ATTRIBUTE_VOLUME => (string) $oxProduct->getSize(),
+            Product::ATTRIBUTE_WEIGHT => $oxProduct->oxarticles__oxweight->value,
+            Product::ATTRIBUTE_VOLUME => (string) $size,
             Product::ATTRIBUTE_DIMENSION => $sDimension,
             // reference quantity is always 1 in oxid shop
             Product::ATTRIBUTE_REFERENCE_QUANTITY => 1,
-            Product::ATTRIBUTE_QUANTITY => $oxProduct->getUnitQuantity(),
+            Product::ATTRIBUTE_QUANTITY => $oxProduct->oxarticles__oxunitquantity->value,
         );
 
         // set optional unit
