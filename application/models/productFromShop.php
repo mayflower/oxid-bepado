@@ -45,28 +45,6 @@ class oxidProductFromShop implements ProductFromShop
         return $sdkProducts;
     }
 
-    public function getShopProducts(array $ids)
-    {
-        $shopProducts = array();
-
-        foreach ($ids as $id) {
-            // load oxid article
-            /**
-             * @var oxarticle $oxProduct
-             */
-            $oxProduct = oxNew('oxarticle');
-            $oxProduct->load($id);
-
-            if (!$oxProduct->readyForExportToBepado() || !$oxProduct->isLoaded()) {
-                continue;
-            }
-
-            $shopProducts[] = $oxProduct;
-        }
-
-        return $shopProducts;
-    }
-
     /**
      * @throws \BadMethodCallException
      *
