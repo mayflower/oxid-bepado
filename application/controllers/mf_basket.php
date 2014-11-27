@@ -20,11 +20,11 @@ class mf_basket extends mf_basket_parent
 
             /** @var mf_bepado_oxarticle $product */
             $product = $basketItem->getArticle();
-            $sdkProduct = $product->getSdkProduct();
 
             $errorMsg = [];
 
             if ($product->isImportedFromBepado()) {
+                $sdkProduct = $product->getSdkProduct();
                 $check = $product->checkProductWithBepardo($sdkProduct);
                 // update sdkProduct
                 foreach ($check as $shopId => $result) {
@@ -38,14 +38,22 @@ class mf_basket extends mf_basket_parent
                     }
                 }
                 $sdkProduct = $product->getSdkProduct();
-                
+
                 if ($amount > $sdkProduct->availability) {
-                   $errorMsg[] = 'This product is available only ' . $sdkProduct->availability . ' times.';
+                    $errorMsg[] =
+                        'This product is available only ' .
+                        $sdkProduct->availability . ' time' .
+                        ($sdkProduct->availability == 1 ? '.' : 's.') .
+                        ' Either delete the product or purchase the reduced amount.';
+                    $basketItem->setAmount($sdkProduct->availability);
                 }
 
                 if ($errorMsg) {
-                    $checkList = '<ul><li>' . implode('</li><li>', $errorMsg) . '</li></ul>';
-                    $this->_aViewData['checkMsg'] = $checkList;
+                    $checkList = '<ul><li><i>' . implode('</i></li><li><i>', $errorMsg) . '</i></li></ul>';
+                    $basketItem->bepado_check = new oxField(
+                        $checkList,
+                        oxField::T_TEXT
+                    );
                 }
             }
         }

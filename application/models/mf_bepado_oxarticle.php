@@ -136,7 +136,7 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     /**
      * @param Product $sdkProduct
      *
-     * @return bool|array
+     * @return array
      * @throws Exception
      */
     public function checkProductWithBepardo($sdkProduct)
@@ -148,17 +148,16 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         $config  = $this->getSdkHelper()->createSdkConfigFromOxid();
         $sdk = $this->getSdkHelper()->instantiateSdk($config);
 
-        $result = null;
+        $results = [$sdkProduct->shopId => true];
 
         try {
             $results = $sdk->checkProducts(array($sdkProduct));
-            $result = $results[0];
 
         } catch (\Exception $e) {
-            # var_dump($e);
+            # throw new Exception("No connection to SDK.");
         }
 
-        return $result;
+        return $results;
     }
 
     private function productIsKnown($oxProductId)
