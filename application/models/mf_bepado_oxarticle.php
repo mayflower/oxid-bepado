@@ -112,6 +112,7 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
 
     /**
      * @return Product
+     * @throws Exception
      */
     public function getSdkProduct()
     {
@@ -148,7 +149,8 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         $config  = $this->getSdkHelper()->createSdkConfigFromOxid();
         $sdk = $this->getSdkHelper()->instantiateSdk($config);
 
-        $results = [$sdkProduct->shopId => true];
+        $results = [];
+        #$results = [$sdkProduct->shopId => true];
 
         try {
             $results = $sdk->checkProducts(array($sdkProduct));
