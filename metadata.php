@@ -31,6 +31,7 @@ $aModule = array(
         'category_main'         => $aPaths['controllers'] . '/admin/mf_category_main',
         'category_list'         => $aPaths['controllers'] . '/admin/mf_category_list',
         'basket'                => $aPaths['controllers'] . '/mf_basket',
+        'order'                 => $aPaths['controllers'] . '/mf_order',
 
         'oxarticle'             => $aPaths['models'] . '/mf_bepado_oxarticle',
     ),
