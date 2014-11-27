@@ -88,14 +88,14 @@ class oxidProductFromShop implements ProductFromShop
     public function reserve(Order $order)
     {
         /** @var oxBasket $oxBasket */
-        $oxBasket = oxNew('oxbasket');
+        $oxBasket = $this->_oVersionLayer->createNewObject('oxbasket');
         $this->addToBasket($order->orderItems, $oxBasket);
         if ($oxBasket->getProductsCount() === 0) {
             throw new Exception('No valid products in basket');
         }
 
         /** @var oxOrder $oxOrder */
-        $oxOrder = oxNew('oxorder');
+        $oxOrder = $this->_oVersionLayer->createNewObject('oxorder');
         $stockValidation = $oxOrder->validateStock($oxBasket);
 
         if (!$stockValidation) {

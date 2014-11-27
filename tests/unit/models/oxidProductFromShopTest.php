@@ -172,6 +172,33 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->assertEquals($expectedId, $actualId);
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedMessage "No valid products in basket"
+     */
+    public function testReserveWithEmptyBasket()
+    {
+        $order = new Struct\Order();
+        $order->orderItems = array();
+
+        $this->productFromShop->reserve($order);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedMessage "Stock of articles is not valid"
+     */
+    public function testReserveWithInvalidStock()
+    {
+        $order = new Struct\Order();
+        $order->orderItems = array();
+
+        // expected method calls
+        $this->oxOrder->expects($this->once())->method('validateStock')->will($this->returnValue(false));
+
+        $this->productFromShop->reserve($order);
+    }
+
     protected function getObjectMapping()
     {
         return array(
