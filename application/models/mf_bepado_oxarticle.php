@@ -120,17 +120,6 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
 
         $sdkProduct = $sdkConverter->toBepadoProduct($this);
 
-        return $sdkProduct;
-    }
-
-    /**
-     * @return bool|array
-     * @throws Exception
-     */
-    public function checkProductWithBepardo()
-    {
-        $sdkProduct = $this->getSdkProduct();
-
         if (!$this->isImportedFromBepado()) {
             throw new Exception("Product is not imported from Bepado.");
         }
@@ -140,6 +129,21 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         $oState->load($this->getId());
 
         $sdkProduct->shopId = $oState->bepado_product_state__shop_id->rawValue;
+
+        return $sdkProduct;
+    }
+
+    /**
+     * @param Product $sdkProduct
+     *
+     * @return bool|array
+     * @throws Exception
+     */
+    public function checkProductWithBepardo($sdkProduct)
+    {
+        if (!$this->isImportedFromBepado()) {
+            throw new Exception("Product is not imported from Bepado.");
+        }
 
         $config  = $this->getSdkHelper()->createSdkConfigFromOxid();
         $sdk = $this->getSdkHelper()->instantiateSdk($config);

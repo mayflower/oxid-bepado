@@ -30,9 +30,9 @@ $aModule = array(
         'article_list'          => $aPaths['controllers'] . '/admin/mf_article_list',
         'category_main'         => $aPaths['controllers'] . '/admin/mf_category_main',
         'category_list'         => $aPaths['controllers'] . '/admin/mf_category_list',
+        'basket'                => $aPaths['controllers'] . '/mf_basket',
 
         'oxarticle'             => $aPaths['models'] . '/mf_bepado_oxarticle',
-        'oxbasket'              => $aPaths['models'] . '/mf_oxbasket',
     ),
     'files'   => array(
         'mfbepado'              => $aPaths['controllers'] . '/mfBepado.php',

@@ -42,7 +42,7 @@ class mf_oxbasket extends mf_oxbasket_parent
             );
         }
 
-        $checked = $oxProduct->checkProductWithBepardo();
+        $checked = $oxProduct->checkProductWithBepardo($oxProduct->getSdkProduct());
 
         // change Product according to check?
 
