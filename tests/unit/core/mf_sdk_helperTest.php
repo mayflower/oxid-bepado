@@ -49,5 +49,10 @@ class mf_sdk_helperTest extends BaseTestCase
         $this->assertEquals('test-key', $sdConfig->getApiKey());
         $this->assertFalse($sdConfig->getProdMode());
     }
+
+    protected function getObjectMapping()
+    {
+        return array();
+    }
 }
  

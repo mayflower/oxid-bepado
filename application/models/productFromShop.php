@@ -145,8 +145,15 @@ class oxidProductFromShop implements ProductFromShop
         $shippingCosts = $sdk->calculateShippingCosts($order);
         $oxBasket->setDeliveryPrice($shippingCosts->shippingCosts);
         /** @var oxPrice $oxPrice */
-        $oxPrice = $this->getVersionLayer()->createNewObject('oxPrice');
-        $oxPrice->setPrice($shippingCosts->grossShippingCosts, ((100*$shippingCosts->grossShippingCosts/$shippingCosts->shippingCosts))/100 - 1);
+        $oxPrice = $this->getVersionLayer()->createNewObject('oxprice');
+        if (0 === $shippingCosts->shippingCosts) {
+            $oxPrice->setPrice(0);
+        } else {
+            $oxPrice->setPrice(
+                $shippingCosts->grossShippingCosts,
+                ((100*$shippingCosts->grossShippingCosts/$shippingCosts->shippingCosts))/100 - 1
+            );
+        }
         $oxBasket->setCost('oxdelivery', $oxPrice);
         /** @var oxOrder $oxOrder */
         $oxOrder = $this->getVersionLayer()->createNewObject('oxorder');
@@ -214,9 +221,9 @@ class oxidProductFromShop implements ProductFromShop
      */
     private function createPaymentID(Order $order)
     {
-        $oxPayment = oxNew('oxpayment');
+        $oxPayment = $this->_oVersionLayer->createNewObject('oxpayment');
         $select = $oxPayment->buildSelectString(array('bepadopaymenttype' => $order->paymentType));
-        $paymentID = oxDb::getDb(true)->getOne($select);
+        $paymentID = $this->_oVersionLayer->getDb(true)->getOne($select);
 
         return $paymentID ?: null;
     }
@@ -272,13 +279,13 @@ class oxidProductFromShop implements ProductFromShop
             throw new SecurityException(sprintf('Shop with id %s not known', $shopId));
         }
 
-        $oxGroup = oxNew('oxgroups');
+        $oxGroup = $this->_oVersionLayer->createNewObject('oxgroups');
         if (!$oxGroup->load(self::BEPADO_USERGROUP_ID)) {
             throw new \RuntimeException('No user group for bepado remote shop found.');
         }
 
         /** @var oxUser $shopUser */
-        $shopUser = oxNew('oxuser');
+        $shopUser = $this->_oVersionLayer->createNewObject('oxuser');
         $select = $shopUser->buildSelectString(array('bepadoshopid' => $shopId, 'OXACTIVE' => 1));
         $shopUser->assignRecord($select);
 
