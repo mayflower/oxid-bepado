@@ -18,6 +18,7 @@ class mf_sdk_helperTest extends BaseTestCase
 
         $this->helper = new mf_sdk_helper();
         $this->helper->setVersionLayer($this->versionLayer);
+
     }
 
     /**
