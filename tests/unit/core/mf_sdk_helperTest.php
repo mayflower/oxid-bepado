@@ -48,6 +48,38 @@ class mf_sdk_helperTest extends BaseTestCase
         $this->assertEquals('test-endpoint', $sdConfig->getApiEndpointUrl());
         $this->assertEquals('test-key', $sdConfig->getApiKey());
         $this->assertFalse($sdConfig->getProdMode());
+        $this->assertNotNull($sdConfig->getSocialnetworkHost());
+        $this->assertNotNull($sdConfig->getTransactionHost());
+        $this->assertNotNull($sdConfig->getSearchHost());
+    }
+
+    public function testConfigCreationInProductMode()
+    {
+        $oxConfig = $this->getMock('oxConfig');
+        $versionLayer = $this->getMock('VersionLayerInterface');
+        $versionLayer->expects($this->once())->method('getConfig')->will($this->returnValue($oxConfig));
+        $this->helper->setVersionLayer($versionLayer);
+        $oxConfig->expects($this->at(0))
+            ->method('getConfigParam')
+            ->with($this->equalTo('sBepadoLocalEndpoint'))
+            ->will($this->returnValue('test-endpoint'));
+        $oxConfig->expects($this->at(1))
+            ->method('getConfigParam')
+            ->with($this->equalTo('sBepadoApiKey'))
+            ->will($this->returnValue('test-key'));
+
+        $oxConfig->expects($this->at(2))
+            ->method('getConfigParam')
+            ->with($this->equalTo('prodMode'))
+            ->will($this->returnValue(true));
+        $sdConfig = $this->helper->createSdkConfigFromOxid();
+
+        $this->assertEquals('test-endpoint', $sdConfig->getApiEndpointUrl());
+        $this->assertEquals('test-key', $sdConfig->getApiKey());
+        $this->assertTrue($sdConfig->getProdMode());
+        $this->assertNull($sdConfig->getSocialnetworkHost());
+        $this->assertNull($sdConfig->getTransactionHost());
+        $this->assertNull($sdConfig->getSearchHost());
     }
 
     public function testImageCreation()
