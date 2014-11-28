@@ -60,7 +60,7 @@ class mf_product_helper
                             'This product is available only ' .
                             $sdkProduct->availability . ' time' .
                             ($sdkProduct->availability == 1 ? '.' : 's.') .
-                            ' Either delete the product or purchase the reduced amount.';
+                            ' Either delete the product from your basket or purchase the reduced amount.';
                     } else {
                         $errorMsg[] =
                             'This product is not available at the moment.';
