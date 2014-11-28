@@ -25,8 +25,6 @@ class mf_article_extend extends mf_article_extend_parent
 
     public function save()
     {
-        parent::save();
-
         $oBepadoProductState = $this->createBepadoProductState();
         $aParams = oxRegistry::getConfig()->getRequestParameter("editval");
         $articleState = isset($aParams['export_to_bepado']) &&  "1" === $aParams['export_to_bepado'] ? true : false;
@@ -43,6 +41,7 @@ class mf_article_extend extends mf_article_extend_parent
             $oBepadoProductState->save();
         }
 
+        parent::save();
     }
 
     /**

@@ -39,6 +39,7 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
             $sdk->recordDelete($oxProductId);
         } elseif ($this->readyForExportToBepado() && !$this->productIsKnown($oxProductId)) {
             $sdk->recordInsert($oxProductId);
+
         }
 
         return $return;
