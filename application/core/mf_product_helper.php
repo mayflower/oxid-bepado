@@ -1,6 +1,8 @@
 <?php
 
 use Bepado\SDK\Struct\Product;
+use Bepado\SDK\Struct\Reservation;
+use Bepado\SDK\Struct\Order;
 
 class mf_product_helper
 {
@@ -38,11 +40,11 @@ class mf_product_helper
             if ($product->isImportedFromBepado()) {
                 $sdkProduct = $product->getSdkProduct();
                 $check = $this->checkProductWithBepardo($sdkProduct);
-                // update sdkProduct
                 foreach ($check as $shopId => $result) {
                     if ($result === true) {
                         // everything alright
                     } else {
+                        // update sdkProduct
                         $this->productToShop->insertOrUpdate($sdkProduct);
                         foreach ($result as $message) {
                             $errorMsg[] = $message;
@@ -101,6 +103,30 @@ class mf_product_helper
         }
 
         return $results;
+    }
+
+    /**
+     * Not done or functional afaik
+     *
+     * @param Order $sdkOrder
+     *
+     * @return bool[]
+     */
+    public function reserveProductWithBepado($sdkOrder)
+    {
+        $config = $this->getSdkHelper()->createSdkConfigFromOxid();
+        $sdk = $this->getSdkHelper()->instantiateSdk($config);
+
+        $reservation = $sdk->reserveProducts($sdkOrder);
+        if (!$reservation->success) {
+            foreach ($reservation->messages as $shopId => $messages) {
+                // handle individual error messages here
+            }
+        }
+
+        $result = $sdk->checkout($reservation, $sdkOrder->localOrderId);
+
+        return $result;
     }
 
     /**
