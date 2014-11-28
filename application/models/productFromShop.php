@@ -148,6 +148,14 @@ class oxidProductFromShop implements ProductFromShop
         $shopUser->onOrderExecute($oxBasket, $iSuccess);
         $this->cleanUp();
 
+        /*
+        $oBepadoOrderState = $this->getVersionLayer()->createNewObject('oxbase');
+        $oBepadoOrderState->init('bepado_product_state');
+        $values = array('oxid_order_id' => $oxOrder->getId(), 'bepado_order_id' => $order->providerOrderId);
+        $oBepadoOrderState->assign($values);
+        $oBepadoOrderState->save();
+        */
+
         return $oxOrder->getId();
     }
 
