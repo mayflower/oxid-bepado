@@ -3,32 +3,31 @@
 
 class mf_order extends mf_order_parent
 {
+    /**
+     * @var mf_product_helper
+     */
+    private $_oProductHelper;
+
     public function render()
     {
-        parent::render();
+        $parent = parent::render();
 
-        $aBasket = $this->_aViewData['oxcmp_basket']->getContents();
+        $oxBasket = $this->_aViewData['oxcmp_basket'];
 
-        /** @var  oxbasketitem $basketItem */
-        foreach ($aBasket as $basketItem) {
-            $amount = $basketItem->getAmount();
+        $this->getProductHelper()->checkProductsWithBepado($oxBasket);
 
-            /** @var mf_bepado_oxarticle $product */
-            $product = $basketItem->getArticle();
+        return $parent;
+    }
 
-            if ($product->isImportedFromBepado()) {
-                $check = $product->checkProductWithBepardo($product->getSdkProduct());
-                // update sdkProduct
-                $sdkProduct = $product->getSdkProduct();
-                if ($amount > $sdkProduct->availability) {
-                    // request amount bigger than availability
-                }
-            }
+    /**
+     * @return mf_product_helper
+     */
+    private function getProductHelper()
+    {
+        if ($this->_oProductHelper === null) {
+            $this->_oProductHelper = oxNew('mf_product_helper');
         }
 
-        // render error messages into template an show updated products in basket
-        // if order not possible, delete basket item
-
-        return parent::render();
+        return $this->_oProductHelper;
     }
 } 

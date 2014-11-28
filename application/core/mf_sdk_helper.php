@@ -75,25 +75,6 @@ class mf_sdk_helper
     }
 
     /**
-     * @return int
-     */
-    public function getState($id)
-    {
-        /** @var oxBase $oBepadoProductState */
-        $oBepadoProductState = oxNew('oxbase');
-        $oBepadoProductState->init('bepado_product_state');
-        $oBepadoProductState->load($id);
-
-        $state = $oBepadoProductState->bepado_product_state__state->rawValue;
-
-        if (!$state) {
-            $state = SDKConfig::ARTICLE_STATE_NONE;
-        }
-
-        return $state;
-    }
-
-    /**
      * Create and/or returns the VersionLayer.
      *
      * @return VersionLayerInterface
