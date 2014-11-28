@@ -49,7 +49,17 @@ class oxidProductFromShop implements ProductFromShop
      */
     public function getExportedProductIDs()
     {
-        throw new \BadMethodCallException('Not needed in oxid module.');
+        $ids = array();
+        $sql = "SELECT p_source_id FROM bepado_product_state WHERE state = ".SDKConfig::ARTICLE_STATE_EXPORTED;
+        $oxDB = $this->_oVersionLayer->getDb(true);
+        $list = $oxDB->execute($sql);
+
+        while (!$list->EOF) {
+            $ids[] = $list->fields[0];
+            $list->MoveNext();
+        }
+
+        return $ids;
     }
 
     /**
