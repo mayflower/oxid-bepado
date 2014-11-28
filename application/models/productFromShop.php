@@ -25,21 +25,18 @@ class oxidProductFromShop implements ProductFromShop
     {
         $sdkProducts = array();
         /** @var mf_sdk_converter $oModuleSDKConverter */
-        $oModuleSDKConverter = oxNew('mf_sdk_converter');
+        $oModuleSDKConverter = $this->_oVersionLayer->createNewObject('mf_sdk_converter');
 
         foreach ($ids as $id) {
-            // load oxid article
-            /**
-             * @var oxarticle $oxProduct
-             */
-            $oxProduct = oxNew('oxarticle');
-            $oxProduct->load($id);
+            /** @var oxarticle $oxArticle */
+            $oxArticle = $this->_oVersionLayer->createNewObject('oxarticle');
+            $load = $oxArticle->load($id);
 
-            if (!$oxProduct->readyForExportToBepado()) {
+            if (!$load || !$oxArticle->readyForExportToBepado()) {
                 continue;
             }
 
-            $sdkProducts[] = $oModuleSDKConverter->toBepadoProduct($oxProduct);
+            $sdkProducts[] = $oModuleSDKConverter->toBepadoProduct($oxArticle);
         }
 
         return $sdkProducts;
@@ -231,7 +228,7 @@ class oxidProductFromShop implements ProductFromShop
         }
 
 
-        $oxProducts = $this->getShopProducts(array_keys($products));
+        $oxProducts = $this->getProducts(array_keys($products));
         foreach ($oxProducts as $oxProduct) {
             $amount = $products[$oxProduct->getId()]['count'];
             $oxBasket->addToBasket($oxProduct->getId(), $amount);

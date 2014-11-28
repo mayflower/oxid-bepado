@@ -25,6 +25,8 @@ class oxidProductFromShopTest extends BaseTestCase
     protected $oxPayment;
     protected $oxPrice;
     protected $oxOrder;
+    protected $converter;
+    protected $oxArticle;
 
     public function setUp()
     {
@@ -41,6 +43,8 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->oxPayment = $this->getMockBuilder('oxPayment')->disableOriginalConstructor()->getMock();
         $this->oxPrice = $this->getMockBuilder('oxPrice')->disableOriginalConstructor()->getMock();
         $this->oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
+        $this->oxArticle = $this->getMockBuilder('mf_bepado_oxarticle')->disableOriginalConstructor()->getMock();
+        $this->converter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
 
         $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
@@ -53,6 +57,19 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->sdkConfig->setProdMode(false);
         $this->sdkHelper->expects($this->any())->method('createSdkConfigFromOxid')->will($this->returnValue($this->sdkConfig));
         $this->sdkHelper->expects($this->any())->method('instantiateSdk')->will($this->returnValue($this->sdk));
+    }
+
+    public function tearDown()
+    {
+        unset(
+            $this->oxArticle,
+            $this->oxOrder,
+            $this->oxBasket,
+            $this->oxDb,
+            $this->oxUser,
+            $this->oxGroup,
+            $this->oxPayment
+        );
     }
 
     /**
@@ -199,16 +216,76 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->productFromShop->reserve($order);
     }
 
+    public function testGetProductsNoExportedProducts()
+    {
+        $this->oxArticle
+            ->expects($this->any())
+            ->method('load')
+            ->with($this->equalTo('some-id'))
+            ->will($this->returnValue(true));
+        $this->oxArticle
+            ->expects($this->any())
+            ->method('readyForExportToBepado')
+            ->will($this->returnValue(false));
+
+        $actual = $this->productFromShop->getProducts(array('some-id'));
+
+        $this->assertCount(0, $actual);
+    }
+
+    public function testGetProductsWithNonExistingArticle()
+    {
+        $this->oxArticle
+            ->expects($this->any())
+            ->method('load')
+            ->with($this->equalTo('some-id'))
+            ->will($this->returnValue(false));
+        $this->oxArticle
+            ->expects($this->any())
+            ->method('readyForExportToBepado')
+            ->will($this->returnValue(true));
+
+        $actual = $this->productFromShop->getProducts(array('some-id'));
+
+        $this->assertCount(0, $actual);
+    }
+
+    public function testGetProducts()
+    {
+        $this->oxArticle
+            ->expects($this->any())
+            ->method('load')
+            ->with($this->equalTo('some-id'))
+            ->will($this->returnValue(true));
+        $this->oxArticle
+            ->expects($this->any())
+            ->method('readyForExportToBepado')
+            ->will($this->returnValue(true));
+
+        $this->converter
+            ->expects($this->once())
+            ->method('toBepadoProduct')
+            ->will($this->returnValue(new Struct\Product()));
+
+        $actual = $this->productFromShop->getProducts(array('some-id'));
+
+        $this->assertCount(1, $actual);
+        $actualArticle = array_shift($actual);
+        $this->assertEquals(new Struct\Product(), $actualArticle);
+    }
+
     protected function getObjectMapping()
     {
         return array(
-            'oxuser'        => $this->oxUser,
-            'oxgroups'      => $this->oxGroup,
-            'oxbasket'      => $this->oxBasket,
-            'oxpayment'     => $this->oxPayment,
-            'oxprice'       => $this->oxPrice,
-            'oxorder'       => $this->oxOrder,
-            'mf_sdk_helper' => $this->sdkHelper,
+            'oxuser'           => $this->oxUser,
+            'oxgroups'         => $this->oxGroup,
+            'oxbasket'         => $this->oxBasket,
+            'oxpayment'        => $this->oxPayment,
+            'oxprice'          => $this->oxPrice,
+            'oxorder'          => $this->oxOrder,
+            'mf_sdk_converter' => $this->converter,
+            'oxarticle'        => $this->oxArticle,
+            'mf_sdk_helper'    => $this->sdkHelper,
         );
     }
 }
