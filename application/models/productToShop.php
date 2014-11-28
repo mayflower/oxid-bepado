@@ -37,53 +37,27 @@ class oxidProductToShop implements ProductToShop
     public function insertOrUpdate(Struct\Product $product)
     {
         /** @var mf_sdk_converter $productConverter */
-        $productConverter = oxRegistry::get('mf_sdk_converter');
+        $productConverter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
         $oxArticle = $productConverter->toShopProduct($product);
 
         /** @var oxBase $oBepadoProductState */
-        $oBepadoProductState = oxNew('oxbase');
+        $oBepadoProductState = $this->getVersionLayer()->createNewObject('oxbase');
         $oBepadoProductState->init('bepado_product_state');
         $select = $oBepadoProductState->buildSelectString(array(
             'p_source_id' => $product->sourceId,
             'shop_id' => $product->shopId
         ));
-        $id = $this->getVersionLayer()->getDb(true)->getOne($select);
-        if ($id) {
+
+        if ($id = $this->getVersionLayer()->getDb(true)->getOne($select)) {
             $oBepadoProductState->load($id);
-        }
 
-        if (!$oBepadoProductState->isLoaded()) {
-            // create a new article, make sure that is isn't active by default
-            $oxArticle->assign(array('oxarticles__oxactive' => 0));
-            $oxArticle->save();
-            
-            // insert into mapping/state table
-            $oBepadoProductState->assign(array(
-                    'p_source_id' => $product->sourceId,
-                    'shop_id'     => $product->shopId,
-                    'state'       => SDKConfig::ARTICLE_STATE_IMPORTED,
-                    'OXID'        => $oxArticle->getId(),
-                )
-            );
-            $oBepadoProductState->save();
+        }
+        if ($oBepadoProductState->isLoaded()) {
+            $this->updateArticle($oxArticle, $oBepadoProductState->getId());
         } else {
-            $persistedoxArticle = oxNew('oxarticle');
-            $persistedoxArticle->load($oBepadoProductState->getId());
-
-            // update existing fields
-            if ($persistedoxArticle->isLoaded()) {
-                $fieldNames = $oxArticle->getFieldNames();
-                $aParams = array();
-                foreach ($fieldNames as $name) {
-                    if ('oxid' == $name) {
-                        continue;
-                    }
-                    $aParams['oxarticles__'.$name] = $oxArticle->getFieldData($name);
-                }
-                $persistedoxArticle->assign($aParams);
-                $persistedoxArticle->save();
-            }
+            $this->insertArticleWithBepadoState($oxArticle, $oBepadoProductState, $product);
         }
+
     }
 
     /**
@@ -142,5 +116,66 @@ class oxidProductToShop implements ProductToShop
     public function commit()
     {
         // TODO: Implement commit() method.
+    }
+
+    /**
+     * @param VersionLayerInterface $versionLayer
+     */
+    public function setVersionLayer(VersionLayerInterface $versionLayer)
+    {
+        $this->_oVersionLayer = $versionLayer;
+    }
+
+    /**
+     * Creating a new article means setting it inactive and create a
+     * state entry.
+     *
+     * @param oxArticle      $oxArticle
+     * @param oxBase         $oBepadoProductState
+     * @param Struct\Product $product
+     */
+    private function insertArticleWithBepadoState(oxArticle $oxArticle, oxBase $oBepadoProductState, Struct\Product $product)
+    {
+        $oxArticle->assign(array('oxarticles__oxactive' => 0));
+        $oxArticle->save();
+
+        // insert into mapping/state table
+        $oBepadoProductState->assign(array(
+                'p_source_id' => $product->sourceId,
+                'shop_id'     => $product->shopId,
+                'state'       => SDKConfig::ARTICLE_STATE_IMPORTED,
+                'OXID'        => $oxArticle->getId(),
+            )
+        );
+        $oBepadoProductState->save();
+    }
+
+    /**
+     * When updating a product it should exist in the database as an oxArticle
+     * and update its data.
+     *
+     * @param oxArticle $oxArticle
+     */
+    private function updateArticle(oxArticle $oxArticle, $persistedId)
+    {
+
+        $persistedoxArticle = $this->getVersionLayer()->createNewObject('oxarticle');
+        $persistedoxArticle->load($persistedId);
+
+        if (!$persistedoxArticle->isLoaded()) {
+            return;
+        }
+
+        $fieldNames = $oxArticle->getFieldNames();
+        $aParams = array();
+        foreach ($fieldNames as $name) {
+            if ('oxid' == $name) {
+                continue;
+            }
+            $aParams['oxarticles__'.$name] = $oxArticle->getFieldData($name);
+        }
+
+        $persistedoxArticle->assign($aParams);
+        $persistedoxArticle->save();
     }
 }
