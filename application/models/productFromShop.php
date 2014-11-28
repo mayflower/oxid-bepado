@@ -55,7 +55,7 @@ class oxidProductFromShop implements ProductFromShop
         $list = $oxDB->execute($sql);
 
         while (!$list->EOF) {
-            $ids[] = $list->fields[0];
+            $ids[] = $list->fields['p_source_id'];
             $list->MoveNext();
         }
 
