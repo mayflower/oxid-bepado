@@ -39,7 +39,7 @@ for option in "$@"; do
             ;;
         '--run-coverage' | '-c')
             rm -rf "$TESTDIR/coverage"
-            __COVERAGE="--coverage-html \"${TESTDIR}/coverage\""
+            __COVERAGE="--coverage-html \"./coverage\""
             ;;
 #        '--configuration='*)
 #            __CONFIG="$option"

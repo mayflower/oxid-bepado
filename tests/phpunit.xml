@@ -25,6 +25,7 @@
                 <directory suffix=".php">../translations/</directory>
                 <directory suffix=".php">../views/</directory>
                 <directory suffix=".php">../out/</directory>
+                <directory>../vendor/</directory>
                 <file suffix=".php">../metadata.php</file>
             </exclude>
         </whitelist>

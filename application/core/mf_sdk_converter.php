@@ -246,4 +246,12 @@ class mf_sdk_converter //implements ProductConverter
 
         return $this->_oVersionLayer;
     }
+
+    /**
+     * @param VersionLayerInterface $versionLayer
+     */
+    public function setVersionLayer(VersionLayerInterface $versionLayer)
+    {
+        $this->_oVersionLayer = $versionLayer;
+    }
 } 
