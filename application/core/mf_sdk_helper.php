@@ -120,7 +120,7 @@ class mf_sdk_helper
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
         $data = curl_exec($ch);
-        $info = curl_getinfo($ch);
+        curl_getinfo($ch);
 
         $maxFilesSize = ini_get('upload_max_filesize');
         $maxFilesSize = trim($maxFilesSize, 'M');
@@ -154,6 +154,12 @@ class mf_sdk_helper
         return array('oxarticles__oxpic' . $key, $sImageName);
     }
 
+    /**
+     * Depending on the settings set the config the env var entries will be
+     * set or not.
+     *
+     * @param SDKConfig $sdkConfig
+     */
     private function prepareHosts(SDKConfig $sdkConfig)
     {
         if (null !== $sdkConfig->getSocialnetworkHost()) {
