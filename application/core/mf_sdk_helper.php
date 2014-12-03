@@ -123,8 +123,9 @@ class mf_sdk_helper
         $oShopConfig = $this->getVersionLayer()->getConfig();
 
         $ch = curl_init($imagePath);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_HEADER, TRUE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
         $data = curl_exec($ch);
         $info = curl_getinfo($ch);
 
@@ -150,7 +151,7 @@ class mf_sdk_helper
             throw new \Exception('Can not create file to write image data into.');
         }
 
-        $writeResult = fwrite($fileHandle,$data);
+        $writeResult = fwrite($fileHandle, $data, $fileSize);
         if (!$writeResult) {
             throw new \Exception('Problems while writing into file.');
         }
