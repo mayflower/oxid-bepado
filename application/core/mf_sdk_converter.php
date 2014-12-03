@@ -97,7 +97,6 @@ class mf_sdk_converter //implements ProductConverter
         $currency = array_shift($currency);
         $rate = $currency->rate;
 
-        $aParams['oxarticles__oxshopid'] = $sdkProduct->shopId;
         $aParams['oxarticles__oxean'] = $sdkProduct->ean;
         $aParams['oxarticles__oxexturl'] = $sdkProduct->url;
         $aParams['oxarticles__oxtitle'] = $sdkProduct->title;
