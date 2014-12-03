@@ -114,19 +114,49 @@ class mf_sdk_helper
      * @param string $imagePath
      * @param int $key
      *
+     * @throws Exception
+     *
      * @return array
      */
     public function createOxidImageFromPath($imagePath, $key)
     {
         $oShopConfig = $this->getVersionLayer()->getConfig();
 
+        $ch = curl_init($imagePath);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, TRUE);
+        $data = curl_exec($ch);
+        $info = curl_getinfo($ch);
+
+        $maxFilesSize = ini_get('upload_max_filesize');
+        $maxFilesSize = trim($maxFilesSize, 'M');
+        $maxFilesSize = $maxFilesSize*1024*1024;
+        $fileSize = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+        if ($fileSize > $maxFilesSize) {
+            throw new \Exception('File to large');
+        }
+
+        if (300 <= curl_getinfo($ch, CURLINFO_HTTP_CODE)  || 0 === curl_getinfo($ch, CURLINFO_HTTP_CODE)) {
+            throw new \Exception('Can not fetch the file in path '.$imagePath);
+        }
+
+        curl_close($ch);
+
         $aImagePath = explode('/', $imagePath);
         $sImageName = $aImagePath[(count($aImagePath) - 1)];
-        $aParams['oxarticles__oxpic' . ($key + 1)] = $sImageName;
+        $destFileName = $oShopConfig->getMasterPictureDir().'product/'.($key).'/'.$sImageName;
+        $fileHandle = fopen($destFileName, 'w');
+        if (!$fileHandle) {
+            throw new \Exception('Can not create file to write image data into.');
+        }
 
-        copy($imagePath, $oShopConfig->getMasterPictureDir() . 'product/' . ($key + 1) . '/' . $sImageName);
+        $writeResult = fwrite($fileHandle,$data);
+        if (!$writeResult) {
+            throw new \Exception('Problems while writing into file.');
+        }
 
-        return array('oxarticles__oxpic' . ($key + 1), $sImageName);
+        fclose($fileHandle);
+        return array('oxarticles__oxpic'.$key, $sImageName);
     }
 }
  

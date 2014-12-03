@@ -50,6 +50,27 @@ class mf_sdk_helperTest extends BaseTestCase
         $this->assertFalse($sdConfig->getProdMode());
     }
 
+    public function testImageCreation()
+    {
+        $this->oxidConfig
+            ->expects($this->any())
+            ->method('getMasterPictureDir')
+            ->will($this->returnValue(__DIR__.'/../testdata/'));
+        list($fieldName, $fieldValue) = $this->helper
+            ->createOxidImageFromPath('https://media-cdn.tripadvisor.com/media/photo-s/05/03/17/b3/aviarios-del-caribe-sloth.jpg', 1);
+
+        $this->assertEquals('oxarticles__oxpic1', $fieldName);
+        $this->assertEquals('aviarios-del-caribe-sloth.jpg', $fieldValue);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testImageCreateWithNonExistingFile()
+    {
+        $this->helper->createOxidImageFromPath('some-path', 1);
+    }
+
     protected function getObjectMapping()
     {
         return array();
