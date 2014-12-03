@@ -61,6 +61,12 @@ class mf_sdk_helperTest extends BaseTestCase
 
         $this->assertEquals('oxarticles__oxpic1', $fieldName);
         $this->assertEquals('aviarios-del-caribe-sloth.jpg', $fieldValue);
+
+        // clean up
+        $filePath = __DIR__.'/../testdata/product/1/aviarios-del-caribe-sloth.jpg';
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
     }
 
     /**
