@@ -31,7 +31,7 @@ class mf_sdk_converterTest extends BaseTestCase
         'freeDelivery'     => false,
         'deliveryDate'     => null,
         'availability'     => 10,
-        'images'           => array(),
+        'images'           => array('imgage-url-1'),
         'categories'       => array(),
         'tags'             => array(),
         'relevance'        => 0,
@@ -59,8 +59,11 @@ class mf_sdk_converterTest extends BaseTestCase
         'oxarticles__oxlength'       => 13,
         'oxarticles__oxheight'       => 14,
         'oxarticles__oxunitquantity' => 10,
-        'oxarticles__oxunitname'     => '_UNIT_G'
+        'oxarticles__oxunitname'     => '_UNIT_G',
+        'oxarticles__oxpic1'         => 'imgage-url-1',
     );
+
+    protected $sdkHelper;
 
     public function setUp()
     {
@@ -71,6 +74,7 @@ class mf_sdk_converterTest extends BaseTestCase
 
         // oxid objects
         $this->oxShop = $this->getMockBuilder('oxShop')->disableOriginalConstructor()->getMock();
+        $this->sdkHelper = $this->getMockBuilder('mf_sdk_helper')->disableOriginalConstructor()->getMock();
 
         // expected method with its values to return
         $currencyItem = new \stdClass();
@@ -100,12 +104,22 @@ class mf_sdk_converterTest extends BaseTestCase
         }
     }
 
+    /**
+     * Can not test the following properties atm:
+     *  - vendor: cause its set on some cruell ways by the shop, got no influence atm
+     *  - longDescription: some strange setter in oxArticle
+     *
+     * @return array
+     */
     public function provideProductValues()
     {
         $values = array();
 
         foreach ($this->productValues as $property => $value) {
             $testable = in_array($property, array('vendor', 'longDescription')) ? false : true;
+            if ('images' === $property) {
+                $value = array('http://www.oxid-test.dev/out/pictures/generated/product/1/380_340_75/nopic.jpg'); // default image for non existing images
+            }
             $values[] = array($property, $value, $testable);
         }
 
@@ -122,6 +136,13 @@ class mf_sdk_converterTest extends BaseTestCase
             $product->$property = $propertyValue;
         }
 
+        // expected behavior of helper
+        $this->sdkHelper
+            ->expects($this->any())
+            ->method('createOxidImageFromPath')
+            ->with($this->equalTo('imgage-url-1'), $this->equalTo(1))
+            ->will($this->returnValue(array('oxarticles__oxpic1', 'imgage-url-1')))
+        ;
         $oxArticle = $this->converter->toShopProduct($product);
 
         if ($testable) {
@@ -154,7 +175,8 @@ class mf_sdk_converterTest extends BaseTestCase
     protected function getObjectMapping()
     {
         return array(
-            'oxshop' => $this->oxShop,
+            'oxshop'         => $this->oxShop,
+            'mf_sdk_helper' => $this->sdkHelper,
         );
     }
 }

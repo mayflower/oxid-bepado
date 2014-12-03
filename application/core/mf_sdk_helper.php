@@ -104,5 +104,29 @@ class mf_sdk_helper
     {
         $this->_oVersionLayer = $versionLayer;
     }
+
+    /**
+     * Bepado send's urls to the images of external products. The oxid shop
+     * need that image as local files in its own structure, so we need to
+     * fetch and persist them.
+     *
+     * We will answer with an array like that array('oxid-field-name','path')
+     * @param string $imagePath
+     * @param int $key
+     *
+     * @return array
+     */
+    public function createOxidImageFromPath($imagePath, $key)
+    {
+        $oShopConfig = $this->getVersionLayer()->getConfig();
+
+        $aImagePath = explode('/', $imagePath);
+        $sImageName = $aImagePath[(count($aImagePath) - 1)];
+        $aParams['oxarticles__oxpic' . ($key + 1)] = $sImageName;
+
+        copy($imagePath, $oShopConfig->getMasterPictureDir() . 'product/' . ($key + 1) . '/' . $sImageName);
+
+        return array('oxarticles__oxpic' . ($key + 1), $sImageName);
+    }
 }
  

@@ -128,13 +128,16 @@ class mf_sdk_converter //implements ProductConverter
         $aParams['oxarticles__oxwidth'] = $aDimension[1];
         $aParams['oxarticles__oxheight'] = $aDimension[2];
 
+        /** @var mf_sdk_helper $sdkHelper */
+        $sdkHelper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
         foreach ($sdkProduct->images as $key => $imagePath) {
             if ($key < 12){
-                $aImagePath = explode('/', $imagePath);
-                $sImageName = $aImagePath[(count($aImagePath) - 1)];
-                $aParams['oxarticles__oxpic' . ($key + 1)] = $sImageName;
-
-                copy($imagePath, $oShopConfig->getMasterPictureDir() . 'product/' . ($key + 1) . '/' . $sImageName);
+                try {
+                    list($fieldName, $fieldValue) = $sdkHelper->createOxidImageFromPath($imagePath, $key+1);
+                    $aParams[$fieldName] = $fieldValue;
+                } catch (\Exception $e) {
+                    // we won't insert the image
+                }
             }
         }
 
