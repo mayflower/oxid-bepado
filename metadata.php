@@ -96,6 +96,14 @@ $aModule = array(
             'type'  => 'bool',
             'value' => false,
         ),
+        array(
+            'group'       => 'main',
+            'name'        => 'sPurchaseGroupChar',
+            'type'        => 'select',
+            'value'       => 'A',
+            'constraints' => 'A|B|C',
+            'position'    => 1
+        ),
     ),
     'events' => array(
         'onActivate'   => 'EventListener::onActivate',
