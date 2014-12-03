@@ -177,11 +177,9 @@ class mf_sdk_converter //implements ProductConverter
     private function mapCategories($oxProduct)
     {
         $aCategory = [];
-
-        $category = oxNew('oxcategory');
         $aIds = $oxProduct->getCategoryIds();
 
-        $oCat = oxNew('oxlist');
+        $oCat = $this->getVersionLayer()->createNewObject('oxlist');
         $oCat->init('oxbase', 'bepado_categories');
         $oCat->getBaseObject();
         $oCat->getList();

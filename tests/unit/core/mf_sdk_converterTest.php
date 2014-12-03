@@ -64,6 +64,7 @@ class mf_sdk_converterTest extends BaseTestCase
     );
 
     protected $sdkHelper;
+    protected $oxList;
 
     public function setUp()
     {
@@ -75,6 +76,7 @@ class mf_sdk_converterTest extends BaseTestCase
         // oxid objects
         $this->oxShop = $this->getMockBuilder('oxShop')->disableOriginalConstructor()->getMock();
         $this->sdkHelper = $this->getMockBuilder('mf_sdk_helper')->disableOriginalConstructor()->getMock();
+        $this->oxList = $this->getMockBuilder('oxList')->disableOriginalConstructor()->getMock();
 
         // expected method with its values to return
         $currencyItem = new \stdClass();
@@ -176,7 +178,8 @@ class mf_sdk_converterTest extends BaseTestCase
     {
         return array(
             'oxshop'         => $this->oxShop,
-            'mf_sdk_helper' => $this->sdkHelper,
+            'mf_sdk_helper'  => $this->sdkHelper,
+            'oxlist'         => $this->oxList,
         );
     }
 }
