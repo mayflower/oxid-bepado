@@ -35,6 +35,7 @@ class mf_sdk_converter //implements ProductConverter
 
         /** @var oxConfig $oShopConfig */
         $oShopConfig = $this->getVersionLayer()->getConfig();
+        $currencyArray = $oShopConfig->getCurrencyArray();
 
         $currency     = array_filter($currencyArray, function ($item) {
             return $item->rate === '1.00';
@@ -46,6 +47,7 @@ class mf_sdk_converter //implements ProductConverter
         $sdkProduct->title = $oxArticle->oxarticles__oxtitle->value;
         $sdkProduct->shortDescription = $oxArticle->oxarticles__oxshortdesc->value;
         $sdkProduct->longDescription = $oxArticle->getLongDescription()->getRawValue();
+
         // if no defined vendor, self is vendor
         if (null !== $oxArticle->getVendor()) {
             $sdkProduct->vendor = $oxArticle->getVendor()->oxvendor__oxtitle->value;
@@ -83,6 +85,7 @@ class mf_sdk_converter //implements ProductConverter
     {
         /** @var oxarticle $oxProduct */
         $oxProduct = oxNew('oxarticle');
+        $aParams = [];
 
         /** @var \oxConfig $oShopConfig */
         $oShopConfig = $this->getVersionLayer()->getConfig();
@@ -98,18 +101,6 @@ class mf_sdk_converter //implements ProductConverter
         $aParams['oxarticles__oxexturl'] = $sdkProduct->url;
         $aParams['oxarticles__oxtitle'] = $sdkProduct->title;
         $aParams['oxarticles__oxshortdesc'] = $sdkProduct->shortDescription;
-
-        $currencyArray = $oShopConfig->getCurrencyArray();
-        $currency = array_filter($currencyArray, function ($item, $sdkProduct) {
-            return $item->unit === $sdkProduct->currency;
-        });
-        $currency = array_shift($currency);
-
-        if ($currency->rate) {
-            $rate = $currency->rate;
-        } else {
-            $rate = 1;
-        }
 
         // Price is netto or brutto depending on ShopConfig
         // PurchasePrice has no equivalent in oxid
