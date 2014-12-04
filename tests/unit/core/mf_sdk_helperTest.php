@@ -7,6 +7,10 @@ require_once __DIR__.'/../BaseTestCase.php';
  */
 class mf_sdk_helperTest extends BaseTestCase
 {
+    protected $oxBasket;
+    protected $oxBasketItem;
+    protected $oxArticle;
+
     /**
      * @var mf_sdk_helper
      */
@@ -19,6 +23,18 @@ class mf_sdk_helperTest extends BaseTestCase
         $this->helper = new mf_sdk_helper();
         $this->helper->setVersionLayer($this->versionLayer);
 
+        // objects from oxid
+        $this->oxBasket = $this->getMockBuilder('oxBasket')->disableOriginalConstructor()->getMock();
+        $this->oxBasketItem = $this->getMockBuilder('oxBasketItem')->disableOriginalConstructor()->getMock();
+        $this->oxArticle = $this->getMockBuilder('oxArticle')->disableOriginalConstructor()->getMock();
+        $this->oxBasket
+            ->expects($this->once())
+            ->method('getContent')
+            ->will($this->returnValue(array($this->oxBasketItem)));
+        $this->oxBasketItem
+            ->expects($this->once())
+            ->method('getArticle')
+            ->will($this->returnValue($this->oxArticle));
     }
 
     /**
@@ -110,6 +126,12 @@ class mf_sdk_helperTest extends BaseTestCase
     public function testImageCreateWithNonExistingFile()
     {
         $this->helper->createOxidImageFromPath('some-path', 1);
+    }
+
+    public function testCheckProductsInBasket()
+    {
+
+        $this->helper->checkProductsInBasket($this->oxBasket);
     }
 
     protected function getObjectMapping()

@@ -16,7 +16,7 @@ class mf_order extends mf_order_parent
 
         /** @var mf_sdk_helper $helper */
         $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
-        $helper->checkProductsWithBepado($oxBasket);
+        $helper->checkProductsInBasket($oxBasket);
 
         return $parent;
     }

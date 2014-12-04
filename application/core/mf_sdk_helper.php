@@ -1,7 +1,6 @@
 <?php
 use Bepado\SDK\SDK;
-use Bepado\SDK\Struct\Order;
-use Bepado\SDK\Struct\Product;
+use Bepado\SDK\Struct as Struct;
 
 /**
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
@@ -185,89 +184,85 @@ class mf_sdk_helper
 
     /**
      * @param oxBasket $oxBasket
-     *
-     * @throws Exception
-     * @throws oxArticleException
-     * @throws oxArticleInputException
-     * @throws oxNoArticleException
-     * @throws oxOutOfStockException
      */
-    public function checkProductsWithBepado(oxBasket $oxBasket)
+    public function checkProductsInBasket(oxBasket $oxBasket)
     {
+        /** @var  oxBasketItem[] $aBasket */
         $aBasket = $oxBasket->getContents();
+        $countChanges = 0;
 
-        /** @var  oxbasketitem $basketItem */
         foreach ($aBasket as $basketItem) {
+            /** @var mf_bepado_oxarticle $oxBasketArticle */
+            $oxBasketArticle = $basketItem->getArticle();
             $amount = $basketItem->getAmount();
-
-            /** @var mf_bepado_oxarticle $product */
-            $product = $basketItem->getArticle();
-
             $errorMsg = [];
+            $basketItem->bepado_check = new oxField('', oxField::T_TEXT);
+            $changedAvailability = null;
+            $changedPrice = null;
 
-            if ($product->isImportedFromBepado()) {
-                $sdkProduct = $product->getSdkProduct();
-                $check = $this->checkProductWithBepardo($sdkProduct);
-                foreach ($check as $shopId => $result) {
-                    if ($result === true) {
-                        // everything alright
-                    } else {
-                        foreach ($result as $message) {
-                            $errorMsg[] = $message;
-                        }
-                    }
-                }
-                // get updated availability
-                $availability = $product->getSdkProduct()->availability;
+            if (!$oxBasketArticle->isImportedFromBepado()) {
+                continue;
+            }
 
-                if ($amount > $availability) {
-                    if ($availability != 0) {
-                        $errorMsg[] =
-                            'This product is available only ' .
-                            $sdkProduct->availability . ' time' .
-                            ($sdkProduct->availability == 1 ? '.' : 's.') .
-                            ' Either delete the product from your basket or purchase the reduced amount.';
-                    } else {
-                        $errorMsg[] =
-                            'This product is not available at the moment.';
-                    }
-                    $basketItem->setAmount($availability);
-                }
-
-                if ($errorMsg) {
-                    $checkList = '<ul><li><i>' . implode('</i></li><li><i>', $errorMsg) . '</i></li></ul>';
-                    $basketItem->bepado_check = new oxField(
-                        $checkList,
-                        oxField::T_TEXT
-                    );
+            $product = $oxBasketArticle->getSdkProduct();
+            foreach ($this->doCheckProduct($product) as $message) {
+                if (isset($message->values['availability'])) {
+                    $changedAvailability = $message->values['availability'];
+                } elseif (isset($message->values['price'])) {
+                    $changedPrice = $message->values['price'];
                 }
             }
+
+            if (null !== $changedAvailability && $amount > $changedAvailability) {
+                if ($changedAvailability != 0) {
+                    $errorMsg[] = 'This product is available only '.$changedAvailability.' time'
+                        .($changedAvailability == 1 ? '.' : 's.').' Either delete the
+                        product from your basket or purchase the reduced amount.';
+                } else {
+                    $errorMsg[] = 'This product is not available at the moment.';
+                }
+                $basketItem->setAmount($changedAvailability);
+            }
+
+            if (null !== $changedPrice) {
+                $basketItem->setPrice(new oxPrice($changedPrice));
+                $errorMsg[] = 'The price has changed.';
+            }
+
+            if ($errorMsg) {
+                $countChanges++;
+                $basketItem->bepado_check = new oxField(
+                    '<ul><li><i>' . implode('</i></li><li><i>', $errorMsg) . '</i></li></ul>',
+                    oxField::T_TEXT
+                );
+            }
+
         }
 
-        $oxBasket->calculateBasket(true);
+        // do calculate when there where changes only
+        if ($countChanges > 0) {
+            $oxBasket->calculateBasket(true);
+        }
     }
 
-
     /**
-     * @param Product $sdkProduct
+     * @param Struct\Product $sdkProduct
      *
-     * @return array
-     *
-     * @throws Exception
+     * @return Struct\Message[]
      */
-    public function checkProductWithBepardo($sdkProduct)
+    private function doCheckProduct($sdkProduct)
     {
         $config = $this->createSdkConfigFromOxid();
         $sdk = $this->instantiateSdk($config);
-
         $results = [];
-        #$results = [$sdkProduct->shopId => true];
 
         try {
             $results = $sdk->checkProducts(array($sdkProduct));
-
         } catch (\Exception $e) {
-            # throw new Exception("No connection to SDK.");
+            $results[] = new Struct\Message(
+                'Problem while checking the product',
+                array()
+            );
         }
 
         return $results;
