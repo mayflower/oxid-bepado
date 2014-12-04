@@ -5,18 +5,6 @@
 class mf_sdk_helper
 {
     /**
-     * Host to talk with when testing bepado.
-     */
-    const BEPADO_HOST_DEMO = 'sn.server1230-han.de-nserver.de';
-
-    /**
-     * Host to talk with when going live with bepado.
-     *
-     * @todo insert the right url
-     */
-    const BEPADO_HOST_LIVE = 'LIVE:sn.server1230-han.de-nserver.de';
-
-    /**
      * @var VersionLayerInterface
      */
     private $_oVersionLayer;
@@ -39,6 +27,12 @@ class mf_sdk_helper
         $config->setApiKey($sApiKey);
         $config->setProdMode($prodMode);
 
+        if (!$prodMode) {
+            $config->setSocialnetworkHost(SDKConfig::SOCIALNETWORK_HOST_DEMO);
+            $config->setTransactionHost(SDKConfig::TRANSACTION_HOST_DEMO);
+            $config->setSearchHost(SDKConfig::SEARCH_HOST_DEMO);
+        }
+
         return $config;
     }
 
@@ -50,8 +44,7 @@ class mf_sdk_helper
      */
     public function instantiateSdk(SDKConfig $sdkConfig)
     {
-        $host = $sdkConfig->getProdMode() ? self::BEPADO_HOST_LIVE : self::BEPADO_HOST_DEMO;
-        putenv('_SOCIALNETWORK_HOST='.$host);
+        $this->prepareHosts($sdkConfig);
 
         // load global oxid config
         $oShopConfig = $this->getVersionLayer()->getConfig();
@@ -127,25 +120,25 @@ class mf_sdk_helper
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
         $data = curl_exec($ch);
-        $info = curl_getinfo($ch);
+        curl_getinfo($ch);
 
         $maxFilesSize = ini_get('upload_max_filesize');
         $maxFilesSize = trim($maxFilesSize, 'M');
-        $maxFilesSize = $maxFilesSize*1024*1024;
+        $maxFilesSize = $maxFilesSize * 1024 * 1024;
         $fileSize = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
         if ($fileSize > $maxFilesSize) {
             throw new \Exception('File to large');
         }
 
-        if (300 <= curl_getinfo($ch, CURLINFO_HTTP_CODE)  || 0 === curl_getinfo($ch, CURLINFO_HTTP_CODE)) {
-            throw new \Exception('Can not fetch the file in path '.$imagePath);
+        if (300 <= curl_getinfo($ch, CURLINFO_HTTP_CODE) || 0 === curl_getinfo($ch, CURLINFO_HTTP_CODE)) {
+            throw new \Exception('Can not fetch the file in path ' . $imagePath);
         }
 
         curl_close($ch);
 
         $aImagePath = explode('/', $imagePath);
         $sImageName = $aImagePath[(count($aImagePath) - 1)];
-        $destFileName = $oShopConfig->getMasterPictureDir().'product/'.($key).'/'.$sImageName;
+        $destFileName = $oShopConfig->getMasterPictureDir() . 'product/' . ($key) . '/' . $sImageName;
         $fileHandle = fopen($destFileName, 'w');
         if (!$fileHandle) {
             throw new \Exception('Can not create file to write image data into.');
@@ -157,7 +150,29 @@ class mf_sdk_helper
         }
 
         fclose($fileHandle);
-        return array('oxarticles__oxpic'.$key, $sImageName);
+
+        return array('oxarticles__oxpic' . $key, $sImageName);
+    }
+
+    /**
+     * Depending on the settings set the config the env var entries will be
+     * set or not.
+     *
+     * @param SDKConfig $sdkConfig
+     */
+    private function prepareHosts(SDKConfig $sdkConfig)
+    {
+        if (null !== $sdkConfig->getSocialnetworkHost()) {
+            putenv('_SOCIALNETWORK_HOST='.$sdkConfig->getSocialnetworkHost());
+        }
+
+        if (null !== $sdkConfig->getTransactionHost()) {
+            putenv('_TRANSACTION_HOST='.$sdkConfig->getTransactionHost());
+        }
+
+        if (null !== $sdkConfig->getSearchHost()) {
+            putenv('_TRANSACTION_HOST='.$sdkConfig->getSearchHost());
+        }
     }
 }
  
