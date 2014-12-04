@@ -12,8 +12,8 @@ class SDKConfig
 
     const SHOP_ID_LOCAL = '_self_';
 
-    const SEARCH_HOST_DEMO = '';
-    const TRANSACTION_HOST_DEMO = '';
+    const SEARCH_HOST_DEMO = 's.server1230-han.de-nserver.de';
+    const TRANSACTION_HOST_DEMO = 't.server1230-han.de-nserver.de';
     const SOCIALNETWORK_HOST_DEMO = 'sn.server1230-han.de-nserver.de';
 
     /**
