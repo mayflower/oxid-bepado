@@ -4,9 +4,9 @@
 class mf_order extends mf_order_parent
 {
     /**
-     * @var mf_product_helper
+     * @var VersionLayerInterface
      */
-    private $_oProductHelper;
+    private $_oVersionLayer;
 
     public function render()
     {
@@ -14,20 +14,34 @@ class mf_order extends mf_order_parent
 
         $oxBasket = $this->_aViewData['oxcmp_basket'];
 
-        $this->getProductHelper()->checkProductsWithBepado($oxBasket);
+        /** @var mf_sdk_helper $helper */
+        $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
+        $helper->checkProductsWithBepado($oxBasket);
 
         return $parent;
     }
 
     /**
-     * @return mf_product_helper
+     * Create and/or returns the VersionLayer.
+     *
+     * @return VersionLayerInterface
      */
-    private function getProductHelper()
+    private function getVersionLayer()
     {
-        if ($this->_oProductHelper === null) {
-            $this->_oProductHelper = oxNew('mf_product_helper');
+        if (null == $this->_oVersionLayer) {
+            /** @var VersionLayerFactory $factory */
+            $factory = oxNew('VersionLayerFactory');
+            $this->_oVersionLayer = $factory->create();
         }
 
-        return $this->_oProductHelper;
+        return $this->_oVersionLayer;
+    }
+
+    /**
+     * @param VersionLayerInterface $versionLayer
+     */
+    public function setVersionLayer(VersionLayerInterface $versionLayer)
+    {
+        $this->_oVersionLayer = $versionLayer;
     }
 } 

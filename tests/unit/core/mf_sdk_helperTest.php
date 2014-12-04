@@ -30,6 +30,7 @@ class mf_sdk_helperTest extends BaseTestCase
         $oxConfig = $this->getMock('oxConfig');
         $versionLayer = $this->getMock('VersionLayerInterface');
         $versionLayer->expects($this->once())->method('getConfig')->will($this->returnValue($oxConfig));
+        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new SDKConfig()));
         $this->helper->setVersionLayer($versionLayer);
         $oxConfig->expects($this->at(0))
             ->method('getConfigParam')
@@ -59,6 +60,7 @@ class mf_sdk_helperTest extends BaseTestCase
         $oxConfig = $this->getMock('oxConfig');
         $versionLayer = $this->getMock('VersionLayerInterface');
         $versionLayer->expects($this->once())->method('getConfig')->will($this->returnValue($oxConfig));
+        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new SDKConfig()));
         $this->helper->setVersionLayer($versionLayer);
         $oxConfig->expects($this->at(0))
             ->method('getConfigParam')
@@ -112,7 +114,9 @@ class mf_sdk_helperTest extends BaseTestCase
 
     protected function getObjectMapping()
     {
-        return array();
+        return array(
+            'SDKConfig' => new SDKConfig(),
+        );
     }
 }
  

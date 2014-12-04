@@ -1,4 +1,8 @@
 <?php
+use Bepado\SDK\SDK;
+use Bepado\SDK\Struct\Order;
+use Bepado\SDK\Struct\Product;
+
 /**
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
@@ -15,7 +19,7 @@ class mf_sdk_helper
     public function createSdkConfigFromOxid()
     {
         /** @var SDKConfig $config */
-        $config = oxNew('SDKConfig');
+        $config = $this->getVersionLayer()->createNewObject('SDKConfig');
         // load global oxid config
         $oShopConfig = $this->getVersionLayer()->getConfig();
         // module config
@@ -41,6 +45,10 @@ class mf_sdk_helper
      *
      * API-Key and Endpoint are fetched from the settings and are
      * editable in the module settings.
+     *
+     * @param SDKConfig $sdkConfig
+     *
+     * @return SDK
      */
     public function instantiateSdk(SDKConfig $sdkConfig)
     {
@@ -57,8 +65,8 @@ class mf_sdk_helper
         $sDbPwd  = $oShopConfig->getConfigParam('dbPwd');
 
         $pdoConnection = new PDO($sDbType . ':dbname=' . $sDbName . ';host=' . $sDbHost,$sDbUser, $sDbPwd);
-        $from = oxnew('oxidproductfromshop');
-        $to = oxnew('oxidproducttoshop');
+        $from = $this->getVersionLayer()->createNewObject('oxidproductfromshop');
+        $to = $this->getVersionLayer()->createNewObject('oxidproducttoshop');
 
         $builder = new \Bepado\SDK\SDKBuilder();
         $builder
@@ -173,6 +181,120 @@ class mf_sdk_helper
         if (null !== $sdkConfig->getSearchHost()) {
             putenv('_TRANSACTION_HOST='.$sdkConfig->getSearchHost());
         }
+    }
+
+    /**
+     * @param oxBasket $oxBasket
+     *
+     * @throws Exception
+     * @throws oxArticleException
+     * @throws oxArticleInputException
+     * @throws oxNoArticleException
+     * @throws oxOutOfStockException
+     */
+    public function checkProductsWithBepado(oxBasket $oxBasket)
+    {
+        $aBasket = $oxBasket->getContents();
+
+        /** @var  oxbasketitem $basketItem */
+        foreach ($aBasket as $basketItem) {
+            $amount = $basketItem->getAmount();
+
+            /** @var mf_bepado_oxarticle $product */
+            $product = $basketItem->getArticle();
+
+            $errorMsg = [];
+
+            if ($product->isImportedFromBepado()) {
+                $sdkProduct = $product->getSdkProduct();
+                $check = $this->checkProductWithBepardo($sdkProduct);
+                foreach ($check as $shopId => $result) {
+                    if ($result === true) {
+                        // everything alright
+                    } else {
+                        foreach ($result as $message) {
+                            $errorMsg[] = $message;
+                        }
+                    }
+                }
+                // get updated availability
+                $availability = $product->getSdkProduct()->availability;
+
+                if ($amount > $availability) {
+                    if ($availability != 0) {
+                        $errorMsg[] =
+                            'This product is available only ' .
+                            $sdkProduct->availability . ' time' .
+                            ($sdkProduct->availability == 1 ? '.' : 's.') .
+                            ' Either delete the product from your basket or purchase the reduced amount.';
+                    } else {
+                        $errorMsg[] =
+                            'This product is not available at the moment.';
+                    }
+                    $basketItem->setAmount($availability);
+                }
+
+                if ($errorMsg) {
+                    $checkList = '<ul><li><i>' . implode('</i></li><li><i>', $errorMsg) . '</i></li></ul>';
+                    $basketItem->bepado_check = new oxField(
+                        $checkList,
+                        oxField::T_TEXT
+                    );
+                }
+            }
+        }
+
+        $oxBasket->calculateBasket(true);
+    }
+
+
+    /**
+     * @param Product $sdkProduct
+     *
+     * @return array
+     *
+     * @throws Exception
+     */
+    public function checkProductWithBepardo($sdkProduct)
+    {
+        $config = $this->createSdkConfigFromOxid();
+        $sdk = $this->instantiateSdk($config);
+
+        $results = [];
+        #$results = [$sdkProduct->shopId => true];
+
+        try {
+            $results = $sdk->checkProducts(array($sdkProduct));
+
+        } catch (\Exception $e) {
+            # throw new Exception("No connection to SDK.");
+        }
+
+        return $results;
+    }
+
+    /**
+     * Not done or functional afaik
+     *
+     * @param Order $sdkOrder
+     *
+     * @return bool[]
+     */
+    public function reserveProductWithBepado(Order $sdkOrder)
+    {
+        $config = $this->createSdkConfigFromOxid();
+        $sdk = $this->instantiateSdk($config);
+
+        $reservation = $sdk->reserveProducts($sdkOrder);
+        if (!$reservation->success) {
+            foreach ($reservation->messages as $shopId => $messages) {
+                // handle individual error messages here
+            }
+        }
+
+        $result = $sdk->checkout($reservation, $sdkOrder->localOrderId);
+
+        return $result;
     }
 }
  

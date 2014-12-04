@@ -5,6 +5,7 @@ use Bepado\SDK\Struct\Product;
 class mf_sdk_converter //implements ProductConverter
 {
     const DEFAULT_PURCHASE_PRICE_CHAR = 'A';
+
     /**
      * @var VersionLayerInterface
      */
