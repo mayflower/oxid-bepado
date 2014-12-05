@@ -50,7 +50,6 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
 
         // preparing sdk and its config
-        $this->sdk = $this->getMockBuilder('stdClass')->disableOriginalConstructor()->getMock();
         $this->sdkConfig = new SDKConfig();
         $this->sdkConfig->setApiEndpointUrl('test-endpoint');
         $this->sdkConfig->setApiKey('test-api-key');
@@ -289,4 +288,3 @@ class oxidProductFromShopTest extends BaseTestCase
         );
     }
 }
- 

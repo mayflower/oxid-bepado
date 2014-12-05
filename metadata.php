@@ -8,6 +8,7 @@ $aPaths = array(
     'controllers' => $sModuleId . '/application/controllers',
     'models'      => $sModuleId . '/application/models',
     'core'        => $sModuleId . '/application/core',
+    'helper'      => $sModuleId . '/application/helper',
 //    'utils'       => $sModuleId . '/utils',
 //    'admin'       => $sModuleId . '/application/controllers/admin',
     'views'       => $sModuleId . '/application/views',
@@ -45,7 +46,6 @@ $aModule = array(
         'SDKConfig'             => $aPaths['models'] . '/SDKConfig.php',
 
         'mf_sdk_converter'      => $aPaths['core'] . '/mf_sdk_converter.php',
-        'mf_sdk_helper'         => $aPaths['core'] . '/mf_sdk_helper.php',
         'EventListener'         => $aPaths['core'] . '/EventListener.php',
         'VersionLayerInterface' => $aPaths['core'] . '/interface/VersionLayerInterface.php',
         'VersionLayer460'       => $aPaths['core'] . '/VersionLayer460.php',
@@ -53,6 +53,10 @@ $aModule = array(
         'VersionLayer490'       => $aPaths['core'] . '/VersionLayer490.php',
         'VersionLayer500'       => $aPaths['core'] . '/VersionLayer500.php',
         'VersionLayerFactory'   => $aPaths['core'] . '/VersionLayerFactory.php',
+
+        'mf_abstract_helper'    => $aPaths['helper'] . '/mf_abstract_helper.php',
+        'mf_sdk_helper'         => $aPaths['helper'] . '/mf_sdk_helper.php',
+        'mf_sdk_product_helper' => $aPaths['helper'] . '/mf_sdk_product_helper.php',
     ),
     'blocks' => array(
         array(

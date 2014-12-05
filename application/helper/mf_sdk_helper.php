@@ -5,13 +5,8 @@ use Bepado\SDK\Struct as Struct;
 /**
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
-class mf_sdk_helper
+class mf_sdk_helper extends mf_abstract_helper
 {
-    /**
-     * @var VersionLayerInterface
-     */
-    private $_oVersionLayer;
-
     /**
      * @return SDKConfig
      */
@@ -80,31 +75,6 @@ class mf_sdk_helper
 
         return $sdk;
     }
-
-    /**
-     * Create and/or returns the VersionLayer.
-     *
-     * @return VersionLayerInterface
-     */
-    private function getVersionLayer()
-    {
-        if (null == $this->_oVersionLayer) {
-            /** @var VersionLayerFactory $factory */
-            $factory = oxNew('VersionLayerFactory');
-            $this->_oVersionLayer = $factory->create();
-        }
-
-        return $this->_oVersionLayer;
-    }
-
-    /**
-     * @param VersionLayerInterface $versionLayer
-     */
-    public function setVersionLayer(VersionLayerInterface $versionLayer)
-    {
-        $this->_oVersionLayer = $versionLayer;
-    }
-
     /**
      * Bepado send's urls to the images of external products. The oxid shop
      * need that image as local files in its own structure, so we need to
@@ -180,116 +150,6 @@ class mf_sdk_helper
         if (null !== $sdkConfig->getSearchHost()) {
             putenv('_TRANSACTION_HOST='.$sdkConfig->getSearchHost());
         }
-    }
-
-    /**
-     * @param oxBasket $oxBasket
-     */
-    public function checkProductsInBasket(oxBasket $oxBasket)
-    {
-        /** @var  oxBasketItem[] $aBasket */
-        $aBasket = $oxBasket->getContents();
-        $countChanges = 0;
-
-        foreach ($aBasket as $basketItem) {
-            /** @var mf_bepado_oxarticle $oxBasketArticle */
-            $oxBasketArticle = $basketItem->getArticle();
-            $amount = $basketItem->getAmount();
-            $errorMsg = [];
-            $basketItem->bepado_check = new oxField('', oxField::T_TEXT);
-            $changedAvailability = null;
-            $changedPrice = null;
-
-            if (!$oxBasketArticle->isImportedFromBepado()) {
-                continue;
-            }
-
-            $product = $oxBasketArticle->getSdkProduct();
-            foreach ($this->doCheckProduct($product) as $message) {
-                if (isset($message->values['availability'])) {
-                    $changedAvailability = $message->values['availability'];
-                } elseif (isset($message->values['price'])) {
-                    $changedPrice = $message->values['price'];
-                }
-            }
-
-            if (null !== $changedAvailability && $amount > $changedAvailability) {
-                if ($changedAvailability != 0) {
-                    $errorMsg[] = 'This product is available only '.$changedAvailability.' time'
-                        .($changedAvailability == 1 ? '.' : 's.').' Either delete the
-                        product from your basket or purchase the reduced amount.';
-                } else {
-                    $errorMsg[] = 'This product is not available at the moment.';
-                }
-                $basketItem->setAmount($changedAvailability);
-            }
-
-            if (null !== $changedPrice) {
-                $basketItem->setPrice(new oxPrice($changedPrice));
-                $errorMsg[] = 'The price has changed.';
-            }
-
-            if ($errorMsg) {
-                $countChanges++;
-                $basketItem->bepado_check = new oxField(
-                    '<ul><li><i>' . implode('</i></li><li><i>', $errorMsg) . '</i></li></ul>',
-                    oxField::T_TEXT
-                );
-            }
-
-        }
-
-        // do calculate when there where changes only
-        if ($countChanges > 0) {
-            $oxBasket->calculateBasket(true);
-        }
-    }
-
-    /**
-     * @param Struct\Product $sdkProduct
-     *
-     * @return Struct\Message[]
-     */
-    private function doCheckProduct($sdkProduct)
-    {
-        $config = $this->createSdkConfigFromOxid();
-        $sdk = $this->instantiateSdk($config);
-        $results = [];
-
-        try {
-            $results = $sdk->checkProducts(array($sdkProduct));
-        } catch (\Exception $e) {
-            $results[] = new Struct\Message(
-                'Problem while checking the product',
-                array()
-            );
-        }
-
-        return $results;
-    }
-
-    /**
-     * Not done or functional afaik
-     *
-     * @param Order $sdkOrder
-     *
-     * @return bool[]
-     */
-    public function reserveProductWithBepado(Order $sdkOrder)
-    {
-        $config = $this->createSdkConfigFromOxid();
-        $sdk = $this->instantiateSdk($config);
-
-        $reservation = $sdk->reserveProducts($sdkOrder);
-        if (!$reservation->success) {
-            foreach ($reservation->messages as $shopId => $messages) {
-                // handle individual error messages here
-            }
-        }
-
-        $result = $sdk->checkout($reservation, $sdkOrder->localOrderId);
-
-        return $result;
     }
 }
  
