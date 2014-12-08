@@ -14,8 +14,8 @@ class mf_basket extends mf_basket_parent
 
         $oxBasket = $this->_aViewData['oxcmp_basket'];
 
-        /** @var mf_sdk_helper $helper */
-        $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
+        /** @var mf_sdk_product_helper $helper */
+        $helper = $this->getVersionLayer()->createNewObject('mf_sdk_product_helper');
         $helper->checkProductsInBasket($oxBasket);
 
         return $parent;
