@@ -1,5 +1,5 @@
 [{$smarty.block.parent}]
-
+[{if $no_bepado_import == 1}]
 </table>
 
 </fieldset>
@@ -22,3 +22,4 @@
 
             </td>
         </tr>
+[{/if}]

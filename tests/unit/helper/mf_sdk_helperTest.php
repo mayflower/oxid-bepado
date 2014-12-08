@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../BaseTestCase.php';
+require_once __DIR__ . '/../BaseTestCase.php';
 
 /**
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
@@ -18,7 +18,6 @@ class mf_sdk_helperTest extends BaseTestCase
 
         $this->helper = new mf_sdk_helper();
         $this->helper->setVersionLayer($this->versionLayer);
-
     }
 
     /**
@@ -30,6 +29,7 @@ class mf_sdk_helperTest extends BaseTestCase
         $oxConfig = $this->getMock('oxConfig');
         $versionLayer = $this->getMock('VersionLayerInterface');
         $versionLayer->expects($this->once())->method('getConfig')->will($this->returnValue($oxConfig));
+        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new SDKConfig()));
         $this->helper->setVersionLayer($versionLayer);
         $oxConfig->expects($this->at(0))
             ->method('getConfigParam')
@@ -59,6 +59,7 @@ class mf_sdk_helperTest extends BaseTestCase
         $oxConfig = $this->getMock('oxConfig');
         $versionLayer = $this->getMock('VersionLayerInterface');
         $versionLayer->expects($this->once())->method('getConfig')->will($this->returnValue($oxConfig));
+        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new SDKConfig()));
         $this->helper->setVersionLayer($versionLayer);
         $oxConfig->expects($this->at(0))
             ->method('getConfigParam')
@@ -85,6 +86,7 @@ class mf_sdk_helperTest extends BaseTestCase
 
     public function testImageCreation()
     {
+        $this->markTestSkipped('No network available');
         $this->oxidConfig
             ->expects($this->any())
             ->method('getMasterPictureDir')
@@ -107,12 +109,15 @@ class mf_sdk_helperTest extends BaseTestCase
      */
     public function testImageCreateWithNonExistingFile()
     {
+        $this->markTestSkipped('No network available');
         $this->helper->createOxidImageFromPath('some-path', 1);
     }
 
     protected function getObjectMapping()
     {
-        return array();
+        return array(
+            'SDKConfig' => new SDKConfig(),
+        );
     }
 }
  

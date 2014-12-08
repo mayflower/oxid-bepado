@@ -13,24 +13,15 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     private $_oVersionLayer;
 
     /**
-     * @var mf_sdk_helper
-     */
-    protected $_oModuleSdkHelper;
-
-    /**
-     * @var mf_sdk_converter
-     */
-    protected $_oProductConverter;
-
-    /**
      * Does the sdk work when saving an oxid article.
      */
     public function save()
     {
         $return = parent::save();
 
-        $config  = $this->getSdkHelper()->createSdkConfigFromOxid();
-        $sdk = $this->getSdkHelper()->instantiateSdk($config);
+        $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
+        $config  = $helper->createSdkConfigFromOxid();
+        $sdk = $helper->instantiateSdk($config);
         $oxProductId = $this->getFieldData('oxid');
 
         if ($this->readyForExportToBepado() && $this->productIsKnown($oxProductId)) {
@@ -47,8 +38,10 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
 
     public function delete($oxId = null)
     {
-        $config  = $this->getSdkHelper()->createSdkConfigFromOxid();
-        $sdk = $this->getSdkHelper()->instantiateSdk($config);
+        $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
+        $config  = $helper->createSdkConfigFromOxid();
+        /** @var SDK $sdk */
+        $sdk = $helper->instantiateSdk($config);
 
         if ($this->productIsKnown($oxId)) {
             $sdk->recordDelete($oxId);
@@ -80,7 +73,7 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getState()
     {
@@ -100,15 +93,37 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     }
 
     /**
-     * @return mf_sdk_helper
+     * @return bool
      */
-    private function getSdkHelper()
+    public function isImportedFromBepado()
     {
-        if ($this->_oModuleSdkHelper === null) {
-            $this->_oModuleSdkHelper = oxNew('mf_sdk_helper');
+        if ($this->getState() == 2) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return Product
+     * @throws Exception
+     */
+    public function getSdkProduct()
+    {
+        /** @var mf_sdk_converter $converter */
+        $converter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
+        $sdkProduct = $converter->fromShoptoBepado($this);
+
+        if ($this->getState() == 0) {
+            throw new Exception("Product is not imported from Bepado or ready for export to Bepado.");
         }
 
-        return $this->_oModuleSdkHelper;
+        $oState = $this->getVersionLayer()->createNewObject('oxbase');
+        $oState->init('bepado_product_state');
+        $oState->load($this->getId());
+
+        $sdkProduct->shopId = $oState->bepado_product_state__shop_id->rawValue;
+
+        return $sdkProduct;
     }
 
     private function productIsKnown($oxProductId)
@@ -135,4 +150,3 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         return $this->_oVersionLayer;
     }
 }
- 

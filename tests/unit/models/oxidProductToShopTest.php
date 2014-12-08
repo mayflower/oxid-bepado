@@ -37,7 +37,7 @@ class oxidProductToShopTest extends BaseTestCase
         // helper/converter for our module
         $this->sdkHelper = $this->getMock('mf_sdk_helper', array('createSdkConfigFromOxid'));
         $this->converter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
-        $this->converter->expects($this->any())->method('toShopProduct')->will($this->returnValue($this->convertedOxArticle));
+        $this->converter->expects($this->any())->method('fromBepadoToShop')->will($this->returnValue($this->convertedOxArticle));
 
         // create the bepadoProductState from that
         $this->bepadoProductState = $this->getMockBuilder('oxBase')->disableOriginalConstructor()->getMock();
@@ -73,7 +73,10 @@ class oxidProductToShopTest extends BaseTestCase
         $this->convertedOxArticle
             ->expects($this->once())
             ->method('assign')
-            ->with($this->equalTo(array('oxarticles__oxactive' => 0)));
+            ->with($this->equalTo(array(
+                'oxarticles__oxactive' => 0,
+                'oxarticles__oxstockflag' => 3,
+            )));
         $this->convertedOxArticle->expects($this->once())->method('save');
 
         // create an entry for the state
@@ -158,4 +161,3 @@ class oxidProductToShopTest extends BaseTestCase
         );
     }
 }
- 

@@ -1,21 +1,19 @@
 <?php
+use Bepado\SDK\SDK;
+use Bepado\SDK\Struct as Struct;
+
 /**
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
-class mf_sdk_helper
+class mf_sdk_helper extends mf_abstract_helper
 {
-    /**
-     * @var VersionLayerInterface
-     */
-    private $_oVersionLayer;
-
     /**
      * @return SDKConfig
      */
     public function createSdkConfigFromOxid()
     {
         /** @var SDKConfig $config */
-        $config = oxNew('SDKConfig');
+        $config = $this->getVersionLayer()->createNewObject('SDKConfig');
         // load global oxid config
         $oShopConfig = $this->getVersionLayer()->getConfig();
         // module config
@@ -41,6 +39,10 @@ class mf_sdk_helper
      *
      * API-Key and Endpoint are fetched from the settings and are
      * editable in the module settings.
+     *
+     * @param SDKConfig $sdkConfig
+     *
+     * @return SDK
      */
     public function instantiateSdk(SDKConfig $sdkConfig)
     {
@@ -57,8 +59,8 @@ class mf_sdk_helper
         $sDbPwd  = $oShopConfig->getConfigParam('dbPwd');
 
         $pdoConnection = new PDO($sDbType . ':dbname=' . $sDbName . ';host=' . $sDbHost,$sDbUser, $sDbPwd);
-        $from = oxnew('oxidproductfromshop');
-        $to = oxnew('oxidproducttoshop');
+        $from = $this->getVersionLayer()->createNewObject('oxidproductfromshop');
+        $to = $this->getVersionLayer()->createNewObject('oxidproducttoshop');
 
         $builder = new \Bepado\SDK\SDKBuilder();
         $builder
@@ -73,31 +75,6 @@ class mf_sdk_helper
 
         return $sdk;
     }
-
-    /**
-     * Create and/or returns the VersionLayer.
-     *
-     * @return VersionLayerInterface
-     */
-    private function getVersionLayer()
-    {
-        if (null == $this->_oVersionLayer) {
-            /** @var VersionLayerFactory $factory */
-            $factory = oxNew('VersionLayerFactory');
-            $this->_oVersionLayer = $factory->create();
-        }
-
-        return $this->_oVersionLayer;
-    }
-
-    /**
-     * @param VersionLayerInterface $versionLayer
-     */
-    public function setVersionLayer(VersionLayerInterface $versionLayer)
-    {
-        $this->_oVersionLayer = $versionLayer;
-    }
-
     /**
      * Bepado send's urls to the images of external products. The oxid shop
      * need that image as local files in its own structure, so we need to
