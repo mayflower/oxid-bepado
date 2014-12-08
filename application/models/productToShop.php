@@ -136,7 +136,11 @@ class oxidProductToShop implements ProductToShop
      */
     private function insertArticleWithBepadoState(oxArticle $oxArticle, oxBase $oBepadoProductState, Struct\Product $product)
     {
-        $oxArticle->assign(array('oxarticles__oxactive' => 0));
+        $oxArticle->assign(array(
+            'oxarticles__oxactive' => 0,
+            'oxarticles__oxstockflag' => 3,
+
+        ));
         $oxArticle->save();
 
         // insert into mapping/state table
