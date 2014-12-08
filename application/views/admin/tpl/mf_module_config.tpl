@@ -121,9 +121,5 @@
 
 </form>
 
-<div>
-    [{$sBepadoLog}]
-</div>
-
 [{include file="bottomnaviitem.tpl"}]
 [{include file="bottomitem.tpl"}]

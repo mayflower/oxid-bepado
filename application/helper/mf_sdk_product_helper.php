@@ -96,11 +96,13 @@ class mf_sdk_product_helper extends mf_abstract_helper
                 $results = array_merge($results, $result);
             }
         } catch (\Exception $e) {
-            $logger->writeBepadoLog($e);
-            $results[] = new Struct\Message(array(
+            $errMsg = new Struct\Message(array(
                 'message' => 'Problem while checking the product',
                 'values'  => array()
             ));
+
+            $logger->writeBepadoLog($errMsg->message);
+            $results[] = $errMsg;
         }
 
         return $results;

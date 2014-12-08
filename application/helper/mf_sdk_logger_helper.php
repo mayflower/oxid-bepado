@@ -4,32 +4,45 @@
 class mf_sdk_logger_helper extends mf_abstract_helper
 {
     /**
-     * Log file path/name
+     * Log file name
      *
      * @var string
      */
     protected $_sFileName = 'BEPADO_LOG.txt';
 
     /**
-     * @param /Exceptopn $oLogObj
+     * @param string $sLogTxt
+     * @param array $values
      */
-    public function writeBepadoLog($oLogObj)
+    public function writeBepadoLog($sLogTxt, $values = array())
     {
-        //We are most likely are already dealing with an exception so making sure no other exceptions interfere
-        try {
-            $sLogMsg = $this->getString($oLogObj) . "\n---------------------------------------------\n";
-            oxRegistry::getUtils()->writeToLog($sLogMsg, $this->_sFileName);
-        } catch (Exception $e) {
+        // if shop is in productive mode, don't log
+        $oShopConfig = $this->getVersionLayer()->getConfig();
+        $oShop = $this->getVersionLayer()->createNewObject('oxshop');
+        $oShop->load($oShopConfig->getShopId());
+        $blProductive = $oShop->isProductiveMode();
+
+        if(!$blProductive) {
+            //We are most likely are already dealing with an exception so making sure no other exceptions interfere
+            try {
+                $sLogMsg = $this->getString($sLogTxt, $values) . "\n---------------------------------------------\n\n";
+                $this->getVersionLayer()->getUtils()->writeToLog($sLogMsg, $this->_sFileName);
+            } catch (Exception $e) {
+            }
         }
     }
 
     /**
-     * @param Exception $oLogObj
+     * @param string $sLogTxt
+     * @param array $values
      * @return string
      */
-    private function getString($oLogObj)
+    private function getString($sLogTxt, $values)
     {
-        $string = " (time: " . date('Y-m-d H:i:s') . "): [{$oLogObj->getCode()}]: {$oLogObj->getMessage()}\n\n";
+        $string =
+            "(time: " . date('Y-m-d H:i:s') . "): " .
+            $sLogTxt . "\n" .
+            ($values ? "\n" . serialize($values) . "\n" : "");
 
         return $string;
     }
