@@ -2,7 +2,7 @@
 
 use Bepado\SDK\Struct\Product;
 
-class mf_sdk_converter //implements ProductConverter
+class mf_sdk_converter implements mf_converter_interface
 {
     const DEFAULT_PURCHASE_PRICE_CHAR = 'A';
 
@@ -26,11 +26,13 @@ class mf_sdk_converter //implements ProductConverter
     );
 
     /**
-     * @param oxarticle $oxArticle
+     * {@inheritDoc}
+     *
+     * @param oxarticle $object
      *
      * @return Product
      */
-    public function toBepadoProduct(oxarticle $oxArticle)
+    public function fromShoptoBepado($object)
     {
         $sdkProduct = new Product();
 
@@ -42,34 +44,34 @@ class mf_sdk_converter //implements ProductConverter
             return $item->rate === '1.00';
         });
         $currency = array_shift($currency);
-        $sdkProduct->sourceId = $oxArticle->getId();
-        $sdkProduct->ean = $oxArticle->oxarticles__oxean->value;
-        $sdkProduct->url = $oxArticle->getLink();
-        $sdkProduct->title = $oxArticle->oxarticles__oxtitle->value;
-        $sdkProduct->shortDescription = $oxArticle->oxarticles__oxshortdesc->value;
-        $sdkProduct->longDescription = $oxArticle->getLongDescription()->getRawValue();
+        $sdkProduct->sourceId = $object->getId();
+        $sdkProduct->ean = $object->oxarticles__oxean->value;
+        $sdkProduct->url = $object->getLink();
+        $sdkProduct->title = $object->oxarticles__oxtitle->value;
+        $sdkProduct->shortDescription = $object->oxarticles__oxshortdesc->value;
+        $sdkProduct->longDescription = $object->getLongDescription()->getRawValue();
 
         // if no defined vendor, self is vendor
-        if (null !== $oxArticle->getVendor()) {
-            $sdkProduct->vendor = $oxArticle->getVendor()->oxvendor__oxtitle->value;
+        if (null !== $object->getVendor()) {
+            $sdkProduct->vendor = $object->getVendor()->oxvendor__oxtitle->value;
         } else {
             $oShop = $this->getVersionLayer()->createNewObject('oxshop');
             $oShop->load($oShopConfig->getShopId());
             $sdkProduct->vendor = $oShop->oxshops__oxname->value;
         }
 
-        $sdkProduct->vat = $oxArticle->getArticleVat() / 100;
+        $sdkProduct->vat = $object->getArticleVat() / 100;
         // Price is net or brut depending on ShopConfig
         // @todo find the purchase representation in oxid article prices, defaults atm on net price
-        $sdkProduct->price = $oxArticle->getPrice()->getNettoPrice();
-        $purchasePrice = new oxPrice($oxArticle->{$this->computePurchasePriceField($oxArticle)}->value);
+        $sdkProduct->price = $object->getPrice()->getNettoPrice();
+        $purchasePrice = new oxPrice($object->{$this->computePurchasePriceField($object)}->value);
         $sdkProduct->purchasePrice = $purchasePrice->getNettoPrice();
         $sdkProduct->currency = $currency->name;
-        $sdkProduct->availability = $oxArticle->oxarticles__oxstock->value;
+        $sdkProduct->availability = $object->oxarticles__oxstock->value;
 
-        $sdkProduct->images = $this->mapImages($oxArticle);
-        $sdkProduct->categories = $this->mapCategories($oxArticle);
-        $sdkProduct->attributes = $this->mapAttributes($oxArticle);
+        $sdkProduct->images = $this->mapImages($object);
+        $sdkProduct->categories = $this->mapCategories($object);
+        $sdkProduct->attributes = $this->mapAttributes($object);
 
         // deliveryDate
         // deliveryWorkDays
@@ -78,11 +80,13 @@ class mf_sdk_converter //implements ProductConverter
     }
 
     /**
-     * @param Product $sdkProduct
+     * {@inheritDoc}
+     *
+     * @param Product $object
      *
      * @return oxarticle
      */
-    public function toShopProduct(Product $sdkProduct)
+    public function fromBepadoToShop($object)
     {
         /** @var oxarticle $oxProduct */
         $oxProduct = oxNew('oxarticle');
@@ -92,45 +96,45 @@ class mf_sdk_converter //implements ProductConverter
         $oShopConfig = $this->getVersionLayer()->getConfig();
         $currencyArray = $oShopConfig->getCurrencyArray();
 
-        $currency = array_filter($currencyArray, function ($item) use ($sdkProduct) {
-            return $item->name === $sdkProduct->currency;
+        $currency = array_filter($currencyArray, function ($item) use ($object) {
+            return $item->name === $object->currency;
         });
         $currency = array_shift($currency);
         $rate = $currency->rate;
 
-        $aParams['oxarticles__oxean'] = $sdkProduct->ean;
-        $aParams['oxarticles__oxexturl'] = $sdkProduct->url;
-        $aParams['oxarticles__oxtitle'] = $sdkProduct->title;
-        $aParams['oxarticles__oxshortdesc'] = $sdkProduct->shortDescription;
+        $aParams['oxarticles__oxean'] = $object->ean;
+        $aParams['oxarticles__oxexturl'] = $object->url;
+        $aParams['oxarticles__oxtitle'] = $object->title;
+        $aParams['oxarticles__oxshortdesc'] = $object->shortDescription;
 
         // Price is netto or brutto depending on ShopConfig
         // PurchasePrice has no equivalent in oxid
         if ($this->getVersionLayer()->getConfig()->getConfigParam('blEnterNetPrice')) {
-            $aParams['oxarticles__oxprice'] = $sdkProduct->price * $rate;
-            $aParams[$this->computePurchasePriceField()] = $sdkProduct->purchasePrice * $rate;
+            $aParams['oxarticles__oxprice'] = $object->price * $rate;
+            $aParams[$this->computePurchasePriceField()] = $object->purchasePrice * $rate;
         } else {
-            $aParams['oxarticles__oxprice'] = $sdkProduct->price * (1 + $sdkProduct->vat) * $rate;
-            $aParams[$this->computePurchasePriceField()] = $sdkProduct->purchasePrice * (1 + $sdkProduct->vat) * $rate;
+            $aParams['oxarticles__oxprice'] = $object->price * (1 + $object->vat) * $rate;
+            $aParams[$this->computePurchasePriceField()] = $object->purchasePrice * (1 + $object->vat) * $rate;
         }
-        $aParams['oxarticles__oxvat'] = $sdkProduct->vat * 100;
-        $aParams['oxarticles__oxstock'] = $sdkProduct->availability;
+        $aParams['oxarticles__oxvat'] = $object->vat * 100;
+        $aParams['oxarticles__oxstock'] = $object->availability;
 
         //attributes
         $aUnitMapping = array_flip($this->oxidUnitMapper);
-        if (isset($aUnitMapping[$sdkProduct->attributes[Product::ATTRIBUTE_UNIT]])) {
-            $aParams['oxarticles__oxunitname'] = $aUnitMapping[$sdkProduct->attributes[Product::ATTRIBUTE_UNIT]];
+        if (isset($aUnitMapping[$object->attributes[Product::ATTRIBUTE_UNIT]])) {
+            $aParams['oxarticles__oxunitname'] = $aUnitMapping[$object->attributes[Product::ATTRIBUTE_UNIT]];
         }
-        $aParams['oxarticles__oxunitquantity'] = $sdkProduct->attributes[Product::ATTRIBUTE_QUANTITY];
-        $aParams['oxarticles__oxweight'] = $sdkProduct->attributes[Product::ATTRIBUTE_WEIGHT];
+        $aParams['oxarticles__oxunitquantity'] = $object->attributes[Product::ATTRIBUTE_QUANTITY];
+        $aParams['oxarticles__oxweight'] = $object->attributes[Product::ATTRIBUTE_WEIGHT];
 
-        $aDimension = explode('x', $sdkProduct->attributes[Product::ATTRIBUTE_DIMENSION]);
+        $aDimension = explode('x', $object->attributes[Product::ATTRIBUTE_DIMENSION]);
         $aParams['oxarticles__oxlength'] = $aDimension[0];
         $aParams['oxarticles__oxwidth'] = $aDimension[1];
         $aParams['oxarticles__oxheight'] = $aDimension[2];
 
         /** @var mf_sdk_helper $sdkHelper */
         $sdkHelper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
-        foreach ($sdkProduct->images as $key => $imagePath) {
+        foreach ($object->images as $key => $imagePath) {
             if ($key < 12){
                 try {
                     list($fieldName, $fieldValue) = $sdkHelper->createOxidImageFromPath($imagePath, $key+1);
@@ -146,7 +150,7 @@ class mf_sdk_converter //implements ProductConverter
 
 
         $oxProduct->assign($aParams);
-        $oxProduct->setArticleLongDesc($sdkProduct->longDescription);
+        $oxProduct->setArticleLongDesc($object->longDescription);
 
         return $oxProduct;
     }
@@ -268,4 +272,4 @@ class mf_sdk_converter //implements ProductConverter
 
         return 'oxarticles__ox'.$purchaseGroupChar.'price';
     }
-} 
+}

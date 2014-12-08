@@ -1,6 +1,8 @@
 <?php
 
+use Bepado\SDK\SDK;
 use Bepado\SDK\Struct as Struct;
+use Bepado\SDK\Struct\Reservation;
 
 /**
  * Helper class for all (oxid) article (bepado) product communication and interactions.
@@ -9,6 +11,11 @@ use Bepado\SDK\Struct as Struct;
  */
 class mf_sdk_product_helper extends mf_abstract_helper
 {
+    /**
+     * @var SDK
+     */
+    protected $sdk;
+
     /**
      * @param oxBasket $oxBasket
      */
@@ -79,12 +86,10 @@ class mf_sdk_product_helper extends mf_abstract_helper
      */
     private function doCheckProduct($sdkProduct)
     {
-        $config = $this->getSdkHelper()->createSdkConfigFromOxid();
-        $sdk = $this->getSdkHelper()->instantiateSdk($config);
         $results = [];
 
         try {
-            $result = $sdk->checkProducts(array($sdkProduct));
+            $result = $this->getSdk()->checkProducts(array($sdkProduct));
             if (is_array($result)) {
                 $results = array_merge($results, $result);
             }
@@ -96,34 +101,75 @@ class mf_sdk_product_helper extends mf_abstract_helper
     }
 
     /**
-     * Not done or functional afaik
+     * Does the reservation work on the sdk. It throws the exception the
+     * order checks while finalizing a order.
      *
-     * @param Order $sdkOrder
+     * @param oxOrder $oxOrder
      *
-     * @return bool[]
+     * @throws oxArticleInputException
+     * @throws oxNoArticleException
+     * @throws oxOutOfStockException
+     *
+     * @return Reservation|bool
      */
-    public function reserveProductWithBepado(Order $sdkOrder)
+    public function reserveProductsInOrder(oxOrder $oxOrder)
     {
-        $config = $this->getSdkHelper()->createSdkConfigFromOxid();
-        $sdk = $this->getSdkHelper()->instantiateSdk($config);
-
-        $reservation = $sdk->reserveProducts($sdkOrder);
-        if (!$reservation->success) {
-            foreach ($reservation->messages as $shopId => $messages) {
-                // handle individual error messages here
-            }
+        /** @var mf_sdk_order_converter $converter */
+        $converter = $this->getVersionLayer()->createNewObject('mf_sdk_order_converter');
+        $sdkOrder = $converter->fromShopToBepado($oxOrder);
+        if (!$sdkOrder->getBasket()->getProductsCount()) {
+            return false;
         }
 
-        $result = $sdk->checkout($reservation, $sdkOrder->localOrderId);
+        $reservation = $this->getSdk()->reserveProducts($sdkOrder);
+        if (!$reservation->success) {
+            $messages = $reservation->messages;
+            foreach ($messages as $message) {
+                if (isset($message->values['availablity'])) {
+                    $exception = new oxOutOfStockException();
+                    $exception->setRemainingAmount($message->values['availablity']);
+                    $exception->setMessage('Availability exceeded');
+                    throw $exception;
+                } elseif (isset($message->values['price'])) {
+                    $exception = new oxArticleInputException();
+                    $exception->setMessage('Price has changed');
+                    throw $exception;
+                }
+            }
 
-        return $result;
+            // @todo find other use cases
+            $exception = new oxNoArticleException();
+            $exception->setMessage('Something went wrong while reservation');
+            throw $exception;
+        }
+
+        return $reservation;
     }
 
     /**
-     * @return mf_sdk_helper
+     * @return SDK
      */
-    private function getSdkHelper()
+    private function getSdk()
     {
-        return $this->getVersionLayer()->createNewObject('mf_sdk_helper');
+        if (null === $this->sdk) {
+            $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
+            $config = $helper->createSdkConfigFromOxid();
+            $this->sdk = $helper->instantiateSdk($config);
+        }
+
+        return $this->sdk;
+    }
+
+    /**
+     * @param Reservation $reservation
+     * @param oxOrder
+     *
+     * @return bool[]
+     */
+    public function checkoutProducts(Reservation $reservation, oxOrder $oxOrder)
+    {
+        $result = $this->getSdk()->checkout($reservation, $oxOrder->getId());
+
+        return $result;
     }
 }

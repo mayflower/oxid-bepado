@@ -36,7 +36,7 @@ class oxidProductFromShop implements ProductFromShop
                 continue;
             }
 
-            $sdkProducts[] = $oModuleSDKConverter->toBepadoProduct($oxArticle);
+            $sdkProducts[] = $oModuleSDKConverter->fromShoptoBepado($oxArticle);
         }
 
         return $sdkProducts;

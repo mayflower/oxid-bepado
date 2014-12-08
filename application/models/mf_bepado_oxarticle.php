@@ -111,7 +111,7 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     {
         /** @var mf_sdk_converter $converter */
         $converter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
-        $sdkProduct = $converter->toBepadoProduct($this);
+        $sdkProduct = $converter->fromShoptoBepado($this);
 
         if ($this->getState() == 0) {
             throw new Exception("Product is not imported from Bepado or ready for export to Bepado.");
@@ -150,4 +150,3 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         return $this->_oVersionLayer;
     }
 }
- 

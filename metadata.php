@@ -46,6 +46,9 @@ $aModule = array(
         'SDKConfig'             => $aPaths['models'] . '/SDKConfig.php',
 
         'mf_sdk_converter'      => $aPaths['core'] . '/mf_sdk_converter.php',
+        'mf_converter_interface'=> $aPaths['core'] . '/mf_converter_interface.php',
+        'mf_sdk_order_converter'=> $aPaths['core'] . '/mf_sdk_order_converter.php',
+
         'EventListener'         => $aPaths['core'] . '/EventListener.php',
         'VersionLayerInterface' => $aPaths['core'] . '/interface/VersionLayerInterface.php',
         'VersionLayer460'       => $aPaths['core'] . '/VersionLayer460.php',

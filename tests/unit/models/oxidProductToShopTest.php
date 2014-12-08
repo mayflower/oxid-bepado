@@ -37,7 +37,7 @@ class oxidProductToShopTest extends BaseTestCase
         // helper/converter for our module
         $this->sdkHelper = $this->getMock('mf_sdk_helper', array('createSdkConfigFromOxid'));
         $this->converter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
-        $this->converter->expects($this->any())->method('toShopProduct')->will($this->returnValue($this->convertedOxArticle));
+        $this->converter->expects($this->any())->method('fromBepadoToShop')->will($this->returnValue($this->convertedOxArticle));
 
         // create the bepadoProductState from that
         $this->bepadoProductState = $this->getMockBuilder('oxBase')->disableOriginalConstructor()->getMock();

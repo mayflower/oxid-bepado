@@ -97,7 +97,7 @@ class mf_sdk_converterTest extends BaseTestCase
         $oxArticle = oxNew('oxarticle');
         $oxArticle->assign($this->articleValues);
 
-        $product = $this->converter->toBepadoProduct($oxArticle);
+        $product = $this->converter->fromShoptoBepado($oxArticle);
 
         if ($testable) {
             $this->assertEquals($productValue, $product->$productProperty);
@@ -145,7 +145,7 @@ class mf_sdk_converterTest extends BaseTestCase
             ->with($this->equalTo('imgage-url-1'), $this->equalTo(1))
             ->will($this->returnValue(array('oxarticles__oxpic1', 'imgage-url-1')))
         ;
-        $oxArticle = $this->converter->toShopProduct($product);
+        $oxArticle = $this->converter->fromBepadoToShop($product);
 
         if ($testable) {
             $actualValue = $oxArticle->getFieldData($field);
@@ -183,4 +183,3 @@ class mf_sdk_converterTest extends BaseTestCase
         );
     }
 }
- 

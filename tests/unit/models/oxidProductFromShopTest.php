@@ -263,7 +263,7 @@ class oxidProductFromShopTest extends BaseTestCase
 
         $this->converter
             ->expects($this->once())
-            ->method('toBepadoProduct')
+            ->method('fromShoptoBepado')
             ->will($this->returnValue(new Struct\Product()));
 
         $actual = $this->productFromShop->getProducts(array('some-id'));
