@@ -20,6 +20,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
     protected $sdkHelper;
     protected $sdk;
     protected $orderConverter;
+    protected $oxOrder;
 
     /**
      * @var mf_sdk_product_helper
@@ -40,6 +41,8 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->sdkHelper = $this->getMockBuilder('mf_sdk_helper')->disableOriginalConstructor()->getMock();
         $this->sdk = $this->getMockBuilder('sdkMock')->disableOriginalConstructor()->getMock();
         $this->orderConverter = $this->getMockBuilder('mf_sdk_order_converter')->disableOriginalConstructor()->getMock();
+        $this->oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
+
         $sdkConfig = new SDKConfig();
         $this->sdkHelper
             ->expects($this->any())
@@ -325,12 +328,31 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->helper->reserveProductsInOrder($oxOrder);
     }
 
+    public function testCheckoutProduct()
+    {
+        $sdkReservation = new Reservation();
+        $this->oxOrder
+            ->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue(10));
+        $this->sdk
+            ->expects($this->once())
+            ->method('checkout')
+            ->with($this->equalTo($sdkReservation), $this->equalTo(10))
+            ->will($this->returnValue(true));
+
+        $result = $this->helper->checkoutProducts($sdkReservation, $this->oxOrder);
+
+        $this->assertTrue($result);
+    }
+
     protected function getObjectMapping()
     {
         return array(
             'SDKConfig'              => new SDKConfig(),
             'mf_sdk_helper'          => $this->sdkHelper,
-            'mf_sdk_order_converter' => $this->orderConverter
+            'mf_sdk_order_converter' => $this->orderConverter,
+            'oxorder'                => $this->oxOrder,
         );
     }
 }
