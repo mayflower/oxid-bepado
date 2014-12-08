@@ -11,4 +11,14 @@ class sdkMock
     {
 
     }
+
+    public function reserveProducts()
+    {
+
+    }
+
+    public function checkout()
+    {
+
+    }
 }
