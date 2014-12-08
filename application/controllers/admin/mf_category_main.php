@@ -3,6 +3,11 @@
 
 class mf_category_main extends mf_category_main_parent
 {
+    /**
+     * @var VersionLayerInterface
+     */
+    private $_oVersionLayer;
+
     public function render()
     {
         $aCategories = $this->getSdkCategories();
@@ -12,7 +17,7 @@ class mf_category_main extends mf_category_main_parent
             $aCategories = [];
         }
 
-        $oCat = oxNew('oxbase');
+        $oCat = $this->getVersionLayer()->createNewObject('oxbase');
         $oCat->init('bepado_categories');
         if ($soxId != "-1" && isset($soxId)){
             try {
@@ -49,10 +54,26 @@ class mf_category_main extends mf_category_main_parent
     private function getSdkCategories()
     {
         /** @var mf_sdk_helper $sdkHelper */
-        $sdkHelper = oxNew('mf_sdk_helper');
+        $sdkHelper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
         $sdkConfig = $sdkHelper->createSdkConfigFromOxid();
         $sdk = $sdkHelper->instantiateSdk($sdkConfig);
 
         return $sdk->getCategories();
+    }
+
+    /**
+     * Create and/or returns the VersionLayer.
+     *
+     * @return VersionLayerInterface
+     */
+    private function getVersionLayer()
+    {
+        if (null == $this->_oVersionLayer) {
+            /** @var VersionLayerFactory $factory */
+            $factory = oxNew('VersionLayerFactory');
+            $this->_oVersionLayer = $factory->create();
+        }
+
+        return $this->_oVersionLayer;
     }
 }
