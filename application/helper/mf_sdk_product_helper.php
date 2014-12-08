@@ -117,7 +117,7 @@ class mf_sdk_product_helper extends mf_abstract_helper
         /** @var mf_sdk_order_converter $converter */
         $converter = $this->getVersionLayer()->createNewObject('mf_sdk_order_converter');
         $sdkOrder = $converter->fromShopToBepado($oxOrder);
-        if (!$sdkOrder->getBasket()->getProductsCount()) {
+        if (count($sdkOrder->orderItems) === 0) {
             return false;
         }
 
@@ -125,14 +125,20 @@ class mf_sdk_product_helper extends mf_abstract_helper
         if (!$reservation->success) {
             $messages = $reservation->messages;
             foreach ($messages as $message) {
-                if (isset($message->values['availablity'])) {
+                $keys = array();
+                foreach ($message->values as $key => $values) {
+                    $keys[] = '%'.$key;
+                }
+                $computedMessage = str_replace($keys, $message->values, $message->message);
+
+                if (isset($message->values['availability'])) {
                     $exception = new oxOutOfStockException();
                     $exception->setRemainingAmount($message->values['availablity']);
-                    $exception->setMessage('Availability exceeded');
+                    $exception->setMessage($computedMessage);
                     throw $exception;
                 } elseif (isset($message->values['price'])) {
                     $exception = new oxArticleInputException();
-                    $exception->setMessage('Price has changed');
+                    $exception->setMessage($computedMessage);
                     throw $exception;
                 }
             }

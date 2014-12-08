@@ -14,7 +14,7 @@ class mf_sdk_order_converter implements mf_converter_interface
      *
      * @param oxOrder $object
      *
-     * @return Order
+     * @return Struct\Order
      */
     public function fromShopToBepado($object)
     {
@@ -26,7 +26,7 @@ class mf_sdk_order_converter implements mf_converter_interface
     /**
      * {@inheritDoc}
      *
-     * @param Order $object
+     * @param Struct\Order $object
      *
      * @return oxOrder
      */
