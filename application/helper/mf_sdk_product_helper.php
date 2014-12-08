@@ -86,6 +86,8 @@ class mf_sdk_product_helper extends mf_abstract_helper
      */
     private function doCheckProduct($sdkProduct)
     {
+        /** @var mf_sdk_logger_helper $logger */
+        $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
         $results = [];
 
         try {
@@ -94,7 +96,11 @@ class mf_sdk_product_helper extends mf_abstract_helper
                 $results = array_merge($results, $result);
             }
         } catch (\Exception $e) {
-            $results[] = new Struct\Message('Problem while checking the product', array());
+            $logger->writeBepadoLog($e);
+            $results[] = new Struct\Message(array(
+                'message' => 'Problem while checking the product',
+                'values'  => array()
+            ));
         }
 
         return $results;

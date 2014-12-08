@@ -34,6 +34,10 @@ class mf_Module_Config extends mf_Module_Config_parent
 
         $this->_aViewData['verified'] = $this->isVerified;
 
+
+        $sLogPath     = $this->getConfig()->getLogsDir() . "/BEPADO_LOG.txt";
+        $this->_aViewData['sBepadoLog'] = file_get_contents($sLogPath);
+
         return 'mf_module_config.tpl';
     }
 
