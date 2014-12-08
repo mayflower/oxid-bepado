@@ -54,8 +54,9 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->will($this->returnValue($this->sdk));
     }
 
-    public function testCheckProductsInBasket()
+    public function testCheckProductsInBasketWithNoChanges()
     {
+        // expectations
         $this->oxBasketItem
             ->expects($this->once())
             ->method('getAmount')
@@ -76,8 +77,141 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->method('getSdkProduct')
             ->will($this->returnValue($product));
 
-            $this->helper->checkProductsInBasket($this->oxBasket);
+        $this->helper->checkProductsInBasket($this->oxBasket);
+
+        // asserts
+        $this->assertEquals(new oxField('', oxField::T_TEXT), $this->oxBasketItem->bepado_check);
     }
+
+    public function testCheckProductsInBasketWithPriceChanges()
+    {
+        // expectations
+        $this->oxBasketItem
+            ->expects($this->once())
+            ->method('getAmount')
+            ->will($this->returnValue(3));
+        $this->oxArticle
+            ->expects($this->any())
+            ->method('isImportedFromBepado')
+            ->will($this->returnValue(true));
+        $this->sdk
+            ->expects($this->any())
+            ->method('checkProducts')
+            ->will($this->returnValue(
+                array(
+                    new \Bepado\SDK\Struct\Message(
+                        array(
+                            'message' =>'Price changed.',
+                            'values'  => array('price' => 10)
+                        )
+                    )
+                )
+            ));
+
+        $product = new Product();
+        $product->availability = 3;
+        $this->oxArticle
+            ->expects($this->once())
+            ->method('getSdkProduct')
+            ->will($this->returnValue($product));
+        $this->oxBasket
+            ->expects($this->once())
+            ->method('calculateBasket')
+            ->with($this->equalTo(true));
+
+        $this->helper->checkProductsInBasket($this->oxBasket);
+
+        // asserts
+        $this->assertEquals(new oxField('<ul><li><i>The price has changed.</i></li></ul>', oxField::T_TEXT), $this->oxBasketItem->bepado_check);
+    }
+
+    public function testCheckProductsInBasketWithAvailabilityChangesNoMatter()
+    {
+        // expectations
+        $this->oxBasketItem
+            ->expects($this->once())
+            ->method('getAmount')
+            ->will($this->returnValue(3));
+        $this->oxArticle
+            ->expects($this->any())
+            ->method('isImportedFromBepado')
+            ->will($this->returnValue(true));
+        $this->sdk
+            ->expects($this->any())
+            ->method('checkProducts')
+            ->will($this->returnValue(
+                array(
+                    new \Bepado\SDK\Struct\Message(
+                        array(
+                            'message' =>'availability changed.',
+                            'values'  => array('availability' => 10)
+                        )
+                    )
+                )
+            ));
+
+        $product = new Product();
+        $product->availability = 3;
+        $this->oxArticle
+            ->expects($this->once())
+            ->method('getSdkProduct')
+            ->will($this->returnValue($product));
+
+        $this->helper->checkProductsInBasket($this->oxBasket);
+
+        // asserts
+        $this->assertEquals(new oxField('', oxField::T_TEXT), $this->oxBasketItem->bepado_check);
+    }
+
+    public function testCheckProductsInBasketWithAvailabilityChangesDoesMatter()
+    {
+        // expectations
+        $this->oxBasketItem
+            ->expects($this->once())
+            ->method('getAmount')
+            ->will($this->returnValue(6));
+        $this->oxArticle
+            ->expects($this->any())
+            ->method('isImportedFromBepado')
+            ->will($this->returnValue(true));
+        $this->sdk
+            ->expects($this->any())
+            ->method('checkProducts')
+            ->will($this->returnValue(
+                array(
+                    new \Bepado\SDK\Struct\Message(
+                        array(
+                            'message' =>'availability changed.',
+                            'values'  => array('availability' => 5)
+                        )
+                    )
+                )
+            ));
+
+        $product = new Product();
+        $product->availability = 3;
+        $this->oxArticle
+            ->expects($this->once())
+            ->method('getSdkProduct')
+            ->will($this->returnValue($product));
+        $this->oxBasket
+            ->expects($this->once())
+            ->method('calculateBasket')
+            ->with($this->equalTo(true));
+
+        $this->helper->checkProductsInBasket($this->oxBasket);
+
+        // asserts
+        $this->assertEquals(
+            new oxField(
+                '<ul><li><i>This product is available only 5 times. Either delete the
+                        product from your basket or purchase the reduced amount.</i></li></ul>',
+                oxField::T_TEXT
+            ),
+            $this->oxBasketItem->bepado_check
+        );
+    }
+
 
     protected function getObjectMapping()
     {
