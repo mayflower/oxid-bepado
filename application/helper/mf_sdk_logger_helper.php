@@ -11,7 +11,7 @@ class mf_sdk_logger_helper extends mf_abstract_helper
     protected $_sFileName = 'BEPADO_LOG.txt';
 
     /**
-     * @param Exceptopn $oLogObj
+     * @param /Exceptopn $oLogObj
      */
     public function writeBepadoLog($oLogObj)
     {
@@ -29,7 +29,7 @@ class mf_sdk_logger_helper extends mf_abstract_helper
      */
     private function getString($oLogObj)
     {
-        $string = " (time: " . date('Y-m-d H:i:s') . "): [{$oLogObj->getCode()}]: {$oLogObj->getMessage()} \n Stack Trace: {$oLogObj->getTraceAsString()}\n\n";
+        $string = " (time: " . date('Y-m-d H:i:s') . "): [{$oLogObj->getCode()}]: {$oLogObj->getMessage()}\n\n";
 
         return $string;
     }
