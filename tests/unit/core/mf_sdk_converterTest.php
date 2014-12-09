@@ -18,7 +18,7 @@ class mf_sdk_converterTest extends BaseTestCase
     protected $productValues = array(
         'sourceId'         => 'some-id',
         'ean'              => 'test-ean',
-        'url'              => 'http://www.oxid-test.dev/index.php?cl=details&amp;anid=some-id',
+        'url'              => '',
         'title'            => 'test-title',
         'shortDescription' => 'test short description',
         'longDescription'  => 'test long description',
@@ -93,6 +93,9 @@ class mf_sdk_converterTest extends BaseTestCase
      */
     public function testConvertToSDKProduct($productProperty, $productValue, $testable = true)
     {
+        $shopUrl = oxRegistry::getConfig()->getShopUrl();
+        $this->productValues['url'] = $shopUrl . 'index.php?cl=details&amp;anid=some-id';
+
         /** @var oxArticle $oxArticle */
         $oxArticle = oxNew('oxarticle');
         $oxArticle->assign($this->articleValues);
@@ -116,11 +119,13 @@ class mf_sdk_converterTest extends BaseTestCase
     public function provideProductValues()
     {
         $values = array();
+        $shopUrl = oxRegistry::getConfig()->getShopUrl();
+        $this->productValues['url'] = $shopUrl . 'index.php?cl=details&amp;anid=some-id';
 
         foreach ($this->productValues as $property => $value) {
             $testable = in_array($property, array('vendor', 'longDescription')) ? false : true;
             if ('images' === $property) {
-                $value = array('http://www.oxid-test.dev/out/pictures/generated/product/1/380_340_75/nopic.jpg'); // default image for non existing images
+                $value = array($shopUrl . 'out/pictures/generated/product/1/380_340_75/nopic.jpg'); // default image for non existing images
             }
             $values[] = array($property, $value, $testable);
         }
@@ -134,6 +139,9 @@ class mf_sdk_converterTest extends BaseTestCase
     public function testConvertFromSDKProduct($field, $fieldValue, $testable)
     {
         $product = new Struct\Product();
+        $shopUrl = oxRegistry::getConfig()->getShopUrl();
+        $this->productValues['url'] = $shopUrl . 'index.php?cl=details&amp;anid=some-id';
+
         foreach ($this->productValues as $property => $propertyValue) {
             $product->$property = $propertyValue;
         }
