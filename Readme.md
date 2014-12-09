@@ -37,7 +37,7 @@ Frisch installiert kommuniziert das SDK mit der Sandbox von Bepado. Um auf Live 
 
 
 
-(TODO fix that)
+# (TODO fix that)
 ## Alte Doku
 
 2. $this->aUserComponents['mfcmp_bepado'] = 0
