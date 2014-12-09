@@ -100,8 +100,6 @@ class oxidProductFromShopTest extends BaseTestCase
         $order = new Struct\Order();
         $order->billingAddress = $address;
         $order->deliveryAddress = $address;
-        $order->billingAddress = $address;
-        $order->deliveryAddress = $address;
         $orderItem = new Struct\OrderItem();
         $orderItem->count = 1;
         $orderItem->product = new Struct\Product();
@@ -120,8 +118,6 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->oxDb->expects($this->any())->method('getOne')->will($this->returnValue('some-id'));
         $address = new Struct\Address();
         $order = new Struct\Order();
-        $order->billingAddress = $address;
-        $order->deliveryAddress = $address;
         $order->billingAddress = $address;
         $order->deliveryAddress = $address;
         $orderItem = new Struct\OrderItem();
@@ -144,8 +140,6 @@ class oxidProductFromShopTest extends BaseTestCase
 
         $address = new Struct\Address();
         $order = new Struct\Order();
-        $order->billingAddress = $address;
-        $order->deliveryAddress = $address;
         $order->billingAddress = $address;
         $order->deliveryAddress = $address;
         $orderItem = new Struct\OrderItem();

@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../BaseTestCase.php';
+require_once __DIR__ . '/../BaseTestCase.php';
 
 use Bepado\SDK\Struct as Struct;
 
