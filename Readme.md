@@ -1,6 +1,6 @@
 # Setup
 
-## 1 Anlegen des Module Ordners
+## 1 Anlegen des Modul-Ordners
 
 Klonen Sie das Modul in den Ordner `/modules/bepado`, dh. Sie gehen in den Ordner `/modules` und führen
 folgenden git Befehl aus:
@@ -10,7 +10,7 @@ folgenden git Befehl aus:
 ```
 
 Dieser Befehl legt den Ordner `bepado` für sie an. Wollen Sie dem Modul einen anderen 
-Ordnernamen geben, beachten Sie dass dieser der `id` in der `metadata.php` des Moduls entsprechen muss.
+Ordnernamen geben, beachten Sie, dass dieser der `id` in der `metadata.php` des Moduls entsprechen muss.
 
 ## 2 Bepado SDK installieren mit Composer
 
@@ -25,16 +25,20 @@ Um den composer autoloader benutzen zu können muss man in der `functions.php` f
     require_once __DIR__."/bepado/vendor/autoload.php";
 ```
 
-## 4 Module im Backend aktivieren
+## 4 Modul im Admin-Bereich aktivieren
 
-Mit dem Aktivieren im Backend werden gleichzeitig die Tabellen, die das SDK benötigt und auch Änderungen an den Tabellen
+Durch die Aktivierung des Moduls im Admin-Bereich werden gleichzeitig die Tabellen, die das SDK benötigt ebenso wie Änderungen an den Tabellen
 des Oxid Shops vorgenommen. Darum ist es danach von Nöten die Views zu updaten. (Services->Tools)
 
 ## 5 Produktiv/DemoMode
 
-Frisch installiert kommuniziert die SDK mit der Sandbox von Bepado. Um auf Live umzustellen kann man dies in den allg. ModuleSettings tun.
+Frisch installiert kommuniziert das SDK mit der Sandbox von Bepado. Um auf Live umzustellen, kann man dies in den allg. ModuleSettings tun.
 
-## 6 Alte Doku (TODO fix that)
+
+
+
+(TODO fix that)
+## Alte Doku
 
 2. $this->aUserComponents['mfcmp_bepado'] = 0
 3. $this->iDebug = true
@@ -42,5 +46,3 @@ Frisch installiert kommuniziert die SDK mit der Sandbox von Bepado. Um auf Live 
 # Todos
 
 1. PDO Config aus Oxid Konfiguration holen
-2. API key konfigurierbar machen
-3. Produkte an bepado exportieren mit $sdk->recordInsert($id); (Siehe docs/tutorial_export.md)
