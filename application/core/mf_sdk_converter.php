@@ -88,6 +88,9 @@ class mf_sdk_converter implements mf_converter_interface
      */
     public function fromBepadoToShop($object)
     {
+        /** @var mf_sdk_logger_helper $logger */
+        $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
+
         /** @var oxarticle $oxProduct */
         $oxProduct = oxNew('oxarticle');
         $aParams = [];
@@ -140,7 +143,7 @@ class mf_sdk_converter implements mf_converter_interface
                     list($fieldName, $fieldValue) = $sdkHelper->createOxidImageFromPath($imagePath, $key+1);
                     $aParams[$fieldName] = $fieldValue;
                 } catch (\Exception $e) {
-                    // we won't insert the image
+                    $logger->writeBepadoLog('Image ' . $imagePath . 'could not be saved during product conversion.');
                 }
             }
         }

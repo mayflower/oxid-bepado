@@ -28,6 +28,7 @@ class mf_sdk_logger_helper extends mf_abstract_helper
                 $sLogMsg = $this->getString($sLogTxt, $values) . "\n---------------------------------------------\n\n";
                 $this->getVersionLayer()->getUtils()->writeToLog($sLogMsg, $this->_sFileName);
             } catch (Exception $e) {
+                // do nothing
             }
         }
     }

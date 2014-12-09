@@ -11,6 +11,9 @@ class EventListener
 
     public function onActivate()
     {
+        /** @var mf_sdk_logger_helper $logger */
+        $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
+
         $schemaDir = __DIR__ . '/../install';
         $sqlFiles = array_filter(
             scandir($schemaDir),
@@ -30,7 +33,7 @@ class EventListener
                 try {
                     self::getVersionLayer()->getDb()->execute($query);
                 } catch (\Exception $e) {
-                    // todo log if possible
+                    $logger->writeBepadoLog($e->getMessage());
                 }
 
             }
