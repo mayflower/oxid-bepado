@@ -15,14 +15,16 @@ class mf_sdk_order_converterTest extends BaseTestCase
     protected $converter;
 
     protected $sdkOrderValues = array(
-        'orderShop'       => null,
-        'providerShop'    => null,
-        'reservationId'   => 'some-reservation-id',
-        'localOrderId'    => null,
-        'shippingCosts'   => null,
-        'deliveryAddress' => null,
-        'billingAddress'  => null,
-
+        'orderShop'          => null,
+        'providerShop'       => null,
+        'reservationId'      => 'some-reservation-id',
+        'localOrderId'       => 'local-id',
+        'shippingCosts'      => 1.99,
+        'grossShippingCosts' => 2.20,
+        'deliveryAddress'    => null,
+        'billingAddress'     => null,
+        'shippingRule'       => null,
+        'paymentType'        => 'test-payment-type',
     );
 
     protected $addressValues = array(
@@ -39,33 +41,37 @@ class mf_sdk_order_converterTest extends BaseTestCase
     );
 
     protected $oxOrderValues = array(
-        'oxorder__oxid'            => null,
+        'oxorder__oxid'            => 'local-id',
         'oxorder__oxuserid'        => 'test-user',
         'oxorder__oxbillcompany'   => 'test company',
-        'oxorder__oxbillmail'      => 'test-mail@mail-for-test.de',
+        'oxorder__oxbillmail'      => null,
         'oxorder__oxbillfname'     => 'test',
         'oxorder__oxbilllname'     => 'case',
         'oxorder__oxbillstreet'    => 'test street',
-        'oxorder__oxbillstreetnr'  => '12',
+        'oxorder__oxbillstreetnr'  => 12,
         'oxorder__oxbilladdinfo'   => 'test add line',
         'oxorder__oxbillcity'      => 'test city',
         'oxorder__oxbillcountryid' => 'some-country-id',
         'oxorder__oxbillstateid'   => 'some-state-id',
         'oxorder__oxbillzip'       => 12345,
         'oxorder__oxbillfon'       => '0000 0000',
-        'oxorder__oxdelcompany'   => 'test company',
-        'oxorder__oxdelmail'      => 'test-mail@mail-for-test.de',
-        'oxorder__oxdelfname'     => 'test',
-        'oxorder__oxdellname'     => 'case',
-        'oxorder__oxdelstreet'    => 'test street',
-        'oxorder__oxdelstreetnr'  => '12',
-        'oxorder__oxdeladdinfo'   => 'test add line',
-        'oxorder__oxdelcity'      => 'test city',
-        'oxorder__oxdelcountryid' => 'some-country-id',
-        'oxorder__oxdelstateid'   => 'some-state-id',
-        'oxorder__oxdelzip'       => 12345,
-        'oxorder__oxdelfon'       => '0000 0000',
+        'oxorder__oxdelcompany'    => 'test company',
+        'oxorder__oxdelmail'       => null,
+        'oxorder__oxdelfname'      => 'test',
+        'oxorder__oxdellname'      => 'case',
+        'oxorder__oxdelstreet'     => 'test street',
+        'oxorder__oxdelstreetnr'   => 12,
+        'oxorder__oxdeladdinfo'    => 'test add line',
+        'oxorder__oxdelcity'       => 'test city',
+        'oxorder__oxdelcountryid'  => 'some-country-id',
+        'oxorder__oxdelstateid'    => 'some-state-id',
+        'oxorder__oxdelzip'        => 12345,
+        'oxorder__oxdelfon'        => '0000 0000',
+        'oxorder__oxpaymentid'     => 'payment-id',
     );
+    protected $oxPayment;
+    protected $addressConverter;
+    protected $oxDb;
 
     public function setUp()
     {
@@ -74,6 +80,28 @@ class mf_sdk_order_converterTest extends BaseTestCase
         $this->converter = new mf_sdk_order_converter();
         $this->converter->setVersionLayer($this->versionLayer);
 
+
+        // mocks of oxid classes
+        $this->oxPayment = $this->getMockBuilder('oxPayment')->disableOriginalConstructor()->getMock();
+        $this->oxPayment->expects($this->any())->method('load')->will($this->returnValue(true));
+        $this->oxPayment->expects($this->any())->method('isLoaded')->will($this->returnValue(true));
+        $this->oxPayment
+            ->expects($this->any())
+            ->method('getFieldData')
+            ->with($this->equalTo('bepadopaymenttype'))
+            ->will($this->returnValue('test-payment-type'));
+        $this->oxPayment
+            ->expects($this->any())
+            ->method('buildSelectString')
+            ->with($this->equalTo(array('bepadopaymenttype' => 'test-payment-type')))
+            ->will($this->returnValue('some-sql'));
+        $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
+        $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
+        $this->oxDb
+            ->expects($this->any())
+            ->method('getOne')
+            ->will($this->returnValue('payment-id'));
+
     }
 
     /**
@@ -81,15 +109,13 @@ class mf_sdk_order_converterTest extends BaseTestCase
      */
     public function testConvertToSDKOrder($orderProperty, $orderValue, $testable = true)
     {
-        $this->markTestSkipped('Do Address first');
         /** @var oxOrder $oxOrder */
         $oxOrder = oxNew('oxorder');
         $oxOrder->assign($this->oxOrderValues);
-
-        $product = $this->converter->fromShoptoBepado($oxOrder);
+        $sdkOrder = $this->converter->fromShoptoBepado($oxOrder, array('reservationId' => 'some-reservation-id'));
 
         if ($testable) {
-            $this->assertEquals($orderValue, $product->$orderProperty);
+            $this->assertEquals($orderValue, $sdkOrder->$orderProperty);
         } else {
             $this->markTestIncomplete('Can not test for Property: '.$orderProperty);
         }
@@ -103,7 +129,11 @@ class mf_sdk_order_converterTest extends BaseTestCase
         $values = array();
 
         foreach ($this->sdkOrderValues as $property => $value) {
-            $testable = in_array($property, array()) ? false : true;
+            $testable = in_array($property, array('shippingCosts', 'grossShippingCosts', 'shippingRule')) ? false : true;
+            if ('deliveryAddress' === $property || 'billingAddress' === $property) {
+                $value = $this->generateSDKAddress();
+                $value->email = null; // isn't set for billing and delivery address
+            }
 
             $values[] = array($property, $value, $testable);
         }
@@ -111,26 +141,59 @@ class mf_sdk_order_converterTest extends BaseTestCase
         return $values;
     }
 
+    public function testConvertToSDKOrderWithOrderItems()
+    {
+        /** @var oxOrder $oxOrder */
+        $oxOrder = oxNew('oxorder');
+        $oxOrder->assign($this->oxOrderValues);
+
+        /** @var oxList $oxArticlesList */
+        $oxArticlesList = oxNew('oxList');
+        $oxArticlesList->init('oxBase', 'oxArticle');
+
+        $importedArticle = $this->getMockBuilder('mf_bepado_oxarticle')->disableOriginalConstructor()->getMock();
+        $importedArticle->expects($this->once())->method('isImportedFromBepado')->will($this->returnValue(true));
+        $importedArticle->expects($this->once())
+            ->method('getFieldData')
+            ->with($this->equalTo('oxorderarticle__oxamount'))
+            ->will($this->returnValue(5));
+        $expectedProduct = new Struct\Product();
+        $expectedProduct->title = 'test-product';
+        $importedArticle->expects($this->once())->method('getSdkProduct')->will($this->returnValue($expectedProduct));
+        $useLessArticle = $this->getMockBuilder('mf_bepado_oxarticle')->disableOriginalConstructor()->getMock();
+        $useLessArticle->expects($this->once())->method('isImportedFromBepado')->will($this->returnValue(false));
+
+        $oxArticlesList->add($importedArticle);
+        $oxArticlesList->add($useLessArticle);
+        $oxOrder->setOrderArticleList($oxArticlesList);
+
+        $order = $this->converter->fromShopToBepado($oxOrder);
+        $orderItem = array_shift($order->orderItems);
+        $actualProduct = $orderItem->product;
+
+        $this->assertEquals($expectedProduct->title, $actualProduct->title);
+        $this->assertEquals(5, $orderItem->count);
+    }
+
     /**
      * @dataProvider provideOxidOrderValues
      */
-    public function testConvertToOxidOrder($orderProperty, $orderValue, $testable = true)
+    public function testConvertToOxidOrder($orderFieldName, $orderFieldValue, $testable = true)
     {
-        $this->markTestSkipped('Do Address first');
         $sdkOrder = new Struct\Order();
         foreach ($this->sdkOrderValues as $property => $value) {
             if ('deliveryAddress' === $property || 'billingAddress' === $property) {
-                $value = $this->generateAddress();
+                $value = $this->generateSDKAddress();
             }
             $sdkOrder->$property = $value;
         }
 
-        $product = $this->converter->fromBepadoToShop($sdkOrder);
+        $oxOrder = $this->converter->fromBepadoToShop($sdkOrder);
 
         if ($testable) {
-            $this->assertEquals($orderValue, $product->$orderProperty);
+            $this->assertEquals($orderFieldValue, $oxOrder->getFieldData($orderFieldName));
         } else {
-            $this->markTestIncomplete('Can not test for Property: '.$orderProperty);
+            $this->markTestIncomplete('Can not test for Property: '.$orderFieldName);
         }
     }
 
@@ -141,12 +204,28 @@ class mf_sdk_order_converterTest extends BaseTestCase
     {
         $values = array();
 
-        foreach ($this->oxOrderValues as $property => $value) {
-            $testable = in_array($property, array()) ? false : true;
-            if ('deliveryAddress' === $property || 'billingAddress' === $property) {
-                $value = $this->generateAddress();
+        foreach ($this->oxOrderValues as $fieldName => $fieldValue) {
+            $testable = in_array($fieldName, array(
+                'oxorder__oxuserid',
+                'oxorder__oxdelcompany',
+                'oxorder__oxdelmail',
+                'oxorder__oxdelfname',
+                'oxorder__oxdellname',
+                'oxorder__oxdelstreet',
+                'oxorder__oxdelstreetnr',
+                'oxorder__oxdeladdinfo',
+                'oxorder__oxdelcity',
+                'oxorder__oxdelcountryid',
+                'oxorder__oxdelstateid',
+                'oxorder__oxdelzip',
+                'oxorder__oxdelfon',
+                'oxorder__oxbillcountryid',
+                'oxorder__oxbillstateid'
+            )) ? false : true;
+            if ('oxorder__oxid' === $fieldName) {
+                $fieldValue = null;
             }
-            $values[] = array($property, $value, $testable);
+            $values[] = array($fieldName, $fieldValue, $testable);
         }
 
         return $values;
@@ -154,21 +233,20 @@ class mf_sdk_order_converterTest extends BaseTestCase
 
     protected function getObjectMapping()
     {
-        return array();
+        return array(
+            'oxpayment'                => $this->oxPayment,
+        );
     }
 
     /**
      * @return Struct\Address
      */
-    private function generateAddress($type = 'oxaddress__ox')
+    private function generateSDKAddress()
     {
         $address = new Struct\Address();
-        foreach ($this->addressMapping as $oxField => $sdkProperty) {
-            if (isset($this->addressValues[$sdkProperty])) {
-                $address->$sdkProperty = $this->addressValues[$sdkProperty];
-            }
+        foreach ($this->addressValues as $property => $value) {
+            $address->$property = $value;
         }
-
         return $address;
     }
 }
