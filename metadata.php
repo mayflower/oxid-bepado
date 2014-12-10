@@ -31,6 +31,9 @@ $aModule = array(
         'article_list'          => $aPaths['controllers'] . '/admin/mf_article_list',
         'category_main'         => $aPaths['controllers'] . '/admin/mf_category_main',
         'category_list'         => $aPaths['controllers'] . '/admin/mf_category_list',
+        'list_order'            => $aPaths['controllers'] . '/admin/mf_list_order',
+        'order_article'         => $aPaths['controllers'] . '/admin/mf_order_article',
+        'order_package'         => $aPaths['controllers'] . '/admin/mf_order_package',
         'basket'                => $aPaths['controllers'] . '/mf_basket',
         'order'                 => $aPaths['controllers'] . '/mf_order',
 
@@ -83,10 +86,21 @@ $aModule = array(
             'block'    => 'admin_payment_main_fields',
             'file'     => $aPaths['blocks'] . '/payment_main.tpl'
         ),
+        array(
+            'template' => 'list_order.tpl',
+            'block'    => 'admin_list_order_item',
+            'file'     => $aPaths['blocks'] . '/mf_list_order.tpl'
+        ),
+        array(
+            'template' => 'order_article.tpl',
+            'block'    => 'admin_order_article_listitem',
+            'file'     => $aPaths['blocks'] . '/mf_order_article.tpl'
+        ),
     ),
     'templates' => array(
-        'mf_module_config.tpl' => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl',
-        'mf_category_list.tpl' => $aPaths['views'] . '/admin/tpl/mf_category_list.tpl',
+        'mf_module_config.tpl'  => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl',
+        'mf_category_list.tpl'  => $aPaths['views'] . '/admin/tpl/mf_category_list.tpl',
+        'mf_order_package.tpl'  => $aPaths['views'] . '/admin/tpl/mf_order_package.tpl',
     ),
     'settings' => array(
         array(
