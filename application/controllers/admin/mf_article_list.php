@@ -5,9 +5,9 @@
  */
 class mf_article_list extends mf_article_list_parent
 {
-    const EXPORT_PIC = 'application/out/src/img/bepado_out.png';
+    const EXPORT_PIC = 'application/out/img/bepado_out.png';
 
-    const IMPORT_PIC = 'application/out/src/img/bepado_in.png';
+    const IMPORT_PIC = 'application/out/img/bepado_in.png';
 
     public function getItemList()
     {

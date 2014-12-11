@@ -2,7 +2,7 @@
 
 class mf_list_order extends mf_list_order_parent
 {
-    const BEPADO_PIC = 'application/out/src/img/bepado.png';
+    const BEPADO_PIC = 'application/out/img/bepado.png';
 
     public function render()
     {

@@ -2,7 +2,7 @@
 
 class mf_order_article extends mf_order_article_parent
 {
-    const BEPADO_PIC = 'application/out/src/img/bepado.png';
+    const BEPADO_PIC = 'application/out/img/bepado.png';
 
     public function render()
     {

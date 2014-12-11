@@ -2,7 +2,7 @@
 
 class mf_order_package extends mf_order_package_parent
 {
-    const BEPADO_PIC = 'application/out/src/img/bepado_b.png';
+    const BEPADO_PIC = 'application/out/img/bepado_b.png';
 
     public function render()
     {
