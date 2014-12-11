@@ -41,6 +41,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
      */
     public function isArticleExported(oxArticle $article)
     {
+        print(PHP_EOL."Article ExportDecission");
         return $this->getBepadoState($article->getId()) === SDKConfig::ARTICLE_STATE_EXPORTED;
     }
 

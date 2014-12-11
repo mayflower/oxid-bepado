@@ -54,14 +54,12 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     public function save()
     {
         $return = parent::save();
-
-        if ($this->getArticleHelper()->isArticleExported($this->getId()) && $this->productIsKnown($this->getId())) {
+        if ($this->getArticleHelper()->isArticleExported($this) && $this->productIsKnown($this->getId())) {
             $this->getSDK()->recordUpdate($this->getId());
-        } elseif (!$this->getArticleHelper()->isArticleExported($this->getId()) && $this->productIsKnown($this->getId())) {
+        } elseif (!$this->getArticleHelper()->isArticleExported($this) && $this->productIsKnown($this->getId())) {
             $this->getSDK()->recordDelete($this->getId());
-        } elseif ($this->getArticleHelper()->isArticleExported($this->getId()) && !$this->productIsKnown($this->getId())) {
+        } elseif ($this->getArticleHelper()->isArticleExported($this) && !$this->productIsKnown($this->getId())) {
             $this->getSDK()->recordInsert($this->getId());
-
         }
 
         return $return;
