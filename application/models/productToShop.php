@@ -38,6 +38,7 @@ class oxidProductToShop implements ProductToShop
     {
         /** @var mf_sdk_converter $productConverter */
         $productConverter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
+
         $oxArticle = $productConverter->fromBepadoToShop($product);
 
         /** @var oxBase $oBepadoProductState */
@@ -57,7 +58,6 @@ class oxidProductToShop implements ProductToShop
         } else {
             $this->insertArticleWithBepadoState($oxArticle, $oBepadoProductState, $product);
         }
-
     }
 
     /**

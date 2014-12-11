@@ -171,7 +171,7 @@ class mf_sdk_order_converterTest extends BaseTestCase
         $importedOrderArticle->expects($this->once())->method('getArticle')->will($this->returnValue($importedArticle));
         $importedOrderArticle->expects($this->once())
             ->method('getFieldData')
-            ->with($this->equalTo('oxorderarticle__oxamount'))
+            ->with($this->equalTo('oxorderarticles__oxamount'))
             ->will($this->returnValue(5));
 
         $oxArticlesList->add($importedOrderArticle);

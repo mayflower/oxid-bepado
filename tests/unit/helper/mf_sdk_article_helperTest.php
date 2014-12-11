@@ -67,7 +67,10 @@ class mf_sdk_article_helperTest extends BaseTestCase
     {
         $this->oxBase->expects($this->once())->method('load')->with($this->equalTo('test-id'));
         $this->oxBase->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
-        $this->oxBase->expects($this->once())->method('getFieldData')->will($this->returnValue(SDKConfig::ARTICLE_STATE_EXPORTED));
+        $this->oxBase
+            ->expects($this->once())
+            ->method('getFieldData')
+            ->will($this->returnValue((string) SDKConfig::ARTICLE_STATE_EXPORTED));
 
         $result = $this->helper->isArticleExported($this->oxArticle);
 
@@ -99,7 +102,10 @@ class mf_sdk_article_helperTest extends BaseTestCase
     {
         $this->oxBase->expects($this->once())->method('load')->with($this->equalTo('test-id'));
         $this->oxBase->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
-        $this->oxBase->expects($this->once())->method('getFieldData')->will($this->returnValue(SDKConfig::ARTICLE_STATE_IMPORTED));
+        $this->oxBase
+            ->expects($this->once())
+            ->method('getFieldData')
+            ->will($this->returnValue((string) SDKConfig::ARTICLE_STATE_IMPORTED));
 
         $result = $this->helper->isArticleImported($this->oxArticle);
 
@@ -131,7 +137,10 @@ class mf_sdk_article_helperTest extends BaseTestCase
     {
         $this->oxBase->expects($this->once())->method('load')->with($this->equalTo('test-id'));
         $this->oxBase->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
-        $this->oxBase->expects($this->once())->method('getFieldData')->will($this->returnValue(SDKConfig::ARTICLE_STATE_IMPORTED));
+        $this->oxBase
+            ->expects($this->once())
+            ->method('getFieldData')
+            ->will($this->returnValue((string) SDKConfig::ARTICLE_STATE_IMPORTED));
 
         $result = $this->helper->isOrderArticleImported($this->oxOrderArticle);
 

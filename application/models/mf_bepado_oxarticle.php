@@ -28,7 +28,7 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     private function getArticleHelper()
     {
         if (null === $this->articleHelper) {
-            $this->getVersionLayer()->createNewObject('mf_sdk_article_helper');
+            $this->articleHelper = $this->getVersionLayer()->createNewObject('mf_sdk_article_helper');
         }
 
         return $this->articleHelper;

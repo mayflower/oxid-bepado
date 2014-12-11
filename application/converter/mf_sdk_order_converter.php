@@ -110,7 +110,7 @@ class mf_sdk_order_converter extends mf_abstract_converter implements mf_convert
             $article = $orderArticle->getArticle();
             $orderItem = new Struct\OrderItem();
             $orderItem->product = $article->getSdkProduct();
-            $orderItem->count = $orderArticle->getFieldData('oxorderarticle__oxamount');
+            $orderItem->count = (int) $orderArticle->getFieldData('oxorderarticles__oxamount');
             $orderItems[] = $orderItem;
         }
 

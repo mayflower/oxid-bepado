@@ -52,7 +52,7 @@ class mf_sdk_converterTest extends BaseTestCase
         'oxarticles__oxtitle'        => 'test-title',
         'oxarticles__oxshortdesc'    => 'test short description',
         'oxarticles__oxprice'        => 1.99,
-        'oxarticles__oxaprice'       => 1.50,
+        'oxarticles__oxpricea'       => 1.50,
         'oxarticles__oxstock'        => 10,
         'oxarticles__oxweight'       => 11,
         'oxarticles__oxwidth'        => 12,

@@ -31,6 +31,7 @@ class mf_oxOrder extends mf_oxOrder_parent
         $helper = $this->getVersionLayer()->createNewObject('mf_sdk_product_helper');
         $reservation = $helper->reserveProductsInOrder($this);
         if (!$reservation) {
+            // no bepado product means nothing to do for us
             return $returnValue;
         }
         $helper->checkoutProducts($reservation, $this);

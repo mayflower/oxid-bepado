@@ -71,8 +71,8 @@ class mf_sdk_article_helper extends mf_abstract_helper
         if (!$oBepadoProductState->isLoaded()) {
             return SDKConfig::ARTICLE_STATE_NONE;
         }
-        $state = $oBepadoProductState->getFieldData('state');
+        $state = (int) $oBepadoProductState->getFieldData('state');
 
-        return !$state && null === $state ?  SDKConfig::ARTICLE_STATE_NONE : $state;
+        return !$state ? SDKConfig::ARTICLE_STATE_NONE : $state;
     }
 }
