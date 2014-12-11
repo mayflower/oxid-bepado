@@ -24,7 +24,6 @@ class mf_oxOrder extends mf_oxOrder_parent
      */
     public function finalizeOrder(oxBasket $oBasket, $oUser, $blRecalculatingOrder = false)
     {
-        $foo = 0;
         $returnValue = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
 
         /** @var mf_sdk_product_helper $helper */
