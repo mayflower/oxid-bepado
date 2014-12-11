@@ -9,7 +9,7 @@ $aPaths = array(
     'models'      => $sModuleId . '/application/models',
     'core'        => $sModuleId . '/application/core',
     'helper'      => $sModuleId . '/application/helper',
-//    'utils'       => $sModuleId . '/utils',
+    'converter'   => $sModuleId . '/application/converter',
 //    'admin'       => $sModuleId . '/application/controllers/admin',
     'views'       => $sModuleId . '/application/views',
     'blocks'      => 'application/views/blocks',
@@ -37,6 +37,7 @@ $aModule = array(
         'basket'                => $aPaths['controllers'] . '/mf_basket',
         'order'                 => $aPaths['controllers'] . '/mf_order',
 
+        'oxorder'               => $aPaths['models'] . '/mf_oxOrder',
         'oxarticle'             => $aPaths['models'] . '/mf_bepado_oxarticle',
     ),
     'files'   => array(
@@ -48,9 +49,11 @@ $aModule = array(
         'oxidProductToShop'     => $aPaths['models'] . '/productToShop.php',
         'SDKConfig'             => $aPaths['models'] . '/SDKConfig.php',
 
-        'mf_sdk_converter'      => $aPaths['core'] . '/mf_sdk_converter.php',
-        'mf_converter_interface'=> $aPaths['core'] . '/mf_converter_interface.php',
-        'mf_sdk_order_converter'=> $aPaths['core'] . '/mf_sdk_order_converter.php',
+        'mf_converter_interface'   => $aPaths['converter'] . '/mf_converter_interface.php',
+        'mf_abstract_converter'    => $aPaths['converter'] . '/mf_abstract_converter.php',
+        'mf_sdk_converter'         => $aPaths['converter'] . '/mf_sdk_converter.php',
+        'mf_sdk_order_converter'   => $aPaths['converter'] . '/mf_sdk_order_converter.php',
+        'mf_sdk_address_converter' => $aPaths['converter'] . '/mf_sdk_address_converter.php',
 
         'EventListener'         => $aPaths['core'] . '/EventListener.php',
         'VersionLayerInterface' => $aPaths['core'] . '/interface/VersionLayerInterface.php',
@@ -64,6 +67,7 @@ $aModule = array(
         'mf_sdk_helper'         => $aPaths['helper'] . '/mf_sdk_helper.php',
         'mf_sdk_product_helper' => $aPaths['helper'] . '/mf_sdk_product_helper.php',
         'mf_sdk_logger_helper'  => $aPaths['helper'] . '/mf_sdk_logger_helper.php',
+        'mf_sdk_article_helper' => $aPaths['helper'] . '/mf_sdk_article_helper.php',
     ),
     'blocks' => array(
         array(

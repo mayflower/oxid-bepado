@@ -37,16 +37,18 @@ class mfBepado extends oxUbase
     }
 
     /**
-     * Create and/or returns the VersionLayer.
-     *
-     * @return VersionLayerInterface
+     * @var VersionLayerInterface
      */
+    private $_oVersionLayer;
+
     private function getVersionLayer()
     {
-        /** @var VersionLayerFactory $factory */
-        $factory = oxNew('VersionLayerFactory');
-        $oVersionLayer = $factory->create();
+        if (null == $this->_oVersionLayer) {
+            /** @var VersionLayerFactory $factory */
+            $factory = oxNew('VersionLayerFactory');
+            $this->_oVersionLayer = $factory->create();
+        }
 
-        return $oVersionLayer;
+        return $this->_oVersionLayer;
     }
 }

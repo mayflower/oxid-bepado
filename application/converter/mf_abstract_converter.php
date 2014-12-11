@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Base method for the different helper.
+ * Abstraction for all converter classes.
  *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
-abstract class mf_abstract_helper
+abstract class mf_abstract_converter
 {
     /**
      * @var VersionLayerInterface

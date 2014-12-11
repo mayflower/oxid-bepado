@@ -152,7 +152,6 @@ class mf_sdk_converter implements mf_converter_interface
         // Vendor: vendor name no use, only id can load vendor object
         // Category: category name no use id can load category object
 
-
         $oxProduct->assign($aParams);
         $oxProduct->setArticleLongDesc($object->longDescription);
 
@@ -274,7 +273,7 @@ class mf_sdk_converter implements mf_converter_interface
         }
         $purchaseGroupChar = strtolower($purchaseGroupChar);
 
-        return 'oxarticles__ox'.$purchaseGroupChar.'price';
+        return 'oxarticles__oxprice'.$purchaseGroupChar;
     }
 
     private function generateArtNum(){
