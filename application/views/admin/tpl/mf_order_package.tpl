@@ -54,15 +54,7 @@
                     <tr>
                         <td class="packitem" valign="top"><b>[{ $article->oxorderarticles__oxamount->value }]</b></td>
                         <td class="packitem" valign="top">
-                            [{if (!$article->oxorderarticles__imported->value)}]
-                                [{ $article->oxorderarticles__oxartnum->value }]
-                            [{else}]
-                                &nbsp
-                                <img src="[{$oViewConf->getModuleUrl("bepado")}][{$order->oxorder__importpic->value}]"
-                                     alt="Bepado"
-                                     height="12px"
-                                     align="center"/>
-                            [{/if}]
+                            [{ $article->oxorderarticles__oxartnum->value }]
                         </td>
                         <td class="packitem" valign="top">[{ $article->oxorderarticles__oxtitle->value }]
 
@@ -81,11 +73,11 @@
                         </td>
                         <td class="packitem" valign="top">[{ $article->oxorderarticles__oxselvariant->value}]</td>
                         <td class="packitem" valign="middle">
-                            [{if (!$article->oxorderarticles__imported->value)}]
+                            [{if ($article->oxorderarticles__oxtitle->value != 'Gadget')}]
                                 &nbsp
                                 <img src="[{$oViewConf->getImageUrl()}]/rectangle.gif" alt="" width="20" height="20" border="0">
                             [{else}]
-                                <img src="[{$oViewConf->getModuleUrl("bepado")}][{$order->oxorder__importpic_b->value}]"
+                                <img src="[{$oViewConf->getModuleUrl("bepado")}][{$order->oxorder__importpic->value}]"
                                      alt="Bepado"
                                      height="20" />
                             [{/if}]
