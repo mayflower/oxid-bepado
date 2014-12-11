@@ -21,6 +21,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
     protected $sdk;
     protected $orderConverter;
     protected $oxOrder;
+    protected $articleHelper;
 
     /**
      * @var mf_sdk_product_helper
@@ -42,6 +43,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->sdk = $this->getMockBuilder('sdkMock')->disableOriginalConstructor()->getMock();
         $this->orderConverter = $this->getMockBuilder('mf_sdk_order_converter')->disableOriginalConstructor()->getMock();
         $this->oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
+        $this->articleHelper = $this->getMockBuilder('mf_sdk_article_helper')->disableOriginalConstructor()->getMock();
 
         $sdkConfig = new SDKConfig();
         $this->sdkHelper
@@ -70,9 +72,9 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->expects($this->once())
             ->method('getAmount')
             ->will($this->returnValue(3));
-        $this->oxArticle
+        $this->articleHelper
             ->expects($this->any())
-            ->method('isImportedFromBepado')
+            ->method('isArticleImported')
             ->will($this->returnValue(true));
         $this->sdk
             ->expects($this->any())
@@ -99,9 +101,9 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->expects($this->once())
             ->method('getAmount')
             ->will($this->returnValue(3));
-        $this->oxArticle
+        $this->articleHelper
             ->expects($this->any())
-            ->method('isImportedFromBepado')
+            ->method('isArticleImported')
             ->will($this->returnValue(true));
         $this->sdk
             ->expects($this->any())
@@ -141,9 +143,9 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->expects($this->once())
             ->method('getAmount')
             ->will($this->returnValue(3));
-        $this->oxArticle
+        $this->articleHelper
             ->expects($this->any())
-            ->method('isImportedFromBepado')
+            ->method('isArticleImported')
             ->will($this->returnValue(true));
         $this->sdk
             ->expects($this->any())
@@ -179,9 +181,9 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->expects($this->once())
             ->method('getAmount')
             ->will($this->returnValue(6));
-        $this->oxArticle
+        $this->articleHelper
             ->expects($this->any())
-            ->method('isImportedFromBepado')
+            ->method('isArticleImported')
             ->will($this->returnValue(true));
         $this->sdk
             ->expects($this->any())
@@ -353,6 +355,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
             'mf_sdk_helper'          => $this->sdkHelper,
             'mf_sdk_order_converter' => $this->orderConverter,
             'oxorder'                => $this->oxOrder,
+            'mf_sdk_article_helper'    => $this->articleHelper,
         );
     }
 }

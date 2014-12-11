@@ -13,23 +13,54 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     private $_oVersionLayer;
 
     /**
+     * @var mf_sdk_article_helper
+     */
+    private $articleHelper;
+
+    /**
+     * @var SDK
+     */
+    private $sdk;
+
+    /**
+     * @return mf_sdk_article_helper
+     */
+    private function getArticleHelper()
+    {
+        if (null === $this->articleHelper) {
+            $this->getVersionLayer()->createNewObject('mf_sdk_article_helper');
+        }
+
+        return $this->articleHelper;
+    }
+
+    /**
+     * @return SDK
+     */
+    private function getSDK()
+    {
+        if (null === $this->sdk) {
+            $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
+            $config  = $helper->createSdkConfigFromOxid();
+            $this->sdk = $helper->instantiateSdk($config);
+        }
+
+        return $this->sdk;
+    }
+
+    /**
      * Does the sdk work when saving an oxid article.
      */
     public function save()
     {
         $return = parent::save();
 
-        $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
-        $config  = $helper->createSdkConfigFromOxid();
-        $sdk = $helper->instantiateSdk($config);
-        $oxProductId = $this->getFieldData('oxid');
-
-        if ($this->readyForExportToBepado() && $this->productIsKnown($oxProductId)) {
-            $sdk->recordUpdate($oxProductId);
-        } elseif (!$this->readyForExportToBepado() && $this->productIsKnown($oxProductId)) {
-            $sdk->recordDelete($oxProductId);
-        } elseif ($this->readyForExportToBepado() && !$this->productIsKnown($oxProductId)) {
-            $sdk->recordInsert($oxProductId);
+        if ($this->getArticleHelper()->isArticleExported($this->getId()) && $this->productIsKnown($this->getId())) {
+            $this->getSDK()->recordUpdate($this->getId());
+        } elseif (!$this->getArticleHelper()->isArticleExported($this->getId()) && $this->productIsKnown($this->getId())) {
+            $this->getSDK()->recordDelete($this->getId());
+        } elseif ($this->getArticleHelper()->isArticleExported($this->getId()) && !$this->productIsKnown($this->getId())) {
+            $this->getSDK()->recordInsert($this->getId());
 
         }
 
@@ -48,28 +79,6 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         }
 
         return parent::delete($oxId);
-    }
-
-    /**
-     * Decider if an article marked as "export to bebado" or not.
-     *
-     * @return bool
-     */
-    public function readyForExportToBepado()
-    {
-        $id = $this->getId();
-        /** @var oxBase $oBepadoProductState */
-        $oBepadoProductState = oxNew('oxbase');
-        $oBepadoProductState->init('bepado_product_state');
-        $select = $oBepadoProductState->buildSelectString(array(
-            'p_source_id' => $id,
-            'shop_id'     => SDKConfig::SHOP_ID_LOCAL,
-            'state'       => SDKConfig::ARTICLE_STATE_EXPORTED
-        ));
-        $id = $this->getVersionLayer()->getDb(true)->getOne($select);
-        $oBepadoProductState->load($id);
-
-        return $oBepadoProductState->isLoaded();
     }
 
     /**
@@ -93,17 +102,6 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     }
 
     /**
-     * @return bool
-     */
-    public function isImportedFromBepado()
-    {
-        if ($this->getState() == 2) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * @return Product
      * @throws Exception
      */
@@ -113,7 +111,7 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         $converter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
         $sdkProduct = $converter->fromShoptoBepado($this);
 
-        if ($this->getState() == 0) {
+        if ($this->getArticleHelper()->getArticleBepadoState($this) == 0) {
             throw new Exception("Product is not imported from Bepado or ready for export to Bepado.");
         }
 

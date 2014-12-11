@@ -72,6 +72,7 @@ class mf_sdk_order_converterTest extends BaseTestCase
     protected $oxPayment;
     protected $addressConverter;
     protected $oxDb;
+    protected $articleHelper;
 
     public function setUp()
     {
@@ -83,6 +84,7 @@ class mf_sdk_order_converterTest extends BaseTestCase
 
         // mocks of oxid classes
         $this->oxPayment = $this->getMockBuilder('oxPayment')->disableOriginalConstructor()->getMock();
+        $this->articleHelper = $this->getMockBuilder('mf_sdk_article_helper')->disableOriginalConstructor()->getMock();
         $this->oxPayment->expects($this->any())->method('load')->will($this->returnValue(true));
         $this->oxPayment->expects($this->any())->method('isLoaded')->will($this->returnValue(true));
         $this->oxPayment
@@ -149,22 +151,31 @@ class mf_sdk_order_converterTest extends BaseTestCase
 
         /** @var oxList $oxArticlesList */
         $oxArticlesList = oxNew('oxList');
-        $oxArticlesList->init('oxBase', 'oxArticle');
+        $oxArticlesList->init('oxBase', 'oxOrderArticle');
 
+        $importedOrderArticle = $this->getMockBuilder('oxOrderArticle')->disableOriginalConstructor()->getMock();
+        $uselessOrderArticle = $this->getMockBuilder('oxOrderArticle')->disableOriginalConstructor()->getMock();
         $importedArticle = $this->getMockBuilder('mf_bepado_oxarticle')->disableOriginalConstructor()->getMock();
-        $importedArticle->expects($this->once())->method('isImportedFromBepado')->will($this->returnValue(true));
-        $importedArticle->expects($this->once())
+        $expectedProduct = new Struct\Product(array('title' => 'test-product'));
+
+        $this->articleHelper
+            ->expects($this->at(0))
+            ->method('isOrderArticleImported')
+            ->will($this->returnValue(true));
+        $this->articleHelper
+            ->expects($this->at(1))
+            ->method('isOrderArticleImported')
+            ->will($this->returnValue(false));
+
+        $importedArticle->expects($this->once())->method('getSdkProduct')->will($this->returnValue($expectedProduct));
+        $importedOrderArticle->expects($this->once())->method('getArticle')->will($this->returnValue($importedArticle));
+        $importedOrderArticle->expects($this->once())
             ->method('getFieldData')
             ->with($this->equalTo('oxorderarticle__oxamount'))
             ->will($this->returnValue(5));
-        $expectedProduct = new Struct\Product();
-        $expectedProduct->title = 'test-product';
-        $importedArticle->expects($this->once())->method('getSdkProduct')->will($this->returnValue($expectedProduct));
-        $useLessArticle = $this->getMockBuilder('mf_bepado_oxarticle')->disableOriginalConstructor()->getMock();
-        $useLessArticle->expects($this->once())->method('isImportedFromBepado')->will($this->returnValue(false));
 
-        $oxArticlesList->add($importedArticle);
-        $oxArticlesList->add($useLessArticle);
+        $oxArticlesList->add($importedOrderArticle);
+        $oxArticlesList->add($uselessOrderArticle);
         $oxOrder->setOrderArticleList($oxArticlesList);
 
         $order = $this->converter->fromShopToBepado($oxOrder);
@@ -235,6 +246,7 @@ class mf_sdk_order_converterTest extends BaseTestCase
     {
         return array(
             'oxpayment'                => $this->oxPayment,
+            'mf_sdk_article_helper'    => $this->articleHelper,
         );
     }
 

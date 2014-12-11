@@ -34,7 +34,7 @@ class mf_sdk_product_helper extends mf_abstract_helper
             $changedAvailability = null;
             $changedPrice = null;
 
-            if (!$oxBasketArticle->isImportedFromBepado()) {
+            if (!$this->getVersionLayer()->createNewObject('mf_sdk_article_helper')->isArticleImported($oxBasketArticle)) {
                 continue;
             }
 

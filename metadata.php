@@ -37,6 +37,7 @@ $aModule = array(
         'basket'                => $aPaths['controllers'] . '/mf_basket',
         'order'                 => $aPaths['controllers'] . '/mf_order',
 
+        'oxorder'               => $aPaths['models'] . '/mf_oxOrder',
         'oxarticle'             => $aPaths['models'] . '/mf_bepado_oxarticle',
     ),
     'files'   => array(
@@ -66,6 +67,7 @@ $aModule = array(
         'mf_sdk_helper'         => $aPaths['helper'] . '/mf_sdk_helper.php',
         'mf_sdk_product_helper' => $aPaths['helper'] . '/mf_sdk_product_helper.php',
         'mf_sdk_logger_helper'  => $aPaths['helper'] . '/mf_sdk_logger_helper.php',
+        'mf_sdk_article_helper' => $aPaths['helper'] . '/mf_sdk_article_helper.php',
     ),
     'blocks' => array(
         array(

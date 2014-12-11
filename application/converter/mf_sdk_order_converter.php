@@ -100,17 +100,17 @@ class mf_sdk_order_converter extends mf_abstract_converter implements mf_convert
     {
         $orderItems = array();
 
-        /** @var oxList $articles */
-        $articles = $object->getOrderArticles();
+        /** @var oxList $orderArticles */
+        $orderArticles = $object->getOrderArticles();
 
-        foreach ($articles->getArray() as $article) {
-            if (!$article->isImportedFromBepado()) {
+        foreach ($orderArticles->getArray() as $orderArticle) {
+            if (!$this->getVersionLayer()->createNewObject('mf_sdk_article_helper')->isOrderArticleImported($orderArticle)) {
                 continue;
             }
-
+            $article = $orderArticle->getArticle();
             $orderItem = new Struct\OrderItem();
             $orderItem->product = $article->getSdkProduct();
-            $orderItem->count = $article->getFieldData('oxorderarticle__oxamount');
+            $orderItem->count = $orderArticle->getFieldData('oxorderarticle__oxamount');
             $orderItems[] = $orderItem;
         }
 

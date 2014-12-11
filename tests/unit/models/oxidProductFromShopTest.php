@@ -27,6 +27,7 @@ class oxidProductFromShopTest extends BaseTestCase
     protected $oxOrder;
     protected $converter;
     protected $oxArticle;
+    protected $articleHelper;
 
     public function setUp()
     {
@@ -45,6 +46,7 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
         $this->oxArticle = $this->getMockBuilder('mf_bepado_oxarticle')->disableOriginalConstructor()->getMock();
         $this->converter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
+        $this->articleHelper = $this->getMockBuilder('mf_sdk_article_helper')->disableOriginalConstructor()->getMock();
 
         $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
@@ -250,15 +252,17 @@ class oxidProductFromShopTest extends BaseTestCase
             ->method('load')
             ->with($this->equalTo('some-id'))
             ->will($this->returnValue(true));
-        $this->oxArticle
-            ->expects($this->any())
-            ->method('readyForExportToBepado')
-            ->will($this->returnValue(true));
 
         $this->converter
             ->expects($this->once())
             ->method('fromShoptoBepado')
             ->will($this->returnValue(new Struct\Product()));
+
+        $this->articleHelper
+            ->expects($this->once())
+            ->method('isArticleExported')
+            ->with($this->equalTo($this->oxArticle))
+            ->will($this->returnValue(true));
 
         $actual = $this->productFromShop->getProducts(array('some-id'));
 
@@ -270,15 +274,16 @@ class oxidProductFromShopTest extends BaseTestCase
     protected function getObjectMapping()
     {
         return array(
-            'oxuser'           => $this->oxUser,
-            'oxgroups'         => $this->oxGroup,
-            'oxbasket'         => $this->oxBasket,
-            'oxpayment'        => $this->oxPayment,
-            'oxprice'          => $this->oxPrice,
-            'oxorder'          => $this->oxOrder,
-            'mf_sdk_converter' => $this->converter,
-            'oxarticle'        => $this->oxArticle,
-            'mf_sdk_helper'    => $this->sdkHelper,
+            'oxuser'                => $this->oxUser,
+            'oxgroups'              => $this->oxGroup,
+            'oxbasket'              => $this->oxBasket,
+            'oxpayment'             => $this->oxPayment,
+            'oxprice'               => $this->oxPrice,
+            'oxorder'               => $this->oxOrder,
+            'mf_sdk_converter'      => $this->converter,
+            'oxarticle'             => $this->oxArticle,
+            'mf_sdk_helper'         => $this->sdkHelper,
+            'mf_sdk_article_helper' => $this->articleHelper,
         );
     }
 }

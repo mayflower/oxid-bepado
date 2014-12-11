@@ -26,13 +26,14 @@ class oxidProductFromShop implements ProductFromShop
         $sdkProducts = array();
         /** @var mf_sdk_converter $oModuleSDKConverter */
         $oModuleSDKConverter = $this->_oVersionLayer->createNewObject('mf_sdk_converter');
-
+        /** @var mf_sdk_article_helper $articleHelper */
+        $articleHelper = $this->getVersionLayer()->createNewObject('mf_sdk_article_helper');
         foreach ($ids as $id) {
             /** @var oxarticle $oxArticle */
             $oxArticle = $this->_oVersionLayer->createNewObject('oxarticle');
             $load = $oxArticle->load($id);
 
-            if (!$load || !$oxArticle->readyForExportToBepado()) {
+            if (!$load || !$articleHelper->isArticleExported($oxArticle)) {
                 continue;
             }
 
