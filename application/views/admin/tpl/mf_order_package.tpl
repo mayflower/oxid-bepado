@@ -73,7 +73,7 @@
                         </td>
                         <td class="packitem" valign="top">[{ $article->oxorderarticles__oxselvariant->value}]</td>
                         <td class="packitem" valign="middle">
-                            [{if ($article->oxorderarticles__oxtitle->value != 'Gadget')}]
+                            [{if (!$article->oxorderarticles__imported->value)}]
                                 &nbsp
                                 <img src="[{$oViewConf->getImageUrl()}]/rectangle.gif" alt="" width="20" height="20" border="0">
                             [{else}]
