@@ -12,7 +12,7 @@ class EventListener
     public function onActivate()
     {
         /** @var mf_sdk_logger_helper $logger */
-        $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
+        $logger = self::getVersionLayer()->createNewObject('mf_sdk_logger_helper');
 
         $schemaDir = __DIR__ . '/../install';
         $sqlFiles = array_filter(
@@ -89,4 +89,3 @@ class EventListener
         return $oVersionLayer;
     }
 }
- 
