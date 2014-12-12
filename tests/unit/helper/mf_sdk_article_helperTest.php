@@ -147,6 +147,58 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->assertTrue($result);
     }
 
+    public function testGetArticleStateForNonTrackedOnes()
+    {
+        $this->oxBase->expects($this->once())->method('load')->with($this->equalTo('test-id'));
+        $this->oxBase->expects($this->once())->method('isLoaded')->will($this->returnValue(false));
+
+        $result = $this->helper->getArticleBepadoState($this->oxArticle);
+
+        $this->assertEquals(0, $result);
+    }
+
+    public function testNoArticleState()
+    {
+        $this->oxBase->expects($this->once())->method('load')->with($this->equalTo('test-id'));
+        $this->oxBase->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+        $this->oxBase
+            ->expects($this->once())
+            ->method('getFieldData')
+            ->will($this->returnValue((string) SDKConfig::ARTICLE_STATE_NONE));
+
+        $result = $this->helper->getArticleBepadoState($this->oxArticle);
+
+        $this->assertEquals(0, $result);
+    }
+
+    public function testExportedArticleState()
+    {
+        $this->oxBase->expects($this->once())->method('load')->with($this->equalTo('test-id'));
+        $this->oxBase->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+        $this->oxBase
+            ->expects($this->once())
+            ->method('getFieldData')
+            ->will($this->returnValue((string) SDKConfig::ARTICLE_STATE_EXPORTED));
+
+        $result = $this->helper->getArticleBepadoState($this->oxArticle);
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testImportedArticleState()
+    {
+        $this->oxBase->expects($this->once())->method('load')->with($this->equalTo('test-id'));
+        $this->oxBase->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+        $this->oxBase
+            ->expects($this->once())
+            ->method('getFieldData')
+            ->will($this->returnValue((string) SDKConfig::ARTICLE_STATE_IMPORTED));
+
+        $result = $this->helper->getArticleBepadoState($this->oxArticle);
+
+        $this->assertEquals(2, $result);
+    }
+
     protected function getObjectMapping()
     {
         return array(

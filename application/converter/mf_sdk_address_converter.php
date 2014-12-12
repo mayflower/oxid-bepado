@@ -140,7 +140,7 @@ class mf_sdk_address_converter extends mf_abstract_converter implements mf_conve
         $oxState = $this->getVersionLayer()->createNewObject('oxcountry');
         $oxState->load($countryId);
         if ($oxState->isLoaded()) {
-            return $oxState->getFieldData('oxisoalpa3');
+            return $oxState->getFieldData('oxisoalpha3');
         }
 
         return null;

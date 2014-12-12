@@ -54,11 +54,15 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     public function save()
     {
         $return = parent::save();
-        if ($this->getArticleHelper()->isArticleExported($this) && $this->productIsKnown($this->getId())) {
+
+        $isExported = $this->getArticleHelper()->isArticleExported($this);
+        $isKnown    = $this->productIsKnown($this->getId());
+
+        if ($isExported && $isKnown) {
             $this->getSDK()->recordUpdate($this->getId());
-        } elseif (!$this->getArticleHelper()->isArticleExported($this) && $this->productIsKnown($this->getId())) {
+        } elseif (!$isExported && $isKnown) {
             $this->getSDK()->recordDelete($this->getId());
-        } elseif ($this->getArticleHelper()->isArticleExported($this) && !$this->productIsKnown($this->getId())) {
+        } elseif ($isExported && !$isKnown) {
             $this->getSDK()->recordInsert($this->getId());
         }
 
@@ -72,31 +76,11 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
         /** @var SDK $sdk */
         $sdk = $helper->instantiateSdk($config);
 
-        if ($this->productIsKnown($oxId)) {
+        if ($this->getArticleHelper()->isArticleKnown($oxId)) {
             $sdk->recordDelete($oxId);
         }
 
         return parent::delete($oxId);
-    }
-
-    /**
-     * @return int
-     */
-    public function getState()
-    {
-        $id = $this->getId();
-        /** @var oxBase $oBepadoProductState */
-        $oBepadoProductState = oxNew('oxbase');
-        $oBepadoProductState->init('bepado_product_state');
-        $oBepadoProductState->load($id);
-
-        $state = $oBepadoProductState->bepado_product_state__state->rawValue;
-
-        if (!$state) {
-            $state = SDKConfig::ARTICLE_STATE_NONE;
-        }
-
-        return $state;
     }
 
     /**
@@ -107,7 +91,7 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     {
         /** @var mf_sdk_converter $converter */
         $converter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
-        $sdkProduct = $converter->fromShoptoBepado($this);
+        $sdkProduct = $converter->fromShopToBepado($this);
 
         if ($this->getArticleHelper()->getArticleBepadoState($this) == 0) {
             throw new Exception("Product is not imported from Bepado or ready for export to Bepado.");

@@ -114,7 +114,7 @@ class mf_sdk_order_converterTest extends BaseTestCase
         /** @var oxOrder $oxOrder */
         $oxOrder = oxNew('oxorder');
         $oxOrder->assign($this->oxOrderValues);
-        $sdkOrder = $this->converter->fromShoptoBepado($oxOrder, array('reservationId' => 'some-reservation-id'));
+        $sdkOrder = $this->converter->fromShopToBepado($oxOrder, array('reservationId' => 'some-reservation-id'));
 
         if ($testable) {
             $this->assertEquals($orderValue, $sdkOrder->$orderProperty);

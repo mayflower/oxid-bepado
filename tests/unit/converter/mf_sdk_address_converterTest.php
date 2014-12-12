@@ -62,7 +62,7 @@ class mf_sdk_address_converterTest extends BaseTestCase
             ->with($this->equalTo(array('OXISOALPHA3' => 'TLA', 'OXACTIVE' => 1)))
             ->will($this->returnValue('some-sql-string-country'));
         $this->oxCountry->expects($this->any())->method('isLoaded')->will($this->returnValue(true));
-        $this->oxCountry->expects($this->any())->method('getFieldData')->with($this->equalTo('oxisoalpa3'))->will($this->returnValue('TLA'));
+        $this->oxCountry->expects($this->any())->method('getFieldData')->with($this->equalTo('oxisoalpha3'))->will($this->returnValue('TLA'));
         $this->oxState
             ->expects($this->any())
             ->method('buildSelectString')
@@ -89,7 +89,7 @@ class mf_sdk_address_converterTest extends BaseTestCase
         $oxAddress = oxNew('oxAddress');
         $oxAddress->assign($this->oxAddressValues);
 
-        $address = $this->converter->fromShoptoBepado($oxAddress);
+        $address = $this->converter->fromShopToBepado($oxAddress);
 
         if ($testable) {
             $this->assertEquals($addressValue, $address->$addressProperty);
@@ -164,7 +164,7 @@ class mf_sdk_address_converterTest extends BaseTestCase
             $expectedAddress->$property = $value;
         }
 
-        $actualAddress = $this->converter->fromShoptoBepado($oxOrder, 'oxorder__oxbill');
+        $actualAddress = $this->converter->fromShopToBepado($oxOrder, 'oxorder__oxbill');
 
         $this->assertEquals($expectedAddress, $actualAddress);
     }
