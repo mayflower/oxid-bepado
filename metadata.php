@@ -37,8 +37,9 @@ $aModule = array(
         'basket'                => $aPaths['controllers'] . '/mf_basket',
         'order'                 => $aPaths['controllers'] . '/mf_order',
 
-        'oxorder'               => $aPaths['models'] . '/mf_oxOrder',
         'oxarticle'             => $aPaths['models'] . '/mf_bepado_oxarticle',
+        'oxorder'               => $aPaths['models'] . '/mf_oxOrder',
+        'oxorderarticle'        => $aPaths['models'] . '/mf_oxorderarticle',
     ),
     'files'   => array(
         'mfbepado'              => $aPaths['controllers'] . '/mfBepado.php',
