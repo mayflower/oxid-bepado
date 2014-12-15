@@ -22,9 +22,7 @@
             <directory suffix=".php">../</directory>
             <exclude>
                 <directory suffix=".php">../tests/</directory>
-                <directory suffix=".php">../translations/</directory>
-                <directory suffix=".php">../views/</directory>
-                <directory suffix=".php">../out/</directory>
+                <directory suffix=".php">../application/views/</directory>
                 <directory>../vendor/</directory>
                 <file suffix=".php">../metadata.php</file>
             </exclude>

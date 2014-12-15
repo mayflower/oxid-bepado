@@ -44,8 +44,6 @@ $aModule = array(
     'files'   => array(
         'mfbepado'              => $aPaths['controllers'] . '/mfBepado.php',
 
-        'mfcmp_bepado'          => $aPaths['components'] . '/mfcmp_bepado.php',
-
         'oxidproductfromshop'   => $aPaths['models'] . '/productFromShop.php',
         'oxidProductToShop'     => $aPaths['models'] . '/productToShop.php',
         'SDKConfig'             => $aPaths['models'] . '/SDKConfig.php',
