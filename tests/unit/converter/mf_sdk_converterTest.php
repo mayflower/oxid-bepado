@@ -103,6 +103,9 @@ class mf_sdk_converterTest extends BaseTestCase
         $product = $this->converter->fromShopToBepado($oxArticle);
 
         if ($testable) {
+            if ('price' === $productProperty && oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
+                $productValue = 1.99;
+            }
             $this->assertEquals($productValue, $product->$productProperty);
         } else {
             $this->markTestIncomplete('Can not test for Property: '.$productProperty);
