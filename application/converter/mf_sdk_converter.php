@@ -32,7 +32,7 @@ class mf_sdk_converter implements mf_converter_interface
      *
      * @return Product
      */
-    public function fromShoptoBepado($object)
+    public function fromShopToBepado($object)
     {
         $sdkProduct = new Product();
 

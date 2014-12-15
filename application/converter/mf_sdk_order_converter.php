@@ -39,6 +39,9 @@ class mf_sdk_order_converter extends mf_abstract_converter implements mf_convert
         $sdkOrder = new Struct\Order();
         $sdkOrder->billingAddress = $this->addressConverter->fromShopToBepado($object, 'oxorder__oxbill');
         $sdkOrder->deliveryAddress = $this->addressConverter->fromShopToBepado($object, 'oxorder__oxdel');
+        if (!$sdkOrder->deliveryAddress->firstName) {
+            $sdkOrder->deliveryAddress = $sdkOrder->billingAddress;
+        }
         $sdkOrder->localOrderId = $object->getId();
         $sdkOrder->paymentType = $this->createSDKPaymentType($object);
         $sdkOrder->orderItems = $this->createOrderItems($object);

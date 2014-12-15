@@ -86,3 +86,6 @@ CREATE TABLE IF NOT EXISTS `bepado_categories` (
   PRIMARY KEY (`oxid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+/* Article can be marked as imported article in order */
+ALTER TABLE oxorderarticles ADD imported TINYINT;
+

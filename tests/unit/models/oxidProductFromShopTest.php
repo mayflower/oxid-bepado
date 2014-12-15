@@ -255,7 +255,7 @@ class oxidProductFromShopTest extends BaseTestCase
 
         $this->converter
             ->expects($this->once())
-            ->method('fromShoptoBepado')
+            ->method('fromShopToBepado')
             ->will($this->returnValue(new Struct\Product()));
 
         $this->articleHelper

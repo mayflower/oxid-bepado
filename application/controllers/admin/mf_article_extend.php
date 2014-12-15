@@ -13,13 +13,19 @@ class mf_article_extend extends mf_article_extend_parent
      */
     private $_oVersionLayer;
 
+    /**
+     * @var mf_sdk_article_helper
+     */
+    private $articleHelper;
+
+
     public function render()
     {
         $template = parent::render();
 
         $oxArticle = oxNew('oxarticle');
         $oxArticle->load($this->getEditObjectId());
-        (int) $state = $oxArticle->getState();
+        $state = $this->getArticleHelper()->getArticleBepadoState($oxArticle);
 
         if ($state != 2) {
             $this->_aViewData['export_to_bepado'] = $state;
@@ -64,6 +70,18 @@ class mf_article_extend extends mf_article_extend_parent
         $oBepadoProductState->load($id);
 
         return $oBepadoProductState;
+    }
+
+    /**
+     * @return mf_sdk_article_helper
+     */
+    private function getArticleHelper()
+    {
+        if (null === $this->articleHelper) {
+            $this->articleHelper = $this->getVersionLayer()->createNewObject('mf_sdk_article_helper');
+        }
+
+        return $this->articleHelper;
     }
 
     /**

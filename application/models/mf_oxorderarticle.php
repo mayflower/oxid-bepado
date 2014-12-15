@@ -1,14 +1,8 @@
 <?php
 
-/**
- * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
- */
-class mf_article_list extends mf_article_list_parent
+
+class mf_oxorderarticle extends mf_oxorderarticle_parent
 {
-    const EXPORT_PIC = 'application/out/img/bepado_out.png';
-
-    const IMPORT_PIC = 'application/out/img/bepado_in.png';
-
     /**
      * @var VersionLayerInterface
      */
@@ -19,27 +13,23 @@ class mf_article_list extends mf_article_list_parent
      */
     private $articleHelper;
 
-    public function getItemList()
+    /**
+     * Copies passed to method product into $this.
+     *
+     * @param oxarticle $oProduct product to copy
+     */
+    public function copyThis($oProduct)
     {
-        $oList = parent::getItemList();
+        $state = $this->getArticleHelper()->getArticleBepadoState($oProduct);
 
-        foreach ($this->_oList as $key => $listItem) {
-            $state = $this->getArticleHelper()->getArticleBepadoState($listItem);
-
-            if ($state == 1) {
-                $listItem->oxarticles__state = new oxField(
-                    self::EXPORT_PIC,
-                    oxField::T_RAW
-                );
-            } elseif ($state == 2) {
-                $listItem->oxarticles__state = new oxField(
-                    self::IMPORT_PIC,
-                    oxField::T_RAW
-                );
-            }
+        if ($state == 2) {
+            $oProduct->oxarticles__imported = new oxField(
+                1,
+                oxField::T_RAW
+            );
         }
 
-        return $oList;
+        parent::copyThis($oProduct);
     }
 
     /**
@@ -69,5 +59,4 @@ class mf_article_list extends mf_article_list_parent
 
         return $this->_oVersionLayer;
     }
-}
- 
+} 

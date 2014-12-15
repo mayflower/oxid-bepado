@@ -100,7 +100,7 @@ class mf_sdk_converterTest extends BaseTestCase
         $oxArticle = oxNew('oxarticle');
         $oxArticle->assign($this->articleValues);
 
-        $product = $this->converter->fromShoptoBepado($oxArticle);
+        $product = $this->converter->fromShopToBepado($oxArticle);
 
         if ($testable) {
             $this->assertEquals($productValue, $product->$productProperty);
