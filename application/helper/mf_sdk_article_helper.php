@@ -84,8 +84,9 @@ class mf_sdk_article_helper extends mf_abstract_helper
     public function onSaveArticleExtend($articleId)
     {
         $oBepadoProductState = $this->createBepadoProductState($articleId);
-        $aParams = oxRegistry::getConfig()->getRequestParameter("editval");
+        $aParams = $this->getVersionLayer()->getConfig()->getRequestParameter("editval");
         $articleState = isset($aParams['export_to_bepado']) &&  "1" === $aParams['export_to_bepado'] ? true : false;
+
         if ($oBepadoProductState->isLoaded() && !$articleState) {
             $oBepadoProductState->delete();
         } elseif (!$oBepadoProductState->isLoaded() && $articleState) {

@@ -40,6 +40,13 @@ class mf_sdk_article_helperTest extends BaseTestCase
 
         $this->oxBase = $this->getMockBuilder('oxBase')->disableOriginalConstructor()->getMock();
         $this->oxBase->expects($this->any())->method('init');
+        $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
+        $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
+    }
+
+    public function tearDown()
+    {
+        unset($this->helper, $this->oxArticle, $this->oxOrderArticle, $this->oxBase, $this->versionLayer);
     }
 
     public function testArticleThatIsNotTracked()
@@ -197,6 +204,94 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $result = $this->helper->getArticleBepadoState($this->oxArticle);
 
         $this->assertEquals(2, $result);
+    }
+
+    public function testOnSaveArticleExtendDeleteExported()
+    {
+        $this->createBepadoStateObject();
+        $this->oxidConfig
+            ->expects($this->once())
+            ->method('getRequestParameter')
+            ->with($this->equalTo('editval'))
+            ->will($this->returnValue(array('export_to_bepado' => "0")));
+        $this->oxBase->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+        $this->oxBase->expects($this->once())->method('delete');
+
+        $this->helper->onSaveArticleExtend('some-id');
+    }
+
+    public function testOnSaveArticleExtendNothingShouldhappenWhenNotFoundAndStateFalse()
+    {
+        $this->createBepadoStateObject();
+        $this->oxidConfig
+            ->expects($this->once())
+            ->method('getRequestParameter')
+            ->with($this->equalTo('editval'))
+            ->will($this->returnValue(array('export_to_bepado' => "0")));
+        $this->oxBase->expects($this->at(0))->method('isLoaded')->will($this->returnValue(false));
+        $this->oxBase->expects($this->at(1))->method('isLoaded')->will($this->returnValue(true));
+        $this->oxBase->expects($this->never())->method('assign');
+        $this->oxBase->expects($this->never())->method('save');
+
+        $this->helper->onSaveArticleExtend('some-id');
+    }
+
+    public function testOnSaveArticleExtendNothingShouldHapenWhenFoundAndStateTrue()
+    {
+        $this->createBepadoStateObject();
+        $this->oxidConfig
+            ->expects($this->once())
+            ->method('getRequestParameter')
+            ->with($this->equalTo('editval'))
+            ->will($this->returnValue(array('export_to_bepado' => "1")));
+        $this->oxBase->expects($this->at(0))->method('isLoaded')->will($this->returnValue(false));
+        $this->oxBase->expects($this->at(1))->method('isLoaded')->will($this->returnValue(true));
+        $this->oxBase->expects($this->never())->method('delete');
+
+        $this->helper->onSaveArticleExtend('some-id');
+    }
+
+    public function testOnSaveArticleExtendSaveNewEntry()
+    {
+        $this->createBepadoStateObject();
+        $this->oxidConfig
+            ->expects($this->once())
+            ->method('getRequestParameter')
+            ->with($this->equalTo('editval'))
+            ->will($this->returnValue(array('export_to_bepado' => "1")));
+        $this->oxBase->expects($this->any())->method('isLoaded')->will($this->returnValue(false));
+        $this->oxBase
+            ->expects($this->once())
+            ->method('assign')
+            ->with($this->equalTo(array(
+                'p_source_id' => 'some-id',
+                'OXID'        => 'some-id',
+                'shop_id'     => '_self_',
+                'state'       => 1
+            )));
+        $this->oxBase->expects($this->once())->method('save');
+
+        $this->helper->onSaveArticleExtend('some-id');
+    }
+
+    public function createBepadoStateObject()
+    {
+        $this->oxBase->expects($this->once())->method('init')->with($this->equalTo('bepado_product_state'));
+        $this->oxBase
+            ->expects($this->once())
+            ->method('buildSelectString')
+            ->with($this->equalTo(array('p_source_id' => 'some-id', 'shop_id' => '_self_')))
+            ->will($this->returnValue('some-sql'));
+        $this->oxDb
+            ->expects($this->once())
+            ->method('getOne')
+            ->with($this->equalTo('some-sql'))
+            ->will($this->returnValue('state-id'));
+        $this->oxBase
+            ->expects($this->once())
+            ->method('load')
+            ->with($this->equalTo('state-id'))
+            ->will($this->returnValue(true));
     }
 
     protected function getObjectMapping()
