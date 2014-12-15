@@ -54,7 +54,7 @@ class mf_oxOrder extends mf_oxOrder_parent
 
         /** @var mf_sdk_order_helper $helper */
         $helper = $this->getVersionLayer()->createNewObject('mf_sdk_order_helper');
-        $helper->setSdkOrderStatus($oOrder);
+        $helper->updateOrderStatus($oOrder);
     }
 
     /**
@@ -80,7 +80,7 @@ class mf_oxOrder extends mf_oxOrder_parent
 
         /** @var mf_sdk_order_helper $helper */
         $helper = $this->getVersionLayer()->createNewObject('mf_sdk_order_helper');
-        $helper->setSdkOrderStatus($oOrder, 1);
+        $helper->updateOrderStatus($oOrder, 1);
 
         parent::delete($sOxId);
     }
