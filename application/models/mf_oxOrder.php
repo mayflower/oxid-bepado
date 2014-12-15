@@ -39,6 +39,53 @@ class mf_oxOrder extends mf_oxOrder_parent
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function save()
+    {
+        $sOxId = parent::save();
+
+        $oOrder = oxNew("oxorder");
+        if ($sOxId != "-1") {
+            $oOrder->load($sOxId);
+        } else {
+            return;
+        }
+
+        /** @var mf_sdk_order_helper $helper */
+        $helper = $this->getVersionLayer()->createNewObject('mf_sdk_order_helper');
+        $helper->setSdkOrderStatus($oOrder);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function delete($sOxId = null)
+    {
+        if ($sOxId) {
+            if (!$this->load($sOxId)) {
+                // such order does not exist
+                return false;
+            }
+        } elseif (!$sOxId) {
+            $sOxId = $this->getId();
+        }
+
+        // no order id is passed
+        if (!$sOxId) {
+            return false;
+        }
+        $oOrder = oxNew("oxorder");
+        $oOrder->load($sOxId);
+
+        /** @var mf_sdk_order_helper $helper */
+        $helper = $this->getVersionLayer()->createNewObject('mf_sdk_order_helper');
+        $helper->setSdkOrderStatus($oOrder, 1);
+
+        parent::delete($sOxId);
+    }
+
+    /**
      * Create and/or returns the VersionLayer.
      *
      * @return VersionLayerInterface
