@@ -75,4 +75,46 @@ class mf_sdk_article_helper extends mf_abstract_helper
 
         return !$state ? SDKConfig::ARTICLE_STATE_NONE : $state;
     }
+
+    /**
+     * Action that happens, when an article is saved on article extend controller/view.
+     *
+     * @param $articleId
+     */
+    public function onSaveArticleExtend($articleId)
+    {
+        $oBepadoProductState = $this->createBepadoProductState($articleId);
+        $aParams = oxRegistry::getConfig()->getRequestParameter("editval");
+        $articleState = isset($aParams['export_to_bepado']) &&  "1" === $aParams['export_to_bepado'] ? true : false;
+        if ($oBepadoProductState->isLoaded() && !$articleState) {
+            $oBepadoProductState->delete();
+        } elseif (!$oBepadoProductState->isLoaded() && $articleState) {
+            $oBepadoProductState->assign(array(
+                    'p_source_id' => $articleId,
+                    'OXID'        => $articleId,
+                    'shop_id'     => '_self_',
+                    'state'       => SDKConfig::ARTICLE_STATE_EXPORTED,
+                )
+            );
+            $oBepadoProductState->save();
+        }
+    }
+
+    /**
+     *
+     * @param $oxArticleId
+     *
+     * @return oxBase
+     */
+    private function createBepadoProductState($oxArticleId)
+    {
+        /** @var oxBase $oBepadoProductState */
+        $oBepadoProductState = $this->getVersionLayer()->createNewObject('oxbase');
+        $oBepadoProductState->init('bepado_product_state');
+        $select = $oBepadoProductState->buildSelectString(array('p_source_id' => $oxArticleId, 'shop_id' => SDKConfig::SHOP_ID_LOCAL));
+        $id = $this->getVersionLayer()->getDb(true)->getOne($select);
+        $oBepadoProductState->load($id);
+
+        return $oBepadoProductState;
+    }
 }
