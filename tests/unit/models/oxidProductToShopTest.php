@@ -33,6 +33,7 @@ class oxidProductToShopTest extends BaseTestCase
         $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
         $this->convertedOxArticle = $this->getMockBuilder('mf_bepado_oxarticle')->disableOriginalConstructor()->getMock();
         $this->oxArticle = $this->getMockBuilder('oxArticle')->disableOriginalConstructor()->getMock();
+        $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
 
         // helper/converter for our module
         $this->sdkHelper = $this->getMock('mf_sdk_helper', array('createSdkConfigFromOxid'));
@@ -41,7 +42,7 @@ class oxidProductToShopTest extends BaseTestCase
 
         // create the bepadoProductState from that
         $this->bepadoProductState = $this->getMockBuilder('oxBase')->disableOriginalConstructor()->getMock();
-        $this->bepadoProductState->expects($this->once())->method('init')->with($this->equalTo('bepado_product_state'));
+        $this->bepadoProductState->expects($this->any())->method('init')->with($this->equalTo('bepado_product_state'));
 
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
     }
@@ -149,6 +150,24 @@ class oxidProductToShopTest extends BaseTestCase
         $this->oxArticle->expects($this->once())->method('save');
         // trigger the insert action
         $this->productToShop->insertOrUpdate($product);
+    }
+
+    public function testTransactionStart()
+    {
+        $this->oxDb
+            ->expects($this->once())
+            ->method('startTransaction');
+
+        $this->productToShop->startTransaction();
+    }
+
+    public function testTransactionCommit()
+    {
+        $this->oxDb
+            ->expects($this->once())
+            ->method('commitTransaction');
+
+        $this->productToShop->commit();
     }
 
     protected function getObjectMapping()
