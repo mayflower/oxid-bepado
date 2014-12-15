@@ -103,7 +103,7 @@ class oxidProductToShop implements ProductToShop
      */
     public function startTransaction()
     {
-        // TODO: Implement startTransaction() method.
+        $this->getVersionLayer()->getDb()->startTransaction();
     }
 
     /**
@@ -115,7 +115,7 @@ class oxidProductToShop implements ProductToShop
      */
     public function commit()
     {
-        // TODO: Implement commit() method.
+        $this->getVersionLayer()->getDb()->commitTransaction();
     }
 
     /**
