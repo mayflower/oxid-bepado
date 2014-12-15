@@ -24,7 +24,7 @@ abstract class BaseTestCase extends PHPUnit_Framework_TestCase
         $this->versionLayer->expects($this->any())->method('createNewObject')->will($this->returnCallback(array($this, 'createNewObject')));
         $this->oxidConfig->expects($this->any())
             ->method('getConfigParam')
-            ->will($this->returnValue('test-value'));
+            ->will($this->returnCallback(array($this, 'createConfigReturnValue')));
     }
 
     /**
@@ -41,6 +41,22 @@ abstract class BaseTestCase extends PHPUnit_Framework_TestCase
         return $mappedObjects[$args[0]];
     }
 
+    public function createConfigReturnValue()
+    {
+        $mappedAnswers = $this->getConfigMapping();
+        $args = func_get_args();
+
+        return isset($mappedAnswers[$args[0]]) ? $mappedAnswers[$args[0]] : 'test-value';
+    }
+
+    /**
+     * When you want to
+     * @return array
+     */
+    protected function getConfigMapping()
+    {
+        return array();
+    }
+
     abstract protected function getObjectMapping();
 }
- 
