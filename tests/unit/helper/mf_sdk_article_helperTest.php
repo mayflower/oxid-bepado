@@ -1,5 +1,8 @@
 <?php
 
+
+use Bepado\SDK\Struct\Product;
+
 require_once __DIR__ . '/../BaseTestCase.php';
 
 /**
@@ -24,6 +27,9 @@ class mf_sdk_article_helperTest extends BaseTestCase
     protected $oxOrderArticle;
     protected $oxBase;
     protected $oxDb;
+    protected $sdkHelper;
+    protected $sdk;
+    protected $productConverter;
 
     public function setUp()
     {
@@ -41,7 +47,20 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->oxBase = $this->getMockBuilder('oxBase')->disableOriginalConstructor()->getMock();
         $this->oxBase->expects($this->any())->method('init');
         $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
+        $this->sdkHelper = $this->getMockBuilder('mf_sdk_helper')->disableOriginalConstructor()->getMock();
+        $this->productConverter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
+        $this->sdk = $this->getMockBuilder('sdkMock')->disableOriginalConstructor()->getMock();
+        $sdkConfig = new SDKConfig();
+        $this->sdkHelper
+            ->expects($this->any())
+            ->method('createSdkConfigFromOxid')
+            ->will($this->returnValue($sdkConfig));
+        $this->sdkHelper
+            ->expects($this->any())
+            ->method('instantiateSdk')
+            ->with($this->equalTo($sdkConfig))
+            ->will($this->returnValue($this->sdk));
     }
 
     public function tearDown()
@@ -217,7 +236,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->oxBase->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
         $this->oxBase->expects($this->once())->method('delete');
 
-        $this->helper->onSaveArticleExtend('some-id');
+        $this->helper->onSaveArticleExtend('test-id');
     }
 
     public function testOnSaveArticleExtendNothingShouldhappenWhenNotFoundAndStateFalse()
@@ -233,7 +252,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->oxBase->expects($this->never())->method('assign');
         $this->oxBase->expects($this->never())->method('save');
 
-        $this->helper->onSaveArticleExtend('some-id');
+        $this->helper->onSaveArticleExtend('test-id');
     }
 
     public function testOnSaveArticleExtendNothingShouldHapenWhenFoundAndStateTrue()
@@ -248,7 +267,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->oxBase->expects($this->at(1))->method('isLoaded')->will($this->returnValue(true));
         $this->oxBase->expects($this->never())->method('delete');
 
-        $this->helper->onSaveArticleExtend('some-id');
+        $this->helper->onSaveArticleExtend('test-id');
     }
 
     public function testOnSaveArticleExtendSaveNewEntry()
@@ -264,23 +283,129 @@ class mf_sdk_article_helperTest extends BaseTestCase
             ->expects($this->once())
             ->method('assign')
             ->with($this->equalTo(array(
-                'p_source_id' => 'some-id',
-                'OXID'        => 'some-id',
+                'p_source_id' => 'test-id',
+                'OXID'        => 'test-id',
                 'shop_id'     => '_self_',
                 'state'       => 1
             )));
         $this->oxBase->expects($this->once())->method('save');
 
-        $this->helper->onSaveArticleExtend('some-id');
+        $this->helper->onSaveArticleExtend('test-id');
     }
 
-    public function createBepadoStateObject()
+    public function testOnArticleDeleteWithUnknownArticle()
+    {
+        $resultSet = $this->getMockBuilder('object_ResultSet')->disableOriginalConstructor()->getMock();
+        $resultSet->expects($this->once())->method('getArray')->will($this->returnValue(array()));
+
+        $this->oxDb
+            ->expects($this->once())
+            ->method('execute')
+            ->with($this->equalTo("SELECT * FROM bepado_product WHERE `OXID` LIKE 'test-id'"))
+            ->will($this->returnValue($resultSet));
+
+        $this->helper->onArticleDelete($this->oxArticle);
+    }
+
+    public function testOnArticleDeleteWithKnownArticle()
+    {
+        $resultSet = $this->getMockBuilder('object_ResultSet')->disableOriginalConstructor()->getMock();
+        $resultSet->expects($this->once())->method('getArray')->will($this->returnValue(array('1', '2')));
+
+        $this->oxDb
+            ->expects($this->once())
+            ->method('execute')
+            ->with($this->equalTo("SELECT * FROM bepado_product WHERE `OXID` LIKE 'test-id'"))
+            ->will($this->returnValue($resultSet));
+
+        $this->sdk->expects($this->once())->method('recordDelete');
+
+        $this->helper->onArticleDelete($this->oxArticle);
+    }
+
+    public function testOnArticleSaveNotKnownAndNotExportedShouldDoNothing()
+    {
+        $this->isArticleExportedShouldReturn(false);
+        $this->isKnownShouldReturn(false);
+
+        $this->sdk->expects($this->never())->method('recordDelete');
+        $this->sdk->expects($this->never())->method('recordInsert');
+        $this->sdk->expects($this->never())->method('recordUpdate');
+
+        $this->helper->onArticleSave($this->oxArticle);
+    }
+
+    public function testOnArticleSaveKnownAndExportedShouldUpdate()
+    {
+        $this->isArticleExportedShouldReturn(true);
+        $this->isKnownShouldReturn(true);
+
+        $this->sdk->expects($this->never())->method('recordDelete');
+        $this->sdk->expects($this->never())->method('recordInsert');
+        $this->sdk->expects($this->once())->method('recordUpdate');
+
+        $this->helper->onArticleSave($this->oxArticle);
+    }
+
+    public function testOnArticleSaveKnownAndNotExportedShouldShouldDelete()
+    {
+        $this->isArticleExportedShouldReturn(false);
+        $this->isKnownShouldReturn(true);
+
+        $this->sdk->expects($this->once())->method('recordDelete');
+        $this->sdk->expects($this->never())->method('recordInsert');
+        $this->sdk->expects($this->never())->method('recordUpdate');
+
+        $this->helper->onArticleSave($this->oxArticle);
+    }
+
+    public function testOnArticleSaveNotKnownAndExportedShouldInsert()
+    {
+        $this->isArticleExportedShouldReturn(true);
+        $this->isKnownShouldReturn(false);
+
+        $this->sdk->expects($this->never())->method('recordDelete');
+        $this->sdk->expects($this->once())->method('recordInsert');
+        $this->sdk->expects($this->never())->method('recordUpdate');
+
+        $this->helper->onArticleSave($this->oxArticle);
+    }
+
+    protected function isArticleExportedShouldReturn($value)
+    {
+        $this->oxBase->expects($this->any())->method('init')->with($this->equalTo('bepado_product_state'));
+        $this->oxBase->expects($this->any())->method('load')->with($this->equalTo('test-id'));
+        $this->oxBase->expects($this->once())->method('isLoaded')->will($this->returnValue($value));
+        if ($value) {
+            $this->oxBase
+                ->expects($this->once())
+                ->method('getFieldData')
+                ->with($this->equalTo('state'))
+                ->will($this->returnValue(SDKConfig::ARTICLE_STATE_EXPORTED));
+        }
+    }
+
+    protected function isKnownShouldReturn($value)
+    {
+        $resultSet = $this->getMockBuilder('object_ResultSet')->disableOriginalConstructor()->getMock();
+        $resultSet
+            ->expects($this->once())
+            ->method('getArray')
+            ->will($this->returnValue($value ? array('1', '2') : array()));
+        $this->oxDb
+            ->expects($this->once())
+            ->method('execute')
+            ->with($this->equalTo("SELECT * FROM bepado_product WHERE `p_source_id` LIKE 'test-id'"))
+            ->will($this->returnValue($resultSet));
+    }
+
+    protected function createBepadoStateObject()
     {
         $this->oxBase->expects($this->once())->method('init')->with($this->equalTo('bepado_product_state'));
         $this->oxBase
             ->expects($this->once())
             ->method('buildSelectString')
-            ->with($this->equalTo(array('p_source_id' => 'some-id', 'shop_id' => '_self_')))
+            ->with($this->equalTo(array('p_source_id' => 'test-id', 'shop_id' => '_self_')))
             ->will($this->returnValue('some-sql'));
         $this->oxDb
             ->expects($this->once())
@@ -294,10 +419,51 @@ class mf_sdk_article_helperTest extends BaseTestCase
             ->will($this->returnValue(true));
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedMessage "Article is not managed for bepado. Neither exported to a remote shop nor imported."
+     */
+    public function testComputeToSDKProductThrowsExceptionWhenArticleIsNotManaged()
+    {
+        $this->oxBase->expects($this->once())->method('init')->with($this->equalTo('bepado_product_state'));
+        $this->oxBase->expects($this->once())->method('load')->with($this->equalTo('test-id'));
+        $this->oxBase
+            ->expects($this->once())
+            ->method('getFieldData')
+            ->with($this->equalTo('state'))
+            ->will($this->returnValue(null));
+
+        $this->helper->computeSdkProduct($this->oxArticle);
+    }
+
+    public function testComputeToSDKProduct()
+    {
+        $this->oxBase->expects($this->once())->method('init')->with($this->equalTo('bepado_product_state'));
+        $this->oxBase->expects($this->once())->method('load')->with($this->equalTo('test-id'));
+        $this->oxBase
+            ->expects($this->once())
+            ->method('getFieldData')
+            ->with($this->equalTo('state'))
+            ->will($this->returnCallback(function() {
+                $args = func_get_args();
+                return 'state' === $args[0] ? SDKConfig::ARTICLE_STATE_EXPORTED : 'product-test-id';
+            }));
+        $this->productConverter
+            ->expects($this->once())
+            ->method('fromShopToBepado')
+            ->will($this->returnValue(new Product()));
+
+        $product = $this->helper->computeSdkProduct($this->oxArticle);
+
+        $this->assertInstanceOf(get_class(new Product()), $product);
+    }
+
     protected function getObjectMapping()
     {
         return array(
-            'oxbase' => $this->oxBase,
+            'oxbase'           => $this->oxBase,
+            'mf_sdk_helper'    => $this->sdkHelper,
+            'mf_sdk_converter' => $this->productConverter,
         );
     }
 }

@@ -31,4 +31,19 @@ class sdkMock
     {
 
     }
+
+    public function recordDelete()
+    {
+
+    }
+
+    public function recordInsert()
+    {
+
+    }
+
+    public function recordUpdate()
+    {
+
+    }
 }

@@ -18,11 +18,6 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     private $articleHelper;
 
     /**
-     * @var SDK
-     */
-    private $sdk;
-
-    /**
      * @return mf_sdk_article_helper
      */
     private function getArticleHelper()
@@ -35,83 +30,39 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     }
 
     /**
-     * @return SDK
-     */
-    private function getSDK()
-    {
-        if (null === $this->sdk) {
-            $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
-            $config  = $helper->createSdkConfigFromOxid();
-            $this->sdk = $helper->instantiateSdk($config);
-        }
-
-        return $this->sdk;
-    }
-
-    /**
-     * Does the sdk work when saving an oxid article.
+     * When saving an article, the helper will do some work on
+     * updating/deleting/inserting and entry to the SDK.
      */
     public function save()
     {
         $return = parent::save();
 
-        $isExported = $this->getArticleHelper()->isArticleExported($this);
-        $isKnown    = $this->productIsKnown($this->getId());
-
-        if ($isExported && $isKnown) {
-            $this->getSDK()->recordUpdate($this->getId());
-        } elseif (!$isExported && $isKnown) {
-            $this->getSDK()->recordDelete($this->getId());
-        } elseif ($isExported && !$isKnown) {
-            $this->getSDK()->recordInsert($this->getId());
-        }
+        $this->getArticleHelper()->onSaveArticleExtend($this);
 
         return $return;
     }
 
+    /**
+     * @param null $oxId
+     *
+     * @return mixed
+     */
     public function delete($oxId = null)
     {
-        $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
-        $config  = $helper->createSdkConfigFromOxid();
-        /** @var SDK $sdk */
-        $sdk = $helper->instantiateSdk($config);
-
-        if ($this->getArticleHelper()->isArticleKnown($oxId)) {
-            $sdk->recordDelete($oxId);
-        }
+        $this->getArticleHelper()->onArticleDelete($this);
 
         return parent::delete($oxId);
     }
 
     /**
+     * @deprecated Function is moved to the helper.
+     *
      * @return Product
      * @throws Exception
      */
     public function getSdkProduct()
     {
-        /** @var mf_sdk_converter $converter */
-        $converter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
-        $sdkProduct = $converter->fromShopToBepado($this);
-
-        if ($this->getArticleHelper()->getArticleBepadoState($this) == 0) {
-            throw new Exception("Product is not imported from Bepado or ready for export to Bepado.");
-        }
-
-        $oState = $this->getVersionLayer()->createNewObject('oxbase');
-        $oState->init('bepado_product_state');
-        $oState->load($this->getId());
-
-        $sdkProduct->shopId = $oState->bepado_product_state__shop_id->rawValue;
-
-        return $sdkProduct;
-    }
-
-    private function productIsKnown($oxProductId)
-    {
-        $sql = "SELECT * FROM bepado_product WHERE `p_source_id` LIKE '" . $oxProductId."'";
-        $result = $this->getVersionLayer()->getDb(true)->execute($sql);
-
-        return count($result->getArray()) > 0;
+        return $this->getArticleHelper()->computeSdkProduct($this);
     }
 
     /**

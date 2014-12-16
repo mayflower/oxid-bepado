@@ -1,5 +1,8 @@
 <?php
 
+use Bepado\SDK\SDK;
+use Bepado\SDK\Struct\Product;
+
 /**
  * This helper will encapsulate some common methods/functions on oxArticles and
  * oxOrderArticles.
@@ -8,6 +11,11 @@
  */
 class mf_sdk_article_helper extends mf_abstract_helper
 {
+    /**
+     * @var SDK
+     */
+    protected $sdk;
+
     /**
      * Articles that are imported from a remote shop got a true response.
      *
@@ -117,5 +125,114 @@ class mf_sdk_article_helper extends mf_abstract_helper
         $oBepadoProductState->load($id);
 
         return $oBepadoProductState;
+    }
+
+    /**
+     * When an article is saved, we need to wheter an article is known and needs to be
+     * updated to the SDK or isn't known and needs to be inserted. When removing the
+     * exported flag from the article we need to delete its information from the SDK.
+     *
+     * @param oxArticle $oxArticle
+     */
+    public function onArticleSave(oxArticle $oxArticle)
+    {
+        $isExported = $this->isArticleExported($oxArticle);
+        $isKnown    = $this->productIsKnown($oxArticle->getId());
+
+        if ($isExported && $isKnown) {
+            $this->getSDK()->recordUpdate($oxArticle->getId());
+        } elseif (!$isExported && $isKnown) {
+            $this->getSDK()->recordDelete($oxArticle->getId());
+        } elseif ($isExported && !$isKnown) {
+            $this->getSDK()->recordInsert($oxArticle->getId());
+        }
+    }
+
+    /**
+     * A bepado product (remote product) is persisted by its id as p_source_id in the bepado product state table.
+     *
+     * @param $oxProductId
+     *
+     * @return bool
+     */
+    private function productIsKnown($oxProductId)
+    {
+        $sql = "SELECT * FROM bepado_product WHERE `p_source_id` LIKE '" . $oxProductId."'";
+        $result = $this->getVersionLayer()->getDb(true)->execute($sql);
+
+        return count($result->getArray()) > 0;
+    }
+
+    /**
+     * An own means oxid article is persisted with its own id as OXID in the bepado product state table.
+     *
+     * @param $articleId
+     *
+     * @return bool
+     */
+    private function isArticleKnown($articleId)
+    {
+        $sql = "SELECT * FROM bepado_product WHERE `OXID` LIKE '" . $articleId."'";
+        $result = $this->getVersionLayer()->getDb(true)->execute($sql);
+
+        return count($result->getArray()) > 0;
+    }
+
+    /**
+     * When a article is deleted, that is imported from bepado, we need
+     * to delete the entry from the bepado state table.
+     *
+     * @param oxArticle $oxArticle
+     */
+    public function onArticleDelete(oxArticle $oxArticle)
+    {
+        if ($this->isArticleKnown($oxArticle->getId())) {
+            $this->getSDK()->recordDelete($oxArticle->getId());
+        }
+    }
+
+    /**
+     * Computes a SDK Product out of an oxid article.
+     *
+     * @param oxArticle $oxArticle
+     *
+     * @return Product
+     *
+     * @throws Exception
+     */
+    public function computeSdkProduct(oxArticle $oxArticle)
+    {
+        $oState = $this->getVersionLayer()->createNewObject('oxbase');
+        $oState->init('bepado_product_state');
+        $oState->load($oxArticle->getId());
+        $state = $oState->getFieldData('state');
+
+        if ($state !== SDKConfig::ARTICLE_STATE_EXPORTED && $state !== SDKConfig::ARTICLE_STATE_IMPORTED) {
+            throw new Exception("Article is not managed for bepado. Neither exported to a remote shop nor imported.");
+        }
+
+        /** @var mf_sdk_converter $converter */
+        $converter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
+        $sdkProduct = $converter->fromShopToBepado($oxArticle);
+
+        $sdkProduct->shopId = $oState->bepado_product_state__shop_id->rawValue;
+
+        return $sdkProduct;
+    }
+
+    /**
+     * Just a little helper to create an SDK instance
+     *
+     * @return SDK
+     */
+    private function getSDK()
+    {
+        if (null === $this->sdk) {
+            $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
+            $config  = $helper->createSdkConfigFromOxid();
+            $this->sdk = $helper->instantiateSdk($config);
+        }
+
+        return $this->sdk;
     }
 }
