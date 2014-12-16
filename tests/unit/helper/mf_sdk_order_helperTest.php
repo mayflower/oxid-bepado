@@ -117,4 +117,4 @@ class mf_sdk_order_helperTest extends BaseTestCase
             'mf_sdk_logger_helper'   => $this->mfLoggerHelper,
         );
     }
-} 
+}
