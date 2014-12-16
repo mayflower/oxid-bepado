@@ -29,9 +29,9 @@ class mf_sdk_order_helper extends mf_abstract_helper
 
     public function updateOrderStatus($oOrder, $flag = null)
     {
-       # if ($this->areExportItems($oOrder)) {
+       if ($this->areExportItems($oOrder)) {
             $this->updateStatus($oOrder, $flag);
-       # }
+       }
     }
 
     /**
