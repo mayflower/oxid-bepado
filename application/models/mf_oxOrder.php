@@ -28,7 +28,14 @@ class mf_oxOrder extends mf_oxOrder_parent
 
         /** @var mf_sdk_product_helper $helper */
         $helper = $this->getVersionLayer()->createNewObject('mf_sdk_product_helper');
-        $reservation = $helper->reserveProductsInOrder($this);
+        $reservation = null;
+        try {
+            $reservation = $helper->reserveProductsInOrder($this);
+        } catch(Exception $e) {
+            /** @var mf_sdk_logger_helper $logger */
+            $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
+            $logger->writeBepadoLog('Problem while reserving the product');
+        }
         if (!$reservation) {
             // no bepado product means nothing to do for us
             return $returnValue;

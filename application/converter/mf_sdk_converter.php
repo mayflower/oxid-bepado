@@ -295,15 +295,8 @@ class mf_sdk_converter implements mf_converter_interface
         return 'oxarticles__oxprice'.$purchaseGroupChar;
     }
 
-    private function generateArtNum(){
-        $artList = oxNew('oxarticlelist');
-        $count = 0;
-
-        foreach($artList as $article){
-            if(strpos($article->oxarticles__oxartnum->value, 'BEP-') === 0){
-                $count++;
-            }
-        }
+    private function generateArtNum()
+    {
 
         return 'BEP-' . mt_rand(0,9999) . '-' . mt_rand(0,9999);
     }

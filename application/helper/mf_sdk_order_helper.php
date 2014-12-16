@@ -87,7 +87,7 @@ class mf_sdk_order_helper extends mf_abstract_helper
         $this->isOrderCanceled($oOrder);
         $this->isOrderError($oOrder, $flag);
 
-        if ($flag && !$this->values[OrderStatus::STATE_ERROR]) {
+        if ($flag && !($this->values[OrderStatus::STATE_ERROR])) {
             return;
         }
 
@@ -116,18 +116,6 @@ class mf_sdk_order_helper extends mf_abstract_helper
         }
     }
 
-    private function isOrderCanceled($oOrder)
-    {
-        if ($oOrder->oxorder__oxstorno->rawValue) {
-            $this->message->message = 'Provider shop has canceled order.';
-            $this->values[OrderStatus::STATE_CANCELED]   = 1;
-            $this->values[OrderStatus::STATE_OPEN]       = 0;
-            $this->values[OrderStatus::STATE_IN_PROCESS] = 0;
-
-            $this->orderStatus->status = OrderStatus::STATE_CANCELED;
-        }
-    }
-
     private function isOrderDelivered($oOrder)
     {
         if ($this->getVersionLayer()->getConfig()->getRequestParameter('fnc') === 'sendorder') {
@@ -141,12 +129,24 @@ class mf_sdk_order_helper extends mf_abstract_helper
         }
     }
 
+    private function isOrderCanceled($oOrder)
+    {
+        if ($oOrder->oxorder__oxstorno->rawValue) {
+            $this->message->message = 'Provider shop has canceled order.';
+            $this->values[OrderStatus::STATE_CANCELED]   = 1;
+            $this->values[OrderStatus::STATE_OPEN]       = 0;
+            $this->values[OrderStatus::STATE_IN_PROCESS] = 0;
+
+            $this->orderStatus->status = OrderStatus::STATE_CANCELED;
+        }
+    }
+
     private function isOrderError($oOrder, $flag)
     {
-        $oxOrderState = $oOrder->oxorder__oxtransstatus->rawValue;
-
-        if ( $oxOrderState === 'NOT_FINISHED' && $this->values[OrderStatus::STATE_IN_PROCESS])
-        {
+        if (
+            $oOrder->oxorder__oxtransstatus->rawValue === 'NOT_FINISHED' &&
+            ($this->values[OrderStatus::STATE_DELIVERED] || $this->values[OrderStatus::STATE_IN_PROCESS])
+        ) {
             $this->message->message = 'There was an error in the provider shop.';
             $this->values[OrderStatus::STATE_ERROR]      = 1;
             $this->values[OrderStatus::STATE_OPEN]       = 0;

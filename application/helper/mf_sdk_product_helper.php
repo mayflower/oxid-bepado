@@ -38,7 +38,9 @@ class mf_sdk_product_helper extends mf_abstract_helper
                 continue;
             }
 
-            $product = $oxBasketArticle->getSdkProduct();
+            /** @var mf_sdk_converter $helper */
+            $helper = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
+            $product = $helper->fromShopToBepado($oxBasketArticle);
             foreach ($this->doCheckProduct($product) as $message) {
                 if (isset($message->values['availability'])) {
                     $changedAvailability = $message->values['availability'];
@@ -161,6 +163,19 @@ class mf_sdk_product_helper extends mf_abstract_helper
     }
 
     /**
+     * @param Reservation $reservation
+     * @param oxOrder
+     *
+     * @return bool[]
+     */
+    public function checkoutProducts(Reservation $reservation, oxOrder $oxOrder)
+    {
+        $result = $this->getSdk()->checkout($reservation, $oxOrder->getId());
+
+        return $result;
+    }
+
+    /**
      * @return SDK
      */
     private function getSdk()
@@ -172,18 +187,5 @@ class mf_sdk_product_helper extends mf_abstract_helper
         }
 
         return $this->sdk;
-    }
-
-    /**
-     * @param Reservation $reservation
-     * @param oxOrder
-     *
-     * @return bool[]
-     */
-    public function checkoutProducts(Reservation $reservation, oxOrder $oxOrder)
-    {
-        $result = $this->getSdk()->checkout($reservation, $oxOrder->getId());
-
-        return $result;
     }
 }
