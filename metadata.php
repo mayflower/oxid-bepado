@@ -68,6 +68,7 @@ $aModule = array(
         'mf_sdk_logger_helper'  => $aPaths['helper'] . '/mf_sdk_logger_helper.php',
         'mf_sdk_article_helper' => $aPaths['helper'] . '/mf_sdk_article_helper.php',
         'mf_sdk_order_helper'   => $aPaths['helper'] . '/mf_sdk_order_helper.php',
+        'mf_module_helper'      => $aPaths['helper'] . '/mf_module_helper.php',
     ),
     'blocks' => array(
         array(

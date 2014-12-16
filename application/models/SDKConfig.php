@@ -56,10 +56,14 @@ class SDKConfig
 
     /**
      * @param mixed $apiEndpointUrl
+     *
+     * @return SDKConfig
      */
     public function setApiEndpointUrl($apiEndpointUrl)
     {
         $this->apiEndpointUrl = $apiEndpointUrl;
+
+        return $this;
     }
 
     /**
@@ -72,10 +76,14 @@ class SDKConfig
 
     /**
      * @param mixed $apiKey
+     *
+     * @return SDKConfig
      */
     public function setApiKey($apiKey)
     {
         $this->apiKey = $apiKey;
+
+        return $this;
     }
 
     /**
@@ -88,10 +96,14 @@ class SDKConfig
 
     /**
      * @param string $urlHost
+     *
+     * @return SDKConfig
      */
     public function setProdMode($urlHost)
     {
         $this->prodMode = $urlHost;
+
+        return $this;
     }
 
     /**
@@ -104,10 +116,14 @@ class SDKConfig
 
     /**
      * @param string $searchHost
+     *
+     * @return SDKConfig
      */
     public function setSearchHost($searchHost)
     {
         $this->searchHost = $searchHost;
+
+        return $this;
     }
 
     /**
@@ -120,10 +136,14 @@ class SDKConfig
 
     /**
      * @param string $socialnetworkHost
+     *
+     * @return SDKConfig
      */
     public function setSocialnetworkHost($socialnetworkHost)
     {
         $this->socialnetworkHost = $socialnetworkHost;
+
+        return $this;
     }
 
     /**
@@ -136,10 +156,13 @@ class SDKConfig
 
     /**
      * @param string $transactionHost
+     *
+     * @return SDKConfig
      */
     public function setTransactionHost($transactionHost)
     {
         $this->transactionHost = $transactionHost;
+
+        return $this;
     }
 }
- 

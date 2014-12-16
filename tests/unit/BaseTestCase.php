@@ -16,6 +16,18 @@ abstract class BaseTestCase extends PHPUnit_Framework_TestCase
      */
     protected $oxidConfig;
 
+    /**
+     * @var array
+     */
+    protected $configVars = array(
+        'bool' => 'confbools',
+        'str'  => 'confstr',
+        'arr'  => 'confarrs',
+        'aarr' => 'confaarrs',
+        'select' => 'confselects',
+        'num'    => 'confnum',
+    );
+
     protected function prepareVersionLayerWithConfig()
     {
         $this->versionLayer = $this->getMock('VersionLayerInterface');

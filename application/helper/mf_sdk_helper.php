@@ -151,5 +151,22 @@ class mf_sdk_helper extends mf_abstract_helper
             putenv('_TRANSACTION_HOST='.$sdkConfig->getSearchHost());
         }
     }
+
+    /**
+     * Wrapper around the controller handling for request on the sdk
+     * functions.
+     */
+    public function handleRequest()
+    {
+        /** @var mf_sdk_logger_helper $logger */
+        $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
+
+        $sdkConfig = $this->createSdkConfigFromOxid();
+        $sdk = $this->instantiateSdk($sdkConfig);
+        try {
+            echo $sdk->handle(file_get_contents('php://input'), $_SERVER);
+        } catch (\Exception $e) {
+            $logger->writeBepadoLog($e->getMessage());
+        }
+    }
 }
- 

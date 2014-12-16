@@ -26,4 +26,24 @@ class sdkMock
     {
 
     }
+
+    public function verifyKey()
+    {
+
+    }
+
+    public function recordDelete()
+    {
+
+    }
+
+    public function recordInsert()
+    {
+
+    }
+
+    public function recordUpdate()
+    {
+
+    }
 }

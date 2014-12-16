@@ -4,15 +4,17 @@
  */
 class mf_Module_Config extends mf_Module_Config_parent
 {
-    const API_KEY_SETTING_NAME = 'sBepadoApiKey';
+    /**
+     * Flag if the shop is verified at bepado.
+     *
+     * @var bool
+     */
+    private $isVerified = false;
 
-    const MODULE_ID = 'bepado';
-
-    const API_URL_SETTING_NAME = 'sBepadoLocalEndpoint';
-
-    private $_oModuleSdkHelper;
-
-    private $isVerified;
+    /**
+     * @var VersionLayerInterface
+     */
+    private $_oVersionLayer;
 
     public function __construct()
     {
@@ -28,7 +30,7 @@ class mf_Module_Config extends mf_Module_Config_parent
     public function render()
     {
         $template = parent::render();
-        if (!$this->isBepadoModule()) {
+        if (!mf_module_helper::MODULE_ID !== $this->getEditObjectId()) {
             return $template;
         }
 
@@ -44,70 +46,29 @@ class mf_Module_Config extends mf_Module_Config_parent
     public function saveConfVars()
     {
         parent::saveConfVars();
-        if (!$this->isBepadoModule()) {
+
+        if (mf_module_helper::MODULE_ID !== $this->getEditObjectId()) {
             return;
         }
 
-        $oConfig = $this->getConfig();
-        $sdkConfig = $this->getSdkHelper()->createSdkConfigFromOxid();
-
-        foreach ($this->_aConfParams as $sType => $sParam) {
-            $aConfVars = $oConfig->getRequestParameter($sParam);
-            if (is_array($aConfVars)) {
-                foreach ($aConfVars as $sName => $sValue) {
-                    if (self::API_KEY_SETTING_NAME === $sName) {
-                        $sdkConfig->setApiKey($sValue);
-                    } elseif (self::API_URL_SETTING_NAME === $sValue) {
-                        $sdkConfig->setApiEndpointUrl($sValue);
-                    }
-                }
-            }
-        }
-
-        if ($this->verifyAtSdk($sdkConfig)) {
-            $this->isVerified = true;
-        } else {
-            $this->isVerified = false;
-        }
+        $this->isVerified = $this->getVersionLayer()
+            ->createNewObject('mf_module_helper')
+            ->onSaveConfigVars($this->_aConfParams);
     }
 
     /**
-     * @param SDKConfig $sdkConfig
+     * Create and/or returns the VersionLayer.
      *
-     * @return bool
+     * @return VersionLayerInterface
      */
-    private function verifyAtSdk(SDKConfig $sdkConfig)
+    private function getVersionLayer()
     {
-        $sdk = $this->getSdkHelper()->instantiateSdk($sdkConfig);
-
-        try {
-            $sdk->verifyKey($sdkConfig->getApiKey());
-        } catch (\RuntimeException $e) {
-            return false;
+        if (null == $this->_oVersionLayer) {
+            /** @var VersionLayerFactory $factory */
+            $factory = oxNew('VersionLayerFactory');
+            $this->_oVersionLayer = $factory->create();
         }
 
-        return true;
-    }
-
-    /**
-     * @return mf_sdk_helper
-     */
-    private function getSdkHelper()
-    {
-        if ($this->_oModuleSdkHelper === null) {
-            $this->_oModuleSdkHelper = oxNew('mf_sdk_helper');
-        }
-
-        return $this->_oModuleSdkHelper;
-    }
-
-    /**
-     * As we need to implement the features for the bepado module configuration settings only.
-     * @return bool
-     */
-    private function isBepadoModule()
-    {
-        return self::MODULE_ID === $this->getEditObjectId();
+        return $this->_oVersionLayer;
     }
 }
- 
