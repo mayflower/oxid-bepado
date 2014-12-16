@@ -21,4 +21,9 @@ class sdkMock
     {
 
     }
+
+    public function updateOrderStatus()
+    {
+
+    }
 }
