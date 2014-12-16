@@ -26,7 +26,7 @@ class sdkMock
     {
 
     }
-    
+
     public function verifyKey()
     {
 
