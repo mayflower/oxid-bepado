@@ -21,6 +21,7 @@ class oxidProductToShopTest extends BaseTestCase
     protected $oxDb;
     protected $convertedOxArticle;
     protected $oxArticle;
+    protected $oxBase;
 
     public function setUp()
     {
@@ -168,6 +169,54 @@ class oxidProductToShopTest extends BaseTestCase
             ->method('commitTransaction');
 
         $this->productToShop->commit();
+    }
+
+    public function testDelete()
+    {
+        $this->bepadoProductState
+            ->expects($this->once())
+            ->method('buildSelectString')
+            ->with(array('p_source_id' => 'source-id', 'shop_id' => 'shop-id'))
+            ->will($this->returnValue('some-sql'));
+        $this->oxDb
+            ->expects($this->once())
+            ->method('getOne')
+            ->with($this->equalTo('some-sql'))
+            ->will($this->returnValue('test-id'))
+        ;
+        $this->bepadoProductState
+            ->expects($this->once())
+            ->method('load')
+            ->with($this->equalTo('test-id'))
+            ->will($this->returnValue(true));
+        $this->bepadoProductState->expects($this->once())->method('delete');
+        $this->oxArticle->expects($this->once())->method('load')->with('test-id');
+        $this->oxArticle->expects($this->once())->method('delete');
+
+        $this->productToShop->delete('shop-id', 'source-id');
+    }
+
+    public function testDeleteWithNonMarkedArticle()
+    {
+        $this->bepadoProductState
+            ->expects($this->once())
+            ->method('buildSelectString')
+            ->with(array('p_source_id' => 'source-id', 'shop_id' => 'shop-id'))
+            ->will($this->returnValue('some-sql'));
+        $this->oxDb
+            ->expects($this->once())
+            ->method('getOne')
+            ->with($this->equalTo('some-sql'))
+            ->will($this->returnValue(false))
+        ;
+        $this->bepadoProductState
+            ->expects($this->never())
+            ->method('load')
+            ->with($this->equalTo('test-id'))
+            ->will($this->returnValue(true));
+        $this->bepadoProductState->expects($this->never())->method('delete');
+
+        $this->productToShop->delete('shop-id', 'source-id');
     }
 
     protected function getObjectMapping()

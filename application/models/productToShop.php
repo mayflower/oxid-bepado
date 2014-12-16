@@ -76,7 +76,7 @@ class oxidProductToShop implements ProductToShop
     public function delete($shopId, $sourceId)
     {
         /** @var oxBase $oBepadoProductState */
-        $oBepadoProductState = oxNew('oxbase');
+        $oBepadoProductState = $this->getVersionLayer()->createNewObject('oxbase');
         $oBepadoProductState->init('bepado_product_state');
         $select = $oBepadoProductState->buildSelectString(array(
             'p_source_id' => $sourceId,
@@ -87,7 +87,7 @@ class oxidProductToShop implements ProductToShop
             $oBepadoProductState->load($id);
             $oBepadoProductState->delete();
 
-            $oxArticle = oxNew('oxarticle');
+            $oxArticle = $this->getVersionLayer()->createNewObject('oxarticle');
             $oxArticle->load($id);
             $oxArticle->delete();
         }
