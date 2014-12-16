@@ -12,7 +12,7 @@ class mf_sdk_order_helper extends mf_abstract_helper
     protected $sdk;
 
     /**
-     * @var Bepado\SDK\Struct\Message
+     * @var Message
      */
     protected $message;
 
@@ -22,7 +22,7 @@ class mf_sdk_order_helper extends mf_abstract_helper
     protected $values;
 
     /**
-     * @var Bepado\SDK\Struct\OrderStatus
+     * @var OrderStatus
      */
     protected $orderStatus;
 
@@ -64,9 +64,11 @@ class mf_sdk_order_helper extends mf_abstract_helper
      */
     private function updateStatus($oOrder, $flag)
     {
+        $this->orderStatus = new OrderStatus();
         $this->orderStatus->id = $oOrder->getId();
         $this->orderStatus->status = OrderStatus::STATE_OPEN;
 
+        $this->message = new Message();
         $this->message->message = 'Provider shop has received order.';
 
         $this->values = array(
