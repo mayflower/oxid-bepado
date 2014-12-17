@@ -66,6 +66,9 @@ class mf_sdk_converter implements mf_converter_interface
         $sdkProduct->price = $object->getPrice()->getNettoPrice();
         $purchasePrice = new oxPrice($object->{$this->computePurchasePriceField($object)}->value);
         $sdkProduct->purchasePrice = $purchasePrice->getNettoPrice();
+        if (!$sdkProduct->purchasePrice) {
+            $sdkProduct->purchasePrice = $sdkProduct->price;
+        }
         $sdkProduct->currency = $currency->name;
         $sdkProduct->availability = $object->oxarticles__oxstock->value;
 
