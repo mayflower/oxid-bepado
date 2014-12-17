@@ -32,7 +32,7 @@ class mf_module_helper extends mf_abstract_helper
                 foreach ($aConfVars as $sName => $sValue) {
                     if (self::API_KEY_SETTING_NAME === $sName) {
                         $sdkConfig->setApiKey($sValue);
-                    } elseif (self::API_URL_SETTING_NAME === $sValue) {
+                    } elseif (self::API_URL_SETTING_NAME === $sName) {
                         $sdkConfig->setApiEndpointUrl($sValue);
                     }
                 }

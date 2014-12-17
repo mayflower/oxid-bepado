@@ -153,6 +153,46 @@ class oxidProductToShopTest extends BaseTestCase
         $this->productToShop->insertOrUpdate($product);
     }
 
+    public function testUpdateProductNotLoaded()
+    {
+        $product = new Struct\Product();
+        $product->sourceId = 'some-id';
+        $product->shopId = 'shop-id';
+
+        // expected method calls
+        $this->bepadoProductState
+            ->expects($this->once())
+            ->method('buildSelectString')
+            ->with($this->equalTo(array('p_source_id' => 'some-id', 'shop_id' => 'shop-id')))
+            ->will($this->returnValue('sql-query'))
+        ;
+
+        $this->oxDb
+            ->expects($this->once())
+            ->method('getOne')
+            ->with($this->equalTo('sql-query'))
+            ->will($this->returnValue('test-id'));
+        // so the state need to be loaded and should return true for the load state
+        $this->bepadoProductState
+            ->expects($this->once())
+            ->method('load')
+            ->with($this->equalTo('test-id'));
+        $this->bepadoProductState
+            ->expects($this->once())
+            ->method('isLoaded')
+            ->will($this->returnValue(true));
+        $this->bepadoProductState->expects($this->once())->method('getId')->will($this->returnValue('test-id'));
+        // expected methods on the existing oxArticle
+        $this->oxArticle
+            ->expects($this->once())
+            ->method('load')
+            ->with($this->equalTo('test-id'));
+        $this->oxArticle->expects($this->once())->method('isLoaded')->will($this->returnValue(false));
+
+        // trigger the insert action
+        $this->productToShop->insertOrUpdate($product);
+    }
+
     public function testTransactionStart()
     {
         $this->oxDb
