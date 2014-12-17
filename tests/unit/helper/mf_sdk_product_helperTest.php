@@ -20,7 +20,6 @@ class mf_sdk_product_helperTest extends BaseTestCase
     protected $sdkHelper;
     protected $sdk;
     protected $orderConverter;
-    protected $converter;
     protected $oxOrder;
     protected $articleHelper;
 
@@ -43,7 +42,6 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->sdkHelper = $this->getMockBuilder('mf_sdk_helper')->disableOriginalConstructor()->getMock();
         $this->sdk = $this->getMockBuilder('sdkMock')->disableOriginalConstructor()->getMock();
         $this->orderConverter = $this->getMockBuilder('mf_sdk_order_converter')->disableOriginalConstructor()->getMock();
-        $this->converter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
         $this->oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
         $this->articleHelper = $this->getMockBuilder('mf_sdk_article_helper')->disableOriginalConstructor()->getMock();
 
@@ -85,9 +83,9 @@ class mf_sdk_product_helperTest extends BaseTestCase
 
         $product = new Product();
         $product->availability = 3;
-        $this->converter
+        $this->articleHelper
             ->expects($this->once())
-            ->method('fromShopToBepado')
+            ->method('computeSdkProduct')
             ->with($this->equalTo($this->oxArticle))
             ->will($this->returnValue($product));
 
@@ -124,9 +122,9 @@ class mf_sdk_product_helperTest extends BaseTestCase
 
         $product = new Product();
         $product->availability = 3;
-        $this->converter
+        $this->articleHelper
             ->expects($this->once())
-            ->method('fromShopToBepado')
+            ->method('computeSdkProduct')
             ->with($this->equalTo($this->oxArticle))
             ->will($this->returnValue($product));
         $this->oxBasket
@@ -167,9 +165,9 @@ class mf_sdk_product_helperTest extends BaseTestCase
 
         $product = new Product();
         $product->availability = 3;
-        $this->converter
+        $this->articleHelper
             ->expects($this->once())
-            ->method('fromShopToBepado')
+            ->method('computeSdkProduct')
             ->with($this->equalTo($this->oxArticle))
             ->will($this->returnValue($product));
 
@@ -206,9 +204,9 @@ class mf_sdk_product_helperTest extends BaseTestCase
 
         $product = new Product();
         $product->availability = 3;
-        $this->converter
+        $this->articleHelper
             ->expects($this->once())
-            ->method('fromShopToBepado')
+            ->method('computeSdkProduct')
             ->with($this->equalTo($this->oxArticle))
             ->will($this->returnValue($product));
         $this->oxBasket
@@ -362,7 +360,6 @@ class mf_sdk_product_helperTest extends BaseTestCase
             'mf_sdk_order_converter' => $this->orderConverter,
             'oxorder'                => $this->oxOrder,
             'mf_sdk_article_helper'  => $this->articleHelper,
-            'mf_sdk_converter'       => $this->converter,
         );
     }
 }

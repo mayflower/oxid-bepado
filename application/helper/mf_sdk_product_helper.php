@@ -34,13 +34,14 @@ class mf_sdk_product_helper extends mf_abstract_helper
             $changedAvailability = null;
             $changedPrice = null;
 
-            if (!$this->getVersionLayer()->createNewObject('mf_sdk_article_helper')->isArticleImported($oxBasketArticle)) {
+            /** @var mf_sdk_article_helper $helper */
+            $helper = $this->getVersionLayer()->createNewObject('mf_sdk_article_helper');
+
+            if (!$helper->isArticleImported($oxBasketArticle)) {
                 continue;
             }
 
-            /** @var mf_sdk_converter $helper */
-            $helper = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
-            $product = $helper->fromShopToBepado($oxBasketArticle);
+            $product = $helper->computeSdkProduct($oxBasketArticle);
             foreach ($this->doCheckProduct($product) as $message) {
                 if (isset($message->values['availability'])) {
                     $changedAvailability = $message->values['availability'];
