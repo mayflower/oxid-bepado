@@ -185,6 +185,38 @@ class mf_sdk_converterTest extends BaseTestCase
         return $values;
     }
 
+    public function testEmptyPurchasePriceShouldUseRegularPriceWhenNull()
+    {
+        $shopUrl = oxRegistry::getConfig()->getShopUrl();
+        $this->productValues['url'] = $shopUrl . 'index.php?cl=details&amp;anid=some-id';
+
+        $this->articleValues['oxarticles__oxpricea'] = null;
+
+        /** @var oxArticle $oxArticle */
+        $oxArticle = oxNew('oxarticle');
+        $oxArticle->assign($this->articleValues);
+
+        $product = $this->converter->fromShopToBepado($oxArticle);
+
+        $this->assertEquals($product->price, $product->purchasePrice);
+    }
+
+    public function testEmptyPurchasePriceShouldUseRegularPriceWhenZero()
+    {
+        $shopUrl = oxRegistry::getConfig()->getShopUrl();
+        $this->productValues['url'] = $shopUrl . 'index.php?cl=details&amp;anid=some-id';
+
+        $this->articleValues['oxarticles__oxpricea'] = 0.0;
+
+        /** @var oxArticle $oxArticle */
+        $oxArticle = oxNew('oxarticle');
+        $oxArticle->assign($this->articleValues);
+
+        $product = $this->converter->fromShopToBepado($oxArticle);
+
+        $this->assertEquals($product->price, $product->purchasePrice);
+    }
+
     protected function getObjectMapping()
     {
         return array(

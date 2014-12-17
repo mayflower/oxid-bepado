@@ -37,7 +37,7 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     {
         $return = parent::save();
 
-        $this->getArticleHelper()->onSaveArticleExtend($this);
+        $this->getArticleHelper()->onArticleSave($this);
 
         return $return;
     }
