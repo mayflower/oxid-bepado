@@ -284,6 +284,15 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->with($this->equalTo(true));
 
         $this->helper->checkProductsInBasket($this->oxBasket);
+
+        // asserts
+        $this->assertEquals(
+            new oxField(
+                '<ul><li><i>This product is not available at the moment.</i></li></ul>',
+                oxField::T_TEXT
+            ),
+            $this->oxBasketItem->bepado_check
+        );
     }
 
     public function testCheckProductsInBasketWithExcption()
@@ -310,21 +319,8 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->method('computeSdkProduct')
             ->with($this->equalTo($this->oxArticle))
             ->will($this->returnValue($product));
-        $this->oxBasket
-            ->expects($this->once())
-            ->method('calculateBasket')
-            ->with($this->equalTo(true));
 
         $this->helper->checkProductsInBasket($this->oxBasket);
-
-        // asserts
-        $this->assertEquals(
-            new oxField(
-                '<ul><li><i>This product is not available at the moment.</i></li></ul>',
-                oxField::T_TEXT
-            ),
-            $this->oxBasketItem->bepado_check
-        );
     }
 
     public function testReservation()
