@@ -106,9 +106,9 @@ class mf_sdk_order_helper extends mf_abstract_helper
 
     private function isOrderInProcess($oOrder)
     {
-        if ($oOrder->oxorder__oxpaid->rawValue !== '0000-00-00 00:00:00') {
+        if ($oOrder->getFieldData('oxpaid') !== '0000-00-00 00:00:00') {
             $this->message->message = 'Provider shop has received payment';
-            $this->values['paydate']                     = $oOrder->oxorder__oxpaid->rawValue;
+            $this->values['paydate']                     = $oOrder->getFieldData('oxpaid');;
             $this->values[OrderStatus::STATE_IN_PROCESS] = 1;
             $this->values[OrderStatus::STATE_OPEN]       = 0;
 
@@ -121,7 +121,7 @@ class mf_sdk_order_helper extends mf_abstract_helper
         if ($this->getVersionLayer()->getConfig()->getRequestParameter('fnc') === 'sendorder') {
             $this->message->message = 'Provider shop has processed and delivered order.';
             $this->values[OrderStatus::STATE_DELIVERED]  = 1;
-            $this->values['senddate']                    = $oOrder->oxorder__oxsenddate->value;
+            $this->values['senddate']                    = $oOrder->getFieldData('oxsenddate');
             $this->values[OrderStatus::STATE_OPEN]       = 0;
             $this->values[OrderStatus::STATE_IN_PROCESS] = 0;
 
@@ -131,7 +131,7 @@ class mf_sdk_order_helper extends mf_abstract_helper
 
     private function isOrderCanceled($oOrder)
     {
-        if ($oOrder->oxorder__oxstorno->rawValue) {
+        if ($oOrder->getFieldData('oxstorno')) {
             $this->message->message = 'Provider shop has canceled order.';
             $this->values[OrderStatus::STATE_CANCELED]   = 1;
             $this->values[OrderStatus::STATE_OPEN]       = 0;
@@ -144,7 +144,7 @@ class mf_sdk_order_helper extends mf_abstract_helper
     private function isOrderError($oOrder, $flag)
     {
         if (
-            $oOrder->oxorder__oxtransstatus->rawValue === 'NOT_FINISHED' &&
+            $oOrder->getFieldData('oxtransstatus') === 'NOT_FINISHED' &&
             ($this->values[OrderStatus::STATE_DELIVERED] || $this->values[OrderStatus::STATE_IN_PROCESS])
         ) {
             $this->message->message = 'There was an error in the provider shop.';

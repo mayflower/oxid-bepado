@@ -54,6 +54,7 @@ class mf_sdk_order_helperTest extends BaseTestCase
             ->expects($this->any())
             ->method('getId')
             ->will($this->returnValue('test-id'));
+
         $this->oxOrderArticle
             ->expects($this->any())
             ->method('getArticle')
@@ -77,6 +78,18 @@ class mf_sdk_order_helperTest extends BaseTestCase
             ->method('getArticleBepadoState')
             ->will($this->returnValue(1));
 
+        $map = array(
+            array('oxtransstatus', 'NOT_FINISHED'),
+            array('oxpaid', '0000-00-00 00:00:00'),
+            array('oxsenddate', ''),
+            array('oxstorno', '0'),
+        );
+
+        $this->oxOrder
+            ->expects($this->any())
+            ->method('getFieldData')
+            ->will($this->returnValueMap($map));
+
         $this->sdk->expects($this->once())->method('updateOrderStatus');
 
         $this->helper->updateOrderStatus($this->oxOrder);
@@ -89,6 +102,18 @@ class mf_sdk_order_helperTest extends BaseTestCase
             ->method('getArticleBepadoState')
             ->will($this->returnValue(1));
 
+        $map = array(
+            array('oxtransstatus', 'NOT_FINISHED'),
+            array('oxpaid', '0000-00-00 00:00:00'),
+            array('oxsenddate', ''),
+            array('oxstorno', '0'),
+        );
+
+        $this->oxOrder
+            ->expects($this->any())
+            ->method('getFieldData')
+            ->will($this->returnValueMap($map));
+
         $exception = new \RuntimeException();
         $this->sdk->expects($this->once())->method('updateOrderStatus')->will($this->throwException($exception));
 
@@ -97,16 +122,22 @@ class mf_sdk_order_helperTest extends BaseTestCase
 
     public function testUpdateOrderStatusInProcess()
     {
-        $values = array (
-            'oxorder__oxtransstatus' => 'OK',
-            'oxorder__oxpaid'        => '2014-12-12 12:30:30',
-        );
-        $this->oxOrder->assign($values);
-
         $this->mfArticleHelper
             ->expects($this->any())
             ->method('getArticleBepadoState')
             ->will($this->returnValue(1));
+
+        $map = array(
+            array('oxtransstatus', 'OK'),
+            array('oxpaid', '2014-12-12 12:30:30'),
+            array('oxsenddate', ''),
+            array('oxstorno', '0'),
+        );
+
+        $this->oxOrder
+            ->expects($this->any())
+            ->method('getFieldData')
+            ->will($this->returnValueMap($map));
 
         $this->sdk->expects($this->once())->method('updateOrderStatus');
 
@@ -115,22 +146,28 @@ class mf_sdk_order_helperTest extends BaseTestCase
 
     public function testUpdateOrderStatusDelivered()
     {
-        $values = array (
-            'oxorder__oxtransstatus' => 'OK',
-            'oxorder__oxpaid'        => '2014-12-12 12:30:30',
-            'oxorder__oxsenddate'    => '2014-12-13 12:30:30',
+        $this->mfArticleHelper
+            ->expects($this->any())
+            ->method('getArticleBepadoState')
+            ->will($this->returnValue(1));
+
+        $map = array(
+            array('oxtransstatus', 'OK'),
+            array('oxpaid', '2014-12-12 12:30:30'),
+            array('oxsenddate', '2014-12-13 12:30:30'),
+            array('oxstorno', '0'),
         );
-        $this->oxOrder->assign($values);
+
+        $this->oxOrder
+            ->expects($this->any())
+            ->method('getFieldData')
+            ->will($this->returnValueMap($map));
 
         $this->oxidConfig
             ->expects($this->once())
             ->method('getRequestParameter')
             ->with($this->equalTo('fnc'))
             ->will($this->returnValue('sendorder'));
-        $this->mfArticleHelper
-            ->expects($this->any())
-            ->method('getArticleBepadoState')
-            ->will($this->returnValue(1));
 
         $this->sdk->expects($this->once())->method('updateOrderStatus');
 
@@ -139,16 +176,22 @@ class mf_sdk_order_helperTest extends BaseTestCase
 
     public function testUpdateOrderStatusCanceled()
     {
-        $values = array (
-            'oxorder__oxtransstatus' => 'OK',
-            'oxorder__oxstorno'      => '1',
-        );
-        $this->oxOrder->assign($values);
-
         $this->mfArticleHelper
             ->expects($this->any())
             ->method('getArticleBepadoState')
             ->will($this->returnValue(1));
+
+        $map = array(
+            array('oxtransstatus', 'OK'),
+            array('oxpaid', '0000-00-00 00:00:00'),
+            array('oxsenddate', ''),
+            array('oxstorno', '1'),
+        );
+
+        $this->oxOrder
+            ->expects($this->any())
+            ->method('getFieldData')
+            ->will($this->returnValueMap($map));
 
         $this->sdk->expects($this->once())->method('updateOrderStatus');
 
@@ -157,16 +200,22 @@ class mf_sdk_order_helperTest extends BaseTestCase
 
     public function testUpdateOrderStatusErrorFlag()
     {
-        $values = array (
-            'oxorder__oxtransstatus' => 'OK',
-            'oxorder__oxpaid'        => '2014-12-12 12:30:30',
-        );
-        $this->oxOrder->assign($values);
-
         $this->mfArticleHelper
             ->expects($this->any())
             ->method('getArticleBepadoState')
             ->will($this->returnValue(1));
+
+        $map = array(
+            array('oxtransstatus', 'OK'),
+            array('oxpaid', '2014-12-12 12:30:30'),
+            array('oxsenddate', ''),
+            array('oxstorno', '0'),
+        );
+
+        $this->oxOrder
+            ->expects($this->any())
+            ->method('getFieldData')
+            ->will($this->returnValueMap($map));
 
         $this->sdk->expects($this->once())->method('updateOrderStatus');
 
@@ -175,16 +224,22 @@ class mf_sdk_order_helperTest extends BaseTestCase
 
     public function testUpdateOrderStatusErrorInternal()
     {
-        $values = array (
-            'oxorder__oxtransstatus' => 'NOT_FINISHED',
-            'oxorder__oxpaid'        => '2014-12-12 12:30:30',
-        );
-        $this->oxOrder->assign($values);
-
         $this->mfArticleHelper
             ->expects($this->any())
             ->method('getArticleBepadoState')
             ->will($this->returnValue(1));
+
+        $map = array(
+            array('oxtransstatus', 'NOT_FINISHED'),
+            array('oxpaid', '2014-12-12 12:30:30'),
+            array('oxsenddate', ''),
+            array('oxstorno', '0'),
+        );
+
+        $this->oxOrder
+            ->expects($this->any())
+            ->method('getFieldData')
+            ->will($this->returnValueMap($map));
 
         $this->sdk->expects($this->once())->method('updateOrderStatus');
 
@@ -193,22 +248,28 @@ class mf_sdk_order_helperTest extends BaseTestCase
 
     public function testUpdateOrderStatusNoErrorFlag()
     {
-        $values = array(
-            'oxorder__oxtransstatus' => 'OK',
-            'oxorder__oxpaid'        => '2014-12-12 12:30:30',
-            'oxorder__oxsenddate'    => '2014-12-13 12:30:30',
+        $this->mfArticleHelper
+            ->expects($this->any())
+            ->method('getArticleBepadoState')
+            ->will($this->returnValue(1));
+
+        $map = array(
+            array('oxtransstatus', 'OK'),
+            array('oxpaid', '2014-12-12 12:30:30'),
+            array('oxsenddate', '2014-12-13 12:30:30'),
+            array('oxstorno', '0'),
         );
-        $this->oxOrder->assign($values);
+
+        $this->oxOrder
+            ->expects($this->any())
+            ->method('getFieldData')
+            ->will($this->returnValueMap($map));
 
         $this->oxidConfig
             ->expects($this->once())
             ->method('getRequestParameter')
             ->with($this->equalTo('fnc'))
             ->will($this->returnValue('sendorder'));
-        $this->mfArticleHelper
-            ->expects($this->any())
-            ->method('getArticleBepadoState')
-            ->will($this->returnValue(1));
 
         $this->helper->updateOrderStatus($this->oxOrder, 1);
     }
