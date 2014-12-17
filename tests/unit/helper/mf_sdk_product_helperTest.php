@@ -22,6 +22,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
     protected $orderConverter;
     protected $oxOrder;
     protected $articleHelper;
+    protected $loggerHelper;
 
     /**
      * @var mf_sdk_product_helper
@@ -44,6 +45,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->orderConverter = $this->getMockBuilder('mf_sdk_order_converter')->disableOriginalConstructor()->getMock();
         $this->oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
         $this->articleHelper = $this->getMockBuilder('mf_sdk_article_helper')->disableOriginalConstructor()->getMock();
+        $this->loggerHelper = $this->getMockBuilder('mf_sdk_logger_helper')->disableOriginalConstructor()->getMock();
 
         $sdkConfig = new SDKConfig();
         $this->sdkHelper
@@ -63,6 +65,23 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->method('instantiateSdk')
             ->with($this->equalTo($sdkConfig))
             ->will($this->returnValue($this->sdk));
+        $this->loggerHelper
+            ->expects($this->any())
+            ->method('writeBepadoLog');
+    }
+
+    public function testCheckProductsInBasketNotImported()
+    {
+        $this->oxBasketItem
+            ->expects($this->once())
+            ->method('getAmount')
+            ->will($this->returnValue(3));
+        $this->articleHelper
+            ->expects($this->any())
+            ->method('isArticleImported')
+            ->will($this->returnValue(false));
+
+        $this->helper->checkProductsInBasket($this->oxBasket);
     }
 
     public function testCheckProductsInBasketWithNoChanges()
@@ -227,6 +246,111 @@ class mf_sdk_product_helperTest extends BaseTestCase
         );
     }
 
+    public function testCheckProductsInBasketWithNoAvailability()
+    {
+        // expectations
+        $this->oxBasketItem
+            ->expects($this->once())
+            ->method('getAmount')
+            ->will($this->returnValue(6));
+        $this->articleHelper
+            ->expects($this->any())
+            ->method('isArticleImported')
+            ->will($this->returnValue(true));
+        $this->sdk
+            ->expects($this->any())
+            ->method('checkProducts')
+            ->will($this->returnValue(
+                array(
+                    new \Bepado\SDK\Struct\Message(
+                        array(
+                            'message' =>'availability changed.',
+                            'values'  => array('availability' => 0)
+                        )
+                    )
+                )
+            ));
+
+        $product = new Product();
+        $product->availability = 3;
+        $this->articleHelper
+            ->expects($this->once())
+            ->method('computeSdkProduct')
+            ->with($this->equalTo($this->oxArticle))
+            ->will($this->returnValue($product));
+        $this->oxBasket
+            ->expects($this->once())
+            ->method('calculateBasket')
+            ->with($this->equalTo(true));
+
+        $this->helper->checkProductsInBasket($this->oxBasket);
+    }
+
+    public function testCheckProductsInBasketWithExcption()
+    {
+        $exception = new \RuntimeException();
+        // expectations
+        $this->oxBasketItem
+            ->expects($this->once())
+            ->method('getAmount')
+            ->will($this->returnValue(6));
+        $this->articleHelper
+            ->expects($this->any())
+            ->method('isArticleImported')
+            ->will($this->returnValue(true));
+        $this->sdk
+            ->expects($this->any())
+            ->method('checkProducts')
+            ->will($this->throwException($exception));
+
+        $product = new Product();
+        $product->availability = 3;
+        $this->articleHelper
+            ->expects($this->once())
+            ->method('computeSdkProduct')
+            ->with($this->equalTo($this->oxArticle))
+            ->will($this->returnValue($product));
+        $this->oxBasket
+            ->expects($this->once())
+            ->method('calculateBasket')
+            ->with($this->equalTo(true));
+
+        $this->helper->checkProductsInBasket($this->oxBasket);
+
+        // asserts
+        $this->assertEquals(
+            new oxField(
+                '<ul><li><i>This product is not available at the moment.</i></li></ul>',
+                oxField::T_TEXT
+            ),
+            $this->oxBasketItem->bepado_check
+        );
+    }
+
+    public function testReservation()
+    {
+        $sdkOrder = new Struct\Order();
+        $orderItem = new Struct\OrderItem();
+        $sdkOrder->orderItems = array($orderItem);
+        $sdkReservation = new Reservation();
+        $sdkReservation->success = true;
+        $oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
+
+        // expected method calls
+        $this->orderConverter
+            ->expects($this->once())
+            ->method('fromShopToBepado')
+            ->with($this->equalTo($oxOrder))
+            ->will($this->returnValue($sdkOrder));
+        $this->sdk
+            ->expects($this->once())
+            ->method('reserveProducts')
+            ->with($this->equalTo($sdkOrder))
+            ->will($this->returnValue($sdkReservation));
+
+        $this->helper->reserveProductsInOrder($oxOrder);
+    }
+
     public function testReservationWithEmptyOrderItems()
     {
         $sdkOrder = new Struct\Order();
@@ -360,6 +484,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
             'mf_sdk_order_converter' => $this->orderConverter,
             'oxorder'                => $this->oxOrder,
             'mf_sdk_article_helper'  => $this->articleHelper,
+            'mf_sdk_logger_helper'  => $this->loggerHelper,
         );
     }
 }
