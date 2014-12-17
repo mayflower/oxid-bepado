@@ -4,20 +4,20 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8507bc98051efd7908c6132c7ea896fe",
+    "hash": "068efcc54c382460cc08737a19161d33",
     "packages": [
         {
             "name": "bepado/sdk",
-            "version": "v1.4.39",
+            "version": "v1.6.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/ShopwareAG/bepado-sdk.git",
-                "reference": "f1a49725771a69c6cbc79ba908223f9244f98e96"
+                "url": "https://github.com/shopware/bepado-sdk.git",
+                "reference": "27c3b9379d85174d9ace7a0c5800d2a304c48978"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ShopwareAG/bepado-sdk/zipball/f1a49725771a69c6cbc79ba908223f9244f98e96",
-                "reference": "f1a49725771a69c6cbc79ba908223f9244f98e96",
+                "url": "https://api.github.com/repos/shopware/bepado-sdk/zipball/27c3b9379d85174d9ace7a0c5800d2a304c48978",
+                "reference": "27c3b9379d85174d9ace7a0c5800d2a304c48978",
                 "shasum": ""
             },
             "require-dev": {
@@ -39,24 +39,14 @@
                 "MIT"
             ],
             "description": "The PHP Software Development Kit for Shop developers.",
-            "time": "2014-07-08 19:35:30"
+            "time": "2014-12-17 14:59:17"
         }
     ],
-    "packages-dev": [
-
-    ],
-    "aliases": [
-
-    ],
+    "packages-dev": [],
+    "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [
-
-    ],
+    "stability-flags": [],
     "prefer-stable": false,
-    "platform": [
-
-    ],
-    "platform-dev": [
-
-    ]
+    "platform": [],
+    "platform-dev": []
 }

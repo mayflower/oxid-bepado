@@ -3,10 +3,11 @@
     "description": "Oxid module implementation of the bepado sdk",
     "license": "MIT",
     "require": {
-        "bepado/sdk": "1.4.*"
+        "bepado/sdk": "1.6.*"
     },
 
     "config": {
         "bin-dir": "vendor/bin/"
-    }
+    },
+    "minimum-stability": "stable"
 }
