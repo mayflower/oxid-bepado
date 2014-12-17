@@ -167,7 +167,7 @@ class mf_sdk_order_converterTest extends BaseTestCase
             ->method('isOrderArticleImported')
             ->will($this->returnValue(false));
 
-        $importedArticle->expects($this->once())->method('getSdkProduct')->will($this->returnValue($expectedProduct));
+        $this->articleHelper->expects($this->once())->method('computeSdkProduct')->will($this->returnValue($expectedProduct));
         $importedOrderArticle->expects($this->once())->method('getArticle')->will($this->returnValue($importedArticle));
         $importedOrderArticle->expects($this->once())
             ->method('getFieldData')

@@ -106,13 +106,16 @@ class mf_sdk_order_converter extends mf_abstract_converter implements mf_convert
         /** @var oxList $orderArticles */
         $orderArticles = $object->getOrderArticles();
 
+        /** @var mf_sdk_article_helper $helper */
+        $helper = $this->getVersionLayer()->createNewObject('mf_sdk_article_helper');
+
         foreach ($orderArticles->getArray() as $orderArticle) {
-            if (!$this->getVersionLayer()->createNewObject('mf_sdk_article_helper')->isOrderArticleImported($orderArticle)) {
+            if (!$helper->isOrderArticleImported($orderArticle)) {
                 continue;
             }
             $article = $orderArticle->getArticle();
             $orderItem = new Struct\OrderItem();
-            $orderItem->product = $article->getSdkProduct();
+            $orderItem->product = $helper->computeSdkProduct($article);
             $orderItem->count = (int) $orderArticle->getFieldData('oxorderarticles__oxamount');
             $orderItems[] = $orderItem;
         }
