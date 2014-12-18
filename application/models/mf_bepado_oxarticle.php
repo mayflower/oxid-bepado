@@ -55,17 +55,6 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     }
 
     /**
-     * @deprecated Function is moved to the helper.
-     *
-     * @return Product
-     * @throws Exception
-     */
-    public function getSdkProduct()
-    {
-        return $this->getArticleHelper()->computeSdkProduct($this);
-    }
-
-    /**
      * Create and/or returns the VersionLayer.
      *
      * @return VersionLayerInterface

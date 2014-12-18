@@ -23,7 +23,7 @@ class mf_module_helperTest extends BaseTestCase
         $this->helper->setVersionLayer($this->versionLayer);
         $sdkConfig = new SDKConfig();
         $sdkConfig
-            ->setApiEndpointUrl('some-ur')
+            ->setApiEndpointUrl('some-url')
             ->setApiKey('some-key')
             ->setSocialnetworkHost('some-host')
             ->setProdMode(true)
