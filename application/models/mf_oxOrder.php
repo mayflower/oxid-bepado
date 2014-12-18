@@ -25,22 +25,22 @@ class mf_oxOrder extends mf_oxOrder_parent
     public function finalizeOrder(oxBasket $oBasket, $oUser, $blRecalculatingOrder = false)
     {
         $returnValue = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
-
+        /** @var mf_sdk_logger_helper $logger */
+        $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
         /** @var mf_sdk_product_helper $helper */
         $helper = $this->getVersionLayer()->createNewObject('mf_sdk_product_helper');
+
         $reservation = null;
         try {
             $reservation = $helper->reserveProductsInOrder($this);
+            if (!$reservation) {
+                return $returnValue;
+            }
+
+            $helper->checkoutProducts($reservation, $this);
         } catch(Exception $e) {
-            /** @var mf_sdk_logger_helper $logger */
-            $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
-            $logger->writeBepadoLog('Problem while reserving the product');
+            $logger->writeBepadoLog('Problem while checking out the product: '.$e->getMessage());
         }
-        if (!$reservation) {
-            // no bepado product means nothing to do for us
-            return $returnValue;
-        }
-        $helper->checkoutProducts($reservation, $this);
 
         return $returnValue;
     }
