@@ -96,7 +96,9 @@ class mf_sdk_product_helper extends mf_abstract_helper
         try {
             $result = $this->getSdk()->checkProducts(array($sdkProduct));
             if (is_array($result)) {
-                $results = array_merge($results, $result);
+                foreach ($result as $id => $messages) {
+                    $results = array_merge($results, $messages);
+                }
             }
         } catch (\Exception $e) {
             $errMsg = new Struct\Message(array(
@@ -134,23 +136,28 @@ class mf_sdk_product_helper extends mf_abstract_helper
 
         $reservation = $this->getSdk()->reserveProducts($sdkOrder);
         if (!$reservation->success) {
-            $messages = $reservation->messages;
-            foreach ($messages as $message) {
-                $keys = array();
-                foreach ($message->values as $key => $values) {
-                    $keys[] = '%'.$key;
-                }
-                $computedMessage = str_replace($keys, $message->values, $message->message);
+            foreach ($reservation->messages as $shopId => $messages) {
+                foreach ($messages as $message) {
+                    $keys = array();
+                    foreach ($message->values as $key => $values) {
+                        $keys[] = '%'.$key;
+                    }
+                    $computedMessage = str_replace($keys, $message->values, $message->message);
 
-                if (isset($message->values['availability'])) {
-                    $exception = new oxOutOfStockException();
-                    $exception->setRemainingAmount($message->values['availablity']);
-                    $exception->setMessage($computedMessage);
-                    throw $exception;
-                } elseif (isset($message->values['price'])) {
-                    $exception = new oxArticleInputException();
-                    $exception->setMessage($computedMessage);
-                    throw $exception;
+                    if (isset($message->values['availability'])) {
+                        $exception = new oxOutOfStockException();
+                        $exception->setRemainingAmount($message->values['availablity']);
+                        $exception->setMessage($computedMessage);
+                        throw $exception;
+                    } elseif (isset($message->values['price'])) {
+                        $exception = new oxArticleInputException();
+                        $exception->setMessage($computedMessage);
+                        throw $exception;
+                    } elseif (isset($message->values['country'])) {
+                        $exception = new oxArticleInputException();
+                        $exception->setMessage($computedMessage);
+                        throw $exception;
+                    }
                 }
             }
 

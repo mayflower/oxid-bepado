@@ -2,7 +2,6 @@
 
 use Bepado\SDK\Struct as Struct;
 use Bepado\SDK\Struct\Message;
-use Bepado\SDK\Struct\Order;
 use Bepado\SDK\Struct\Reservation;
 use Bepado\SDK\Struct\SearchResult\Product;
 
@@ -128,15 +127,15 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->sdk
             ->expects($this->any())
             ->method('checkProducts')
-            ->will($this->returnValue(
-                array(
-                    new \Bepado\SDK\Struct\Message(
-                        array(
-                            'message' =>'Price changed.',
-                            'values'  => array('price' => 10)
+            ->will($this->returnValue(array(
+                    'some-id' => array(
+                        new \Bepado\SDK\Struct\Message(
+                            array(
+                                'message' =>'Price changed.',
+                                'values'  => array('price' => 10)
+                            )
                         )
-                    )
-                )
+                    ))
             ));
 
         $product = new Product();
@@ -171,14 +170,15 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->sdk
             ->expects($this->any())
             ->method('checkProducts')
-            ->will($this->returnValue(
-                array(
-                    new \Bepado\SDK\Struct\Message(
+            ->will($this->returnValue(array(
+                    'some-id' =>
                         array(
-                            'message' =>'availability changed.',
-                            'values'  => array('availability' => 10)
-                        )
-                    )
+                            new \Bepado\SDK\Struct\Message(
+                                array(
+                                    'message' =>'availability changed.',
+                                    'values'  => array('availability' => 10)
+                                )
+                            ))
                 )
             ));
 
@@ -210,15 +210,15 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->sdk
             ->expects($this->any())
             ->method('checkProducts')
-            ->will($this->returnValue(
-                array(
-                    new \Bepado\SDK\Struct\Message(
-                        array(
-                            'message' =>'availability changed.',
-                            'values'  => array('availability' => 5)
+            ->will($this->returnValue(array(
+                'some-id' => array(
+                        new \Bepado\SDK\Struct\Message(
+                            array(
+                                'message' =>'availability changed.',
+                                'values'  => array('availability' => 5)
+                            )
                         )
-                    )
-                )
+                ))
             ));
 
         $product = new Product();
@@ -260,15 +260,15 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->sdk
             ->expects($this->any())
             ->method('checkProducts')
-            ->will($this->returnValue(
-                array(
+            ->will($this->returnValue(array(
+                'some-id' => array(
                     new \Bepado\SDK\Struct\Message(
                         array(
                             'message' =>'availability changed.',
                             'values'  => array('availability' => 0)
                         )
                     )
-                )
+                ))
             ));
 
         $product = new Product();
@@ -393,7 +393,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
 
     /**
      * @expectedException \oxOutOfStockException
-     * @expectedMessage "test message: 10"
+     * @expectedExceptionMessage test message: 10
      */
     public function testReservationStockExceeded()
     {
@@ -416,7 +416,13 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->will($this->returnValue($sdkReservation));
         $sdkReservation->success = false;
         $sdkReservation->messages = array(
-            new Message(array('message' => 'test message: %availability', 'values' => array('availability' => 10)))
+            'some-id' => array(
+                new Message( array(
+                        'message' => 'test message: %availability',
+                        'values' => array('availability' => 10)
+                    )
+                )
+            )
         );
 
         $this->helper->reserveProductsInOrder($oxOrder);
@@ -425,7 +431,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
 
     /**
      * @expectedException \oxArticleInputException
-     * @expectedMessage "test message: 10"
+     * @expectedExceptionMessage test message: 10
      */
     public function testReservationPriceChanged()
     {
@@ -447,8 +453,49 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->with($this->equalTo($sdkOrder))
             ->will($this->returnValue($sdkReservation));
         $sdkReservation->success = false;
-        $sdkReservation->messages = array(
-            new Message(array('message' => 'test message: %price', 'values' => array('price' => 10)))
+        $sdkReservation->messages =  array(
+            'some-id' => array(
+                new Message(array(
+                        'message' => 'test message: %price',
+                        'values' => array('price' => 10)
+                    )
+            ))
+        );
+
+        $this->helper->reserveProductsInOrder($oxOrder);
+    }
+
+    /**
+     * @expectedException \oxArticleInputException
+     * @expectedExceptionMessage Products cannot be shipped to DEU
+     */
+    public function testReservationNotShippedToCountry()
+    {
+        $sdkOrder = new Struct\Order();
+        $orderItem = new Struct\OrderItem();
+        $sdkOrder->orderItems = array($orderItem);
+        $sdkReservation = new Reservation();
+        $oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
+
+        // expected method calls
+        $this->orderConverter
+            ->expects($this->once())
+            ->method('fromShopToBepado')
+            ->with($this->equalTo($oxOrder))
+            ->will($this->returnValue($sdkOrder));
+        $this->sdk
+            ->expects($this->once())
+            ->method('reserveProducts')
+            ->with($this->equalTo($sdkOrder))
+            ->will($this->returnValue($sdkReservation));
+        $sdkReservation->success = false;
+        $sdkReservation->messages =  array(
+            'some-id' => array(
+                new Message(array(
+                        'message' => 'Products cannot be shipped to %country',
+                        'values' => array('country' => 'DEU')
+                    )
+                ))
         );
 
         $this->helper->reserveProductsInOrder($oxOrder);
