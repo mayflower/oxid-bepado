@@ -14,13 +14,20 @@ class EventListener
         /** @var mf_sdk_logger_helper $logger */
         $logger = self::getVersionLayer()->createNewObject('mf_sdk_logger_helper');
 
-        $schemaDir = __DIR__ . '/../install';
+        $schemaDir = __DIR__ . '/../../vendor/bepado/sdk/src/schema';
         $sqlFiles = array_filter(
             scandir($schemaDir),
             function ($file) { return substr($file, -4) === '.sql'; }
         );
+        $schemaDir = __DIR__ . '/../install';
+        $sqlFiles = array_merge(
+            $sqlFiles,
+            array_filter(
+                scandir($schemaDir),
+                function ($file) { return substr($file, -4) === '.sql'; }
+            )
+        );
 
-        sort($sqlFiles);
         foreach ($sqlFiles as $sqlFile) {
             $sql = file_get_contents($schemaDir . '/' . $sqlFile);
             $sql = str_replace("\n", "", $sql);
@@ -43,6 +50,7 @@ class EventListener
         $oxUserGruop = self::getVersionLayer()->createNewObject('oxgroups');
         $oxUserGruop->load('bepadoshopgroup');
         if (!$oxUserGruop->isLoaded()) {
+            $logger->writeBepadoLog('No bepado user group found.');
             throw new \Exception('No bepado user group found.');
         }
 
@@ -50,6 +58,7 @@ class EventListener
         $oxDelivery = self::getVersionLayer()->createNewObject('oxdelivery');
         $oxDelivery->load('bepadoshippingrule');
         if (!$oxDelivery->isLoaded()) {
+            $logger->writeBepadoLog('No bepado shipping found.');
             throw new \Exception('No bepado shipping found');
         }
 
@@ -57,6 +66,7 @@ class EventListener
         $oxDeliverySet = self::getVersionLayer()->createNewObject('oxdeliveryset');
         $oxDeliverySet->load('bepadoshipping');
         if (!$oxDeliverySet->isLoaded()) {
+            $logger->writeBepadoLog('No bepado shipping rule found.');
             throw new \Exception('No bepado shipping rule found');
         }
 
