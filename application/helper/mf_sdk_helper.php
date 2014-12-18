@@ -59,6 +59,8 @@ class mf_sdk_helper extends mf_abstract_helper
         $sDbPwd  = $oShopConfig->getConfigParam('dbPwd');
 
         $pdoConnection = new PDO($sDbType . ':dbname=' . $sDbName . ';host=' . $sDbHost,$sDbUser, $sDbPwd);
+        $pdoConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
         $from = $this->getVersionLayer()->createNewObject('oxidproductfromshop');
         $to = $this->getVersionLayer()->createNewObject('oxidproducttoshop');
 
@@ -164,7 +166,7 @@ class mf_sdk_helper extends mf_abstract_helper
         $sdkConfig = $this->createSdkConfigFromOxid();
         $sdk = $this->instantiateSdk($sdkConfig);
         try {
-            echo $sdk->handle(file_get_contents('php://input'), $_SERVER);
+            return $sdk->handle(file_get_contents('php://input'), $_SERVER);
         } catch (\Exception $e) {
             $logger->writeBepadoLog($e->getMessage());
         }
