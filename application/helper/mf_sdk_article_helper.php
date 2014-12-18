@@ -205,7 +205,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
         $oState = $this->getVersionLayer()->createNewObject('oxbase');
         $oState->init('bepado_product_state');
         $oState->load($oxArticle->getId());
-        $state = $oState->getFieldData('state');
+        $state = (int) $oState->getFieldData('state');
 
         if ($state !== SDKConfig::ARTICLE_STATE_EXPORTED && $state !== SDKConfig::ARTICLE_STATE_IMPORTED) {
             throw new Exception("Article is not managed for bepado. Neither exported to a remote shop nor imported.");
