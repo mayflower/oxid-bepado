@@ -135,13 +135,14 @@ class mf_sdk_product_helper extends mf_abstract_helper
         $reservation = $this->getSdk()->reserveProducts($sdkOrder);
         if (!$reservation->success) {
             $messages = $reservation->messages;
+            $reservationMessages = array();
             foreach ($messages as $message) {
                 $keys = array();
                 foreach ($message->values as $key => $values) {
                     $keys[] = '%'.$key;
                 }
                 $computedMessage = str_replace($keys, $message->values, $message->message);
-
+                $reservationMessages[] = $computedMessage;
                 if (isset($message->values['availability'])) {
                     $exception = new oxOutOfStockException();
                     $exception->setRemainingAmount($message->values['availablity']);
@@ -156,7 +157,7 @@ class mf_sdk_product_helper extends mf_abstract_helper
 
             // @todo find other use cases
             $exception = new oxNoArticleException();
-            $exception->setMessage('Something went wrong while reservation');
+            $exception->setMessage('Something went wrong while reservation: '.implode(' - ', $reservationMessages));
             throw $exception;
         }
 
