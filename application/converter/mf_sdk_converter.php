@@ -157,7 +157,13 @@ class mf_sdk_converter implements mf_converter_interface
                     list($fieldName, $fieldValue) = $sdkHelper->createOxidImageFromPath($imagePath, $key+1);
                     $aParams[$fieldName] = $fieldValue;
                 } catch (\Exception $e) {
-                    $logger->writeBepadoLog('Image ' . $imagePath . ' could not be saved during product conversion.');
+                    $logger->writeBepadoLog(
+                        sprintf(
+                            'Image % could not be saved during product conversion. Got the following exception: %',
+                            $imagePath,
+                            $e->getMessage()
+                        )
+                    );
                 }
             }
         }
