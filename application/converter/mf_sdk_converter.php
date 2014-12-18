@@ -64,8 +64,18 @@ class mf_sdk_converter implements mf_converter_interface
         // Price is net or brut depending on ShopConfig
         // @todo find the purchase representation in oxid article prices, defaults atm on net price
         $sdkProduct->price = $object->getPrice()->getNettoPrice();
-        $purchasePrice = new oxPrice($object->{$this->computePurchasePriceField($object)}->value);
+
+        // create the purchase price with the matching mode
+        $purchasePrice = new oxPrice();
+        $purchasePrice->setVat($object->getArticleVat()) /100;
+        if (oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
+            $purchasePrice->setNettoPriceMode();
+        } else {
+            $purchasePrice->setBruttoPriceMode();
+        }
+        $purchasePrice->setPrice($object->{$this->computePurchasePriceField($object)}->value);
         $sdkProduct->purchasePrice = $purchasePrice->getNettoPrice();
+
         if (!$sdkProduct->purchasePrice) {
             $sdkProduct->purchasePrice = $sdkProduct->price;
         }
@@ -89,7 +99,7 @@ class mf_sdk_converter implements mf_converter_interface
      *
      * @return oxarticle
      */
-    public function fromBepadoToShop($object)
+    public function     fromBepadoToShop($object)
     {
         /** @var mf_sdk_logger_helper $logger */
         $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
@@ -116,7 +126,7 @@ class mf_sdk_converter implements mf_converter_interface
 
         // Price is netto or brutto depending on ShopConfig
         // PurchasePrice has no equivalent in oxid
-        if ($this->getVersionLayer()->getConfig()->getConfigParam('blEnterNetPrice')) {
+        if (oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
             $aParams['oxarticles__oxprice'] = $object->price * $rate;
             $aParams[$this->computePurchasePriceField()] = $object->purchasePrice * $rate;
         } else {

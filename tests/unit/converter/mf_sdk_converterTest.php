@@ -24,8 +24,8 @@ class mf_sdk_converterTest extends BaseTestCase
         'longDescription'  => 'test long description',
         'vendor'           => 'test-vendor',
         'vat'              => 0.19,      # should come from the shop directly
-        'price'            => 1.67,
-        'purchasePrice'    => 1.50,
+        'price'            => 92.44,
+        'purchasePrice'    => 90,
         'fixedPrice'       => false,   # won't skip this in usual shops
         'currency'         => 'EUR',
         'freeDelivery'     => false,
@@ -51,8 +51,8 @@ class mf_sdk_converterTest extends BaseTestCase
         'oxarticles__oxean'          => 'test-ean',
         'oxarticles__oxtitle'        => 'test-title',
         'oxarticles__oxshortdesc'    => 'test short description',
-        'oxarticles__oxprice'        => 1.99,
-        'oxarticles__oxpricea'       => 1.50,
+        'oxarticles__oxprice'        => 92.44,
+        'oxarticles__oxpricea'       => 90,
         'oxarticles__oxstock'        => 10,
         'oxarticles__oxweight'       => 11,
         'oxarticles__oxwidth'        => 12,
@@ -103,9 +103,6 @@ class mf_sdk_converterTest extends BaseTestCase
         $product = $this->converter->fromShopToBepado($oxArticle);
 
         if ($testable) {
-            if ('price' === $productProperty && oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
-                $productValue = 1.99;
-            }
             $this->assertEquals($productValue, $product->$productProperty);
         } else {
             $this->markTestIncomplete('Can not test for Property: '.$productProperty);
@@ -130,6 +127,15 @@ class mf_sdk_converterTest extends BaseTestCase
             if ('images' === $property) {
                 $value = array($shopUrl . 'out/pictures/generated/product/1/380_340_75/nopic.jpg'); // default image for non existing images
             }
+
+            if (!oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
+                if ('price' === $property) {
+                    $value = 77.68;
+                } elseif ('purchasePrice' === $property) {
+                    $value = 75.63;
+                }
+            }
+
             $values[] = array($property, $value, $testable);
         }
 
@@ -176,8 +182,12 @@ class mf_sdk_converterTest extends BaseTestCase
         $values = array();
         foreach ($this->articleValues as $field => $value) {
             $testable = in_array($field, array()) ? false : true;
-            if ('oxarticles__oxprice' === $field) {
-                $value = '1.6699999999999999';
+            if (!oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
+                if ('oxarticles__oxprice' === $field) {
+                    $value = 110.00359999999999;
+                } elseif ('oxarticles__oxpricea' === $field) {
+                    $value = 107.10;
+                }
             }
             $values[] = array($field, $value, $testable);
         }
