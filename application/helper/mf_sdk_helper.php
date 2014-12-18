@@ -69,7 +69,7 @@ class mf_sdk_helper extends mf_abstract_helper
             ->configurePDOGateway($pdoConnection)
             ->setProductToShop($to)
             ->setProductFromShop($from)
-            ->setPluginSoftwareVersion('no one expects the spanish inquisition!')
+            ->setPluginSoftwareVersion('oxid v4.9ce/mf_bepado v1.0-RC')
         ;
         $sdk = $builder->build();
 

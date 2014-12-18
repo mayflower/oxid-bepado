@@ -40,6 +40,7 @@ class mf_oxOrder extends mf_oxOrder_parent
             $helper->checkoutProducts($reservation, $this);
         } catch(Exception $e) {
             $logger->writeBepadoLog('Problem while checking out the product: '.$e->getMessage());
+            throw $e;
         }
 
         return $returnValue;
