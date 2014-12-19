@@ -150,7 +150,7 @@ class mf_sdk_helper extends mf_abstract_helper
         }
 
         if (null !== $sdkConfig->getSearchHost()) {
-            putenv('_TRANSACTION_HOST='.$sdkConfig->getSearchHost());
+            putenv('_SEARCH_HOST='.$sdkConfig->getSearchHost());
         }
     }
 
