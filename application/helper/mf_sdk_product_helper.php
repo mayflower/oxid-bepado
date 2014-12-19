@@ -130,11 +130,17 @@ class mf_sdk_product_helper extends mf_abstract_helper
         /** @var mf_sdk_order_converter $converter */
         $converter = $this->getVersionLayer()->createNewObject('mf_sdk_order_converter');
         $sdkOrder = $converter->fromShopToBepado($oxOrder);
+
         if (count($sdkOrder->orderItems) === 0) {
             return false;
         }
 
         $reservation = $this->getSdk()->reserveProducts($sdkOrder);
+        if (!$reservation instanceof Reservation) {
+            $exception = new oxNoArticleException();
+            $exception->setMessage('Something went wrong while reservation');
+            throw $exception;
+        }
         if (!$reservation->success) {
             foreach ($reservation->messages as $shopId => $messages) {
                 foreach ($messages as $message) {
@@ -156,11 +162,6 @@ class mf_sdk_product_helper extends mf_abstract_helper
                     }
                 }
             }
-
-            // @todo find other use cases
-            $exception = new oxNoArticleException();
-            $exception->setMessage('Something went wrong while reservation');
-            throw $exception;
         }
 
         return $reservation;
