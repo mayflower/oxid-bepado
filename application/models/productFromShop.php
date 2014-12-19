@@ -224,7 +224,6 @@ class oxidProductFromShop implements ProductFromShop
         $oxPayment = $this->_oVersionLayer->createNewObject('oxpayment');
         $select = $oxPayment->buildSelectString(array('bepadopaymenttype' => $order->paymentType));
         $paymentID = $this->_oVersionLayer->getDb(true)->getOne($select);
-        file_put_contents("/tmp/change", "Query: \n $select \n", FILE_APPEND);
 
         return $paymentID ?: null;
     }
