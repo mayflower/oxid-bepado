@@ -187,6 +187,12 @@ class mf_sdk_converter implements mf_converter_interface
             }
         }
 
+        // deliveryDate
+        $aParams['oxarticles__oxdelivery'] = date('Y-m-d', $object->deliveryDate);
+        // deliveryWorkDays
+        $aParams['oxarticles__oxmaxdeltime'] = $object->deliveryWorkDays;
+        $aParams['oxarticles__oxdeltimeunit'] = 'DAY';
+
         // Vendor: vendor name no use, only id can load vendor object
         // Category: category name no use id can load category object
 
