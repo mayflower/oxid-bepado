@@ -61,8 +61,7 @@ class mf_sdk_converter implements mf_converter_interface
         }
 
         $sdkProduct->vat = $object->getArticleVat() / 100;
-        // Price is net or brut depending on ShopConfig
-        // @todo find the purchase representation in oxid article prices, defaults atm on net price
+        // Price are net or brut depending on ShopConfig
         $sdkProduct->price = $object->getPrice()->getNettoPrice();
 
         // create the purchase price with the matching mode
@@ -87,7 +86,27 @@ class mf_sdk_converter implements mf_converter_interface
         $sdkProduct->attributes = $this->mapAttributes($object);
 
         // deliveryDate
+        $delDate = explode('-', $object->getFieldData('oxdelivery'));
+        $delDate = mktime(0, 0, 0, $delDate[1], $delDate[2], $delDate[0]);
+        if ($delDate > microtime(true)) {
+            $sdkProduct->deliveryDate = $delDate;
+        }
+
         // deliveryWorkDays
+        $maxDelTime = $object->getFieldData('oxmaxdeltime');
+        $delUnit = $object->getFieldData('oxdeltimeunit');
+
+        switch ($delUnit) {
+            case 'WEEK':
+                $delUnit = 5;
+                break;
+            case 'MONTH':
+                $delUnit = 20;
+                break;
+            default:
+                $delUnit = 1;
+        }
+        $sdkProduct->deliveryWorkDays = $maxDelTime * $delUnit;
 
         return $sdkProduct;
     }
