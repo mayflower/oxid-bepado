@@ -149,11 +149,7 @@ class mf_sdk_product_helper extends mf_abstract_helper
                         $exception->setRemainingAmount($message->values['availablity']);
                         $exception->setMessage($computedMessage);
                         throw $exception;
-                    } elseif (isset($message->values['price'])) {
-                        $exception = new oxArticleInputException();
-                        $exception->setMessage($computedMessage);
-                        throw $exception;
-                    } elseif (isset($message->values['country'])) {
+                    } else {
                         $exception = new oxArticleInputException();
                         $exception->setMessage($computedMessage);
                         throw $exception;
