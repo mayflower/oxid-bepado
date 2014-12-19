@@ -215,7 +215,8 @@ class mf_sdk_article_helper extends mf_abstract_helper
         $converter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
         $sdkProduct = $converter->fromShopToBepado($oxArticle);
 
-        $sdkProduct->shopId = $oState->bepado_product_state__shop_id->rawValue;
+        $sdkProduct->shopId = $oState->getFieldData('shop_id');
+        $sdkProduct->sourceId = $oState->getFieldData('p_source_id');
 
         return $sdkProduct;
     }

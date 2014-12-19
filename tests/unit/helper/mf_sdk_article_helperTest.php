@@ -440,14 +440,15 @@ class mf_sdk_article_helperTest extends BaseTestCase
     {
         $this->oxBase->expects($this->once())->method('init')->with($this->equalTo('bepado_product_state'));
         $this->oxBase->expects($this->once())->method('load')->with($this->equalTo('test-id'));
-        $this->oxBase
-            ->expects($this->once())
-            ->method('getFieldData')
-            ->with($this->equalTo('state'))
-            ->will($this->returnCallback(function() {
-                $args = func_get_args();
-                return 'state' === $args[0] ? SDKConfig::ARTICLE_STATE_EXPORTED : 'product-test-id';
-            }));
+        $this->oxBase->expects($this->any())->method('getFieldData')->will($this->returnCallback(function() {
+            $args = $args = func_get_args();
+            $returnValues = array(
+                'p_source_id' => 'source-id',
+                'shop_id'     => 'shop-id',
+                'state'       => 1
+            );
+            return $returnValues[$args[0]];
+        }));
         $this->productConverter
             ->expects($this->once())
             ->method('fromShopToBepado')
@@ -456,6 +457,8 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $product = $this->helper->computeSdkProduct($this->oxArticle);
 
         $this->assertInstanceOf(get_class(new Product()), $product);
+        $this->assertEquals('source-id', $product->sourceId);
+        $this->assertEquals('shop-id', $product->shopId);
     }
 
     protected function getObjectMapping()
