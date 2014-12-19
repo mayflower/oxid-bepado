@@ -316,12 +316,9 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->oxArticle
             ->expects($this->any())
             ->method('load')
-            ->with($this->equalTo('some-id'))
-            ->will($this->returnValue(false));
-        $this->oxArticle
-            ->expects($this->any())
-            ->method('readyForExportToBepado')
-            ->will($this->returnValue(true));
+            ->with($this->equalTo('some-id'));
+        $this->oxArticle->expects($this->once())->method('isLoaded')->will($this->returnValue(false));
+        $this->oxArticle->expects($this->any())->method('readyForExportToBepado')->will($this->returnValue(true));
 
         $actual = $this->productFromShop->getProducts(array('some-id'));
 
@@ -330,16 +327,9 @@ class oxidProductFromShopTest extends BaseTestCase
 
     public function testGetProducts()
     {
-        $this->oxArticle
-            ->expects($this->any())
-            ->method('load')
-            ->with($this->equalTo('some-id'))
-            ->will($this->returnValue(true));
-
-        $this->converter
-            ->expects($this->once())
-            ->method('fromShopToBepado')
-            ->will($this->returnValue(new Struct\Product()));
+        $this->oxArticle->expects($this->any())->method('load')->with($this->equalTo('some-id'));
+        $this->oxArticle->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+        $this->converter->expects($this->once())->method('fromShopToBepado')->will($this->returnValue(new Struct\Product()));
 
         $this->articleHelper
             ->expects($this->once())

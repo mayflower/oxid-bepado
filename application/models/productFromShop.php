@@ -36,9 +36,9 @@ class oxidProductFromShop implements ProductFromShop
         foreach ($ids as $id) {
             /** @var oxarticle $oxArticle */
             $oxArticle = $this->getVersionLayer()->createNewObject('oxarticle');
-            $load = $oxArticle->load($id);
+            $oxArticle->load($id);
 
-            if (!$load || !$articleHelper->isArticleExported($oxArticle)) {
+            if (!$oxArticle->isLoaded() || !$articleHelper->isArticleExported($oxArticle)) {
                 continue;
             }
 
