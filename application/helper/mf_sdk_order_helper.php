@@ -96,7 +96,7 @@ class mf_sdk_order_helper extends mf_abstract_helper
         $this->orderStatus->messages = $this->message;
 
         try{
-            $this->getSdk()->updateOrderStatus($this->orderStatus);
+            #$this->getSdk()->updateOrderStatus($this->orderStatus);
         } catch (\Exception $e){
             /** @var mf_sdk_logger_helper $helper */
             $helper = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');

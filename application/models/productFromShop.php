@@ -87,11 +87,7 @@ class oxidProductFromShop implements ProductFromShop
 
         /** @var oxOrder $oxOrder */
         $oxOrder = $this->_oVersionLayer->createNewObject('oxorder');
-        $stockValidation = $oxOrder->validateStock($oxBasket);
-
-        if (!$stockValidation) {
-            throw new Exception('Stock of articles is not valid');
-        }
+        $oxOrder->validateStock($oxBasket);
     }
 
     /**
@@ -251,7 +247,7 @@ class oxidProductFromShop implements ProductFromShop
         /** @var mf_sdk_converter $converter */
         $converter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
         foreach ($orderItems as $item) {
-            $oxBasket->addToBasket($converter->fromBepadoToShop($item->product)->getId(), $item->count);
+            $oxBasket->addToBasket($item->product->sourceId, $item->count);
             $oxBasket->calculateBasket(true);
         }
     }
@@ -266,7 +262,7 @@ class oxidProductFromShop implements ProductFromShop
      */
     private function getOrCreateUser(Order $order)
     {
-        $shopId = $order->providerShop;
+        $shopId = $order->localOrderId;
         $shop = $this->getOrCreateSDK()->getShop($shopId);
 
         if (!$shop) {
@@ -280,16 +276,19 @@ class oxidProductFromShop implements ProductFromShop
 
         /** @var oxUser $shopUser */
         $shopUser = $this->_oVersionLayer->createNewObject('oxuser');
-        $select = $shopUser->buildSelectString(array('bepadoshopid' => $shopId, 'OXACTIVE' => 1));
-        $shopUser->assignRecord($select);
+        $selectQuery = $shopUser->buildSelectString(array('OXUSERNAME' => $shopId, 'OXACTIVE' => 1));
+
+        $userId = $this->getVersionLayer()->getDb(true)->getOne($selectQuery);
+        if ($userId) {
+            $shopUser->load($userId);
+        }
 
         // creates the shop as an user if it does not exist
         if (!$shopUser->isLoaded()) {
             $values = array(
-                'oxuser__oxusername' => $shopId,
-                'oxuser__oxurl'      => $shop->url,
-                'bepadoshopid'       => $shopId,
-                'oxuser__oxactive'   => true,
+                'oxuser__oxusername'   => $shopId,
+                'oxuser__oxurl'        => $shop->url,
+                'oxuser__oxactive'     => true,
             );
             $values = array_merge($values, $this->convertAddress($order->billingAddress, 'oxuser__ox'));
             $shopUser->assign($values);
