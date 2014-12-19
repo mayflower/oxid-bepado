@@ -102,7 +102,7 @@ class mf_sdk_product_helper extends mf_abstract_helper
             }
         } catch (\Exception $e) {
             $errMsg = new Struct\Message(array(
-                'message' => 'Problem while checking the product with %exception',
+                'message' => 'Problem while checking the product with: "%exception"',
                 'values'  => array('exception' => $e->getMessage())
             ));
 
