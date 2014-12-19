@@ -12,9 +12,9 @@ class mfBepado extends oxUbase
 
         /** @var mf_sdk_helper $helper */
         $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
-        $helper->handleRequest();
+        $this->_aViewData['sdk_result'] = $helper->handleRequest();
 
-        return $this->_sThisTemplate;
+        return 'mf_sdk_result.tpl';
     }
 
     private function getVersionLayer()

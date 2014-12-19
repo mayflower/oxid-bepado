@@ -103,9 +103,10 @@ $aModule = array(
         ),
     ),
     'templates' => array(
-        'mf_module_config.tpl'  => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl',
-        'mf_category_list.tpl'  => $aPaths['views'] . '/admin/tpl/mf_category_list.tpl',
-        'mf_order_package.tpl'  => $aPaths['views'] . '/admin/tpl/mf_order_package.tpl',
+        'mf_module_config.tpl'     => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl',
+        'mf_category_list.tpl'     => $aPaths['views'] . '/admin/tpl/mf_category_list.tpl',
+        'mf_order_package.tpl'     => $aPaths['views'] . '/admin/tpl/mf_order_package.tpl',
+        'mf_sdk_result.tpl' => $aPaths['views'] . '/tpl/mf_sdk_result.tpl',
     ),
     'settings' => array(
         array(
