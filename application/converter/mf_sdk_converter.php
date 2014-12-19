@@ -99,7 +99,7 @@ class mf_sdk_converter implements mf_converter_interface
      *
      * @return oxarticle
      */
-    public function     fromBepadoToShop($object)
+    public function fromBepadoToShop($object)
     {
         /** @var mf_sdk_logger_helper $logger */
         $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
