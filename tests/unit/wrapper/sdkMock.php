@@ -46,4 +46,14 @@ class sdkMock
     {
 
     }
+
+    public function calculateShippingCosts()
+    {
+
+    }
+
+    public function getShop()
+    {
+
+    }
 }

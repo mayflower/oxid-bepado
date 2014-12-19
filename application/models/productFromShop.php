@@ -10,6 +10,11 @@ use Bepado\SDK\Struct\OrderItem;
 class oxidProductFromShop implements ProductFromShop
 {
     /**
+     * @var SDK
+     */
+    private $sdk;
+
+    /**
     * @var VersionLayerInterface
     */
     private $_oVersionLayer;
@@ -76,7 +81,7 @@ class oxidProductFromShop implements ProductFromShop
         /** @var oxBasket $oxBasket */
         $oxBasket = $this->_oVersionLayer->createNewObject('oxbasket');
         $this->addToBasket($order->orderItems, $oxBasket);
-        if ($oxBasket->getProductsCount() === 0) {
+        if (!$oxBasket->getProductsCount()) {
             throw new Exception('No valid products in basket');
         }
 
@@ -87,6 +92,20 @@ class oxidProductFromShop implements ProductFromShop
         if (!$stockValidation) {
             throw new Exception('Stock of articles is not valid');
         }
+    }
+
+    /**
+     * @return SDK
+     */
+    public function getOrCreateSDK()
+    {
+        if (null === $this->sdk) {
+            $sdkHelper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
+            $sdkConfig = $sdkHelper->createSdkConfigFromOxid();
+            $this->sdk = $sdkHelper->instantiateSdk($sdkConfig);
+        }
+
+        return $this->sdk;
     }
 
     /**
@@ -105,18 +124,11 @@ class oxidProductFromShop implements ProductFromShop
      */
     public function buy(Order $order)
     {
-        /** @var mf_sdk_helper $sdkHelper */
-        $sdkHelper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
-        $sdkConfig = $sdkHelper->createSdkConfigFromOxid();
-        $sdk = $sdkHelper->instantiateSdk($sdkConfig);
-
-        // create user and "login" - create a session entry
-        $shopUser = $this->getOrCreateUser($order, $sdk);
-
         /** @var oxBasket $oxBasket */
         $oxBasket = $this->getVersionLayer()->createNewObject('oxbasket');
+        $shopUser = $this->getOrCreateUser($order);
         $this->addToBasket($order->orderItems, $oxBasket);
-        if ($oxBasket->getProductsCount() === 0) {
+        if (!$oxBasket->getProductsCount()) {
             throw new Exception('No valid products in basket');
         }
 
@@ -125,26 +137,24 @@ class oxidProductFromShop implements ProductFromShop
         if (!$oxPaymentID) {
             throw new Exception('No Payment method found.');
         }
-        $oxBasket->setPayment($oxPaymentID);
 
-        // create shipping costs
-        $shippingCosts = $sdk->calculateShippingCosts($order);
-        $oxBasket->setDeliveryPrice($shippingCosts->shippingCosts);
-        /** @var oxPrice $oxPrice */
+        $oxBasket->setPayment($oxPaymentID);
+        $shippingCosts = $this->getOrCreateSDK()->calculateShippingCosts($order);
+
+        /** @var oxPrice $oxPrice with the decision for the price mode*/
         $oxPrice = $this->getVersionLayer()->createNewObject('oxprice');
         if (0 === $shippingCosts->shippingCosts) {
             $oxPrice->setPrice(0);
         } else {
             $oxPrice->setPrice(
-                $shippingCosts->grossShippingCosts,
+                $shippingCosts->shippingCosts,
                 ((100*$shippingCosts->grossShippingCosts/$shippingCosts->shippingCosts))/100 - 1
             );
         }
         $oxBasket->setCost('oxdelivery', $oxPrice);
+
         /** @var oxOrder $oxOrder */
         $oxOrder = $this->getVersionLayer()->createNewObject('oxorder');
-
-        // finalize order and do a cleanup
         $iSuccess = $oxOrder->finalizeOrder($oxBasket, $shopUser);
         $shopUser->onOrderExecute($oxBasket, $iSuccess);
         $this->cleanUp();
@@ -238,19 +248,10 @@ class oxidProductFromShop implements ProductFromShop
      */
     private function addToBasket(array $orderItems, oxBasket $oxBasket)
     {
-        $products = array();
+        /** @var mf_sdk_converter $converter */
+        $converter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
         foreach ($orderItems as $item) {
-            $products[$item->product->sourceId] = array(
-                'product' => $item->product,
-                'count'   => $item->count,
-            );
-        }
-
-
-        $oxProducts = $this->getProducts(array_keys($products));
-        foreach ($oxProducts as $oxProduct) {
-            $amount = $products[$oxProduct->getId()]['count'];
-            $oxBasket->addToBasket($oxProduct->getId(), $amount);
+            $oxBasket->addToBasket($converter->fromBepadoToShop($item->product)->getId(), $item->count);
             $oxBasket->calculateBasket(true);
         }
     }
@@ -260,14 +261,13 @@ class oxidProductFromShop implements ProductFromShop
      * The bepado bill address will be used as the users address, the delivery address added to the user.
      *
      * @param Order $order
-     * @param SDK $sdk
      *
      * @return oxUser
      */
-    private function getOrCreateUser(Order $order, SDK $sdk)
+    private function getOrCreateUser(Order $order)
     {
         $shopId = $order->providerShop;
-        $shop = $sdk->getShop($shopId);
+        $shop = $this->getOrCreateSDK()->getShop($shopId);
 
         if (!$shop) {
             throw new SecurityException(sprintf('Shop with id %s not known', $shopId));

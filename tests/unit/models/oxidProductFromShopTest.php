@@ -3,6 +3,7 @@
 require_once __DIR__.'/../BaseTestCase.php';
 
 use Bepado\SDK\Struct as Struct;
+use Bepado\SDK\Struct\Product;
 
 /**
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
@@ -35,7 +36,7 @@ class oxidProductFromShopTest extends BaseTestCase
 
         $this->productFromShop = new oxidProductFromShop();
         $this->productFromShop->setVersionLayer($this->versionLayer);
-        $this->sdkHelper = $this->getMock('mf_sdk_helper', array('createSdkConfigFromOxid'));
+        $this->sdkHelper = $this->getMockBuilder('mf_sdk_helper')->disableOriginalConstructor()->getMock();
 
         // create the objects for the mapping
         $this->oxUser = $this->getMockBuilder('oxUser')->disableOriginalConstructor()->getMock();
@@ -47,6 +48,7 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->oxArticle = $this->getMockBuilder('mf_bepado_oxarticle')->disableOriginalConstructor()->getMock();
         $this->converter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
         $this->articleHelper = $this->getMockBuilder('mf_sdk_article_helper')->disableOriginalConstructor()->getMock();
+        $this->sdk = $this->getMockBuilder('sdkMock')->disableOriginalConstructor()->getMock();
 
         $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
@@ -58,6 +60,7 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->sdkConfig->setProdMode(false);
         $this->sdkHelper->expects($this->any())->method('createSdkConfigFromOxid')->will($this->returnValue($this->sdkConfig));
         $this->sdkHelper->expects($this->any())->method('instantiateSdk')->will($this->returnValue($this->sdk));
+        $this->oxArticle->expects($this->any())->method('getId')->will($this->returnValue('some-id'));
     }
 
     public function tearDown()
@@ -73,9 +76,28 @@ class oxidProductFromShopTest extends BaseTestCase
         );
     }
 
+
     /**
      * @expectedException \Exception
-     * @expectedMessage "No user group for bepado remote shop found."
+     * @expectedExceptionMessage Shop with id some-id not known
+     */
+    public function testBuyWithNoShop()
+    {
+        $this->sdk
+            ->expects($this->once())
+            ->method('getShop')
+            ->with('some-id')
+            ->will($this->returnValue(false));
+        $order = new Struct\Order();
+        $order->providerShop = 'some-id';
+
+
+        $this->productFromShop->buy($order);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage No user group for bepado remote shop found.
      */
     public function testBuyWithNonExistingUserGroup()
     {
@@ -83,13 +105,20 @@ class oxidProductFromShopTest extends BaseTestCase
             ->method('load')
             ->with($this->equalTo(oxidProductFromShop::BEPADO_USERGROUP_ID))
             ->will($this->returnValue(false));
+        $this->sdk
+            ->expects($this->once())
+            ->method('getShop')
+            ->with('some-id')
+            ->will($this->returnValue(true));
+        $order = new Struct\Order();
+        $order->providerShop = 'some-id';
 
-        $this->productFromShop->buy(new Struct\Order());
+        $this->productFromShop->buy($order);
     }
 
     /**
      * @expectedException \Exception
-     * @expectedMessage "No valid products in basket"
+     * @expectedExceptionMessage No valid products in basket
      */
     public function testBuyWithEmptyBasket()
     {
@@ -98,34 +127,57 @@ class oxidProductFromShopTest extends BaseTestCase
             ->with($this->equalTo(oxidProductFromShop::BEPADO_USERGROUP_ID))
             ->will($this->returnValue(true));
 
+        $this->sdk
+            ->expects($this->once())
+            ->method('getShop')
+            ->with($this->equalTo('some-id'))
+            ->will($this->returnValue(true));
         $address = new Struct\Address();
         $order = new Struct\Order();
+        $order->providerShop = 'some-id';
+
         $order->billingAddress = $address;
         $order->deliveryAddress = $address;
-        $orderItem = new Struct\OrderItem();
-        $orderItem->count = 1;
-        $orderItem->product = new Struct\Product();
-        $order->orderItems[] = $orderItem;
+        $order->orderItems = array();
 
         $this->productFromShop->buy($order);
     }
 
     /**
      * @expectedException \Exception
-     * @expectedMessage "No Payment method found."
+     * @expectedExceptionMessage No Payment method found.
      */
     public function testBuyWithNoPaymentAction()
     {
         $this->oxGroup->expects($this->any())->method('load')->will($this->returnValue(true));
-        $this->oxDb->expects($this->any())->method('getOne')->will($this->returnValue('some-id'));
+        $this->oxDb->expects($this->any())->method('getOne')->will($this->returnValue(null));
         $address = new Struct\Address();
         $order = new Struct\Order();
+        $order->providerShop = 'some-id';
         $order->billingAddress = $address;
         $order->deliveryAddress = $address;
         $orderItem = new Struct\OrderItem();
         $orderItem->count = 1;
         $orderItem->product = new Struct\Product();
         $order->orderItems[] = $orderItem;
+
+        $this->sdk
+            ->expects($this->once())
+            ->method('getShop')
+            ->with($this->equalTo('some-id'))
+            ->will($this->returnValue(true));
+        $this->converter
+            ->expects($this->once())
+            ->method('fromBepadoToShop')
+            ->with($this->equalTo($orderItem->product))
+            ->will($this->returnValue($this->oxArticle));
+        $this->oxBasket
+            ->expects($this->once())
+            ->method('addToBasket')
+            ->with($this->equalTo('some-id'))
+            ;
+        $this->oxBasket->expects($this->once())->method('calculateBasket')->with($this->equalTo(true));
+        $this->oxBasket->expects($this->any())->method('getProductsCount')->will($this->returnValue(1));
 
         $this->productFromShop->buy($order);
     }
@@ -139,26 +191,22 @@ class oxidProductFromShopTest extends BaseTestCase
             ->expects($this->any())
             ->method('getSession')
             ->will($this->returnValue($session));
-
+        $this->sdk
+            ->expects($this->once())
+            ->method('getShop')
+            ->with($this->equalTo('some-id'))
+            ->will($this->returnValue(true));
         $address = new Struct\Address();
         $order = new Struct\Order();
+        $order->providerShop = 'some-id';
         $order->billingAddress = $address;
         $order->deliveryAddress = $address;
         $orderItem = new Struct\OrderItem();
         $orderItem->count = 1;
         $orderItem->product = new Struct\Product();
-        $orderItem->product->shopId = '__test__id__';
-        $orderItem->product->sourceId = 'test';
-        $orderItem->product->price = 0.99;
-        $orderItem->product->purchasePrice = 0.89;
-        $orderItem->product->availability = 3;
-        $orderItem->product->title = 'Test Product';
-        $orderItem->product->vendor = 'vendort-test';
-        $orderItem->product->vat = 0.19;
         $order->orderItems[] = $orderItem;
 
         // expectations for called methods
-        $this->oxPrice->expects($this->once())->method('setPrice')->with($this->equalTo(0));
         $this->oxBasket
             ->expects($this->once())
             ->method('setCost')
@@ -168,15 +216,35 @@ class oxidProductFromShopTest extends BaseTestCase
             ->method('finalizeOrder')
             ->with($this->equalTo($this->oxBasket), $this->equalTo($this->oxUser))
             ->will($this->returnValue('success-token'));
-        $this->oxUser
-            ->expects($this->once())
-            ->method('onOrderExecute')
-            ->with($this->equalTo($this->oxBasket), $this->equalTo('success-token'));
+        $this->oxUser->expects($this->once())->method('onOrderExecute')->with($this->equalTo($this->oxBasket), $this->equalTo('success-token'));
         $expectedId = 'some-id';
-        $this->oxOrder
+        $this->oxOrder->expects($this->once())->method('getId')->will($this->returnValue($expectedId));
+
+        $this->converter
             ->expects($this->once())
-            ->method('getId')
-            ->will($this->returnValue($expectedId));
+            ->method('fromBepadoToShop')
+            ->with($this->equalTo($orderItem->product))
+            ->will($this->returnValue($this->oxArticle));
+        $this->oxBasket
+            ->expects($this->once())
+            ->method('addToBasket')
+            ->with($this->equalTo('some-id'))
+        ;
+        $this->oxBasket->expects($this->once())->method('calculateBasket')->with($this->equalTo(true));
+        $this->oxBasket
+            ->expects($this->any())
+            ->method('getProductsCount')
+            ->will($this->returnValue(1));
+        $shippingCosts = new Struct\ShippingCosts();
+        $shippingCosts->shippingCosts = 10;
+        $shippingCosts->grossShippingCosts = 10*1.19;
+        $this->sdk
+            ->expects($this->once())
+            ->method('calculateShippingCosts')
+            ->with($this->equalTo($order))
+            ->will($this->returnValue($shippingCosts));
+        $this->oxPrice->expects($this->once())->method('setPrice')->with($this->equalTo(10), $this->equalTo(0.19));
+
         $session->expects($this->once())->method('delBasket');
 
         $actualId = $this->productFromShop->buy($order);
@@ -186,7 +254,7 @@ class oxidProductFromShopTest extends BaseTestCase
 
     /**
      * @expectedException \Exception
-     * @expectedMessage "No valid products in basket"
+     * @expectedExceptionMessage No valid products in basket
      */
     public function testReserveWithEmptyBasket()
     {
@@ -198,12 +266,27 @@ class oxidProductFromShopTest extends BaseTestCase
 
     /**
      * @expectedException \Exception
-     * @expectedMessage "Stock of articles is not valid"
+     * @expectedExceptionMessage Stock of articles is not valid
      */
     public function testReserveWithInvalidStock()
     {
         $order = new Struct\Order();
-        $order->orderItems = array();
+        $orderItem = new Struct\OrderItem();
+        $product = new Product();
+        $orderItem->count = 3;
+        $orderItem->product = $product;
+        $order->orderItems[] = $orderItem;
+        $this->converter
+            ->expects($this->once())
+            ->method('fromBepadoToShop')
+            ->with($this->equalTo($product))
+            ->will($this->returnValue($this->oxArticle));
+        $this->oxBasket->expects($this->once())->method('addToBasket')->with($this->equalTo('some-id'), $this->equalTo(3));
+        $this->oxBasket->expects($this->once())->method('calculateBasket')->with($this->equalTo(true));
+        $this->oxBasket
+            ->expects($this->once())
+            ->method('getProductsCount')
+            ->will($this->returnValue(3));
 
         // expected method calls
         $this->oxOrder->expects($this->once())->method('validateStock')->will($this->returnValue(false));
