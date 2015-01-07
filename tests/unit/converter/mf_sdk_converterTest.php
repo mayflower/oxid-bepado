@@ -29,7 +29,7 @@ class mf_sdk_converterTest extends BaseTestCase
         'fixedPrice'       => false,   # won't skip this in usual shops
         'currency'         => 'EUR',
         'freeDelivery'     => false,
-        'deliveryDate'     => null,
+        'deliveryDate'     => 1421622000,
         'availability'     => 10,
         'images'           => array('imgage-url-1'),
         'categories'       => array(),
@@ -190,6 +190,10 @@ class mf_sdk_converterTest extends BaseTestCase
                     $value = 110.00359999999999;
                 } elseif ('oxarticles__oxpricea' === $field) {
                     $value = 107.10;
+                } elseif ('oxarticles__oxdeltimeunit' === $field) {
+                    $value = 'DAY';
+                } elseif ('oxarticles__oxmaxdeltime' === $field) {
+                    $value = 10;
                 }
             }
             $values[] = array($field, $value, $testable);

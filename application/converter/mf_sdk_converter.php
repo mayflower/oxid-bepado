@@ -90,7 +90,7 @@ class mf_sdk_converter implements mf_converter_interface
         $sdkProduct->attributes = $this->mapAttributes($object);
 
         // deliveryDate
-        $deliveryDate = DateTime::createFromFormat('Y-m-j', $object->getFieldData('oxdelivery'));
+        $deliveryDate = DateTime::createFromFormat('Y-m-j H:i:s', $object->getFieldData('oxdelivery').' 00:00:00');
         $deliveryDateTimestamp = $deliveryDate->getTimestamp();
         if ($deliveryDateTimestamp > microtime(true)) {
             $sdkProduct->deliveryDate = $deliveryDateTimestamp;
