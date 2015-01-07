@@ -6,6 +6,10 @@ class mf_sdk_converter implements mf_converter_interface
 {
     const DEFAULT_PURCHASE_PRICE_CHAR = 'A';
 
+    const OXID_DELIVERY_UNIT_WEEK = 'WEEK';
+
+    const OXID_DELIVERY_UNIT_MONTH = 'MONTH';
+
     /**
      * @var VersionLayerInterface
      */
@@ -61,8 +65,7 @@ class mf_sdk_converter implements mf_converter_interface
         }
 
         $sdkProduct->vat = $object->getArticleVat() / 100;
-        // Price is net or brut depending on ShopConfig
-        // @todo find the purchase representation in oxid article prices, defaults atm on net price
+        // Price are net or brut depending on ShopConfig
         $sdkProduct->price = $object->getPrice()->getNettoPrice();
 
         // create the purchase price with the matching mode
@@ -87,7 +90,27 @@ class mf_sdk_converter implements mf_converter_interface
         $sdkProduct->attributes = $this->mapAttributes($object);
 
         // deliveryDate
+        $deliveryDate = DateTime::createFromFormat('Y-m-j H:i:s', $object->getFieldData('oxdelivery').' 00:00:00');
+        $deliveryDateTimestamp = $deliveryDate->getTimestamp();
+        if ($deliveryDateTimestamp > microtime(true)) {
+            $sdkProduct->deliveryDate = $deliveryDateTimestamp;
+        }
+
         // deliveryWorkDays
+        $maxDeliveryTime = (int) $object->getFieldData('oxmaxdeltime');
+        $deliveryUnit = $object->getFieldData('oxdeltimeunit');
+
+        switch ($deliveryUnit) {
+            case self::OXID_DELIVERY_UNIT_MONTH:
+                $deliveryUnit = 20;
+                break;
+            case self::OXID_DELIVERY_UNIT_WEEK:
+                $deliveryUnit = 5;
+                break;
+            default:
+                $deliveryUnit = 1;
+        }
+        $sdkProduct->deliveryWorkDays = $maxDeliveryTime * $deliveryUnit;
 
         return $sdkProduct;
     }
@@ -167,6 +190,12 @@ class mf_sdk_converter implements mf_converter_interface
                 }
             }
         }
+
+        // deliveryDate
+        $aParams['oxarticles__oxdelivery'] = date('Y-m-d', $object->deliveryDate);
+        // deliveryWorkDays
+        $aParams['oxarticles__oxmaxdeltime'] = $object->deliveryWorkDays;
+        $aParams['oxarticles__oxdeltimeunit'] = 'DAY';
 
         // Vendor: vendor name no use, only id can load vendor object
         // Category: category name no use id can load category object

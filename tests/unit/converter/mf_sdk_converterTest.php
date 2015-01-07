@@ -29,7 +29,7 @@ class mf_sdk_converterTest extends BaseTestCase
         'fixedPrice'       => false,   # won't skip this in usual shops
         'currency'         => 'EUR',
         'freeDelivery'     => false,
-        'deliveryDate'     => null,
+        'deliveryDate'     => 1421622000,
         'availability'     => 10,
         'images'           => array('imgage-url-1'),
         'categories'       => array(),
@@ -43,7 +43,7 @@ class mf_sdk_converterTest extends BaseTestCase
             Struct\Product::ATTRIBUTE_QUANTITY => 10,
             Struct\Product::ATTRIBUTE_UNIT => 'g'
         ),
-        'deliveryWorkDays' => null,
+        'deliveryWorkDays' => 10,
     );
 
     protected $articleValues = array(
@@ -61,6 +61,9 @@ class mf_sdk_converterTest extends BaseTestCase
         'oxarticles__oxunitquantity' => 10,
         'oxarticles__oxunitname'     => '_UNIT_G',
         'oxarticles__oxpic1'         => 'imgage-url-1',
+        'oxarticles__oxdelivery'     => '2015-01-19',
+        'oxarticles__oxmaxdeltime'   => '2',
+        'oxarticles__oxdeltimeunit'  => 'WEEK'
     );
 
     protected $sdkHelper;
@@ -187,6 +190,10 @@ class mf_sdk_converterTest extends BaseTestCase
                     $value = 110.00359999999999;
                 } elseif ('oxarticles__oxpricea' === $field) {
                     $value = 107.10;
+                } elseif ('oxarticles__oxdeltimeunit' === $field) {
+                    $value = 'DAY';
+                } elseif ('oxarticles__oxmaxdeltime' === $field) {
+                    $value = 10;
                 }
             }
             $values[] = array($field, $value, $testable);
