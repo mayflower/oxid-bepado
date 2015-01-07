@@ -244,12 +244,11 @@ class oxidProductFromShop implements ProductFromShop
      */
     private function addToBasket(array $orderItems, oxBasket $oxBasket)
     {
-        /** @var mf_sdk_converter $converter */
-        $converter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
         foreach ($orderItems as $item) {
             $oxBasket->addToBasket($item->product->sourceId, $item->count);
-            $oxBasket->calculateBasket(true);
         }
+
+        $oxBasket->calculateBasket(true);
     }
 
     /**
@@ -262,7 +261,7 @@ class oxidProductFromShop implements ProductFromShop
      */
     private function getOrCreateUser(Order $order)
     {
-        $shopId = $order->localOrderId;
+        $shopId = $order->orderShop;
         $shop = $this->getOrCreateSDK()->getShop($shopId);
 
         if (!$shop) {

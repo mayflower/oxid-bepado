@@ -89,8 +89,7 @@ class oxidProductFromShopTest extends BaseTestCase
             ->with('some-id')
             ->will($this->returnValue(false));
         $order = new Struct\Order();
-        $order->providerShop = 'some-id';
-
+        $order->orderShop = 'some-id';
 
         $this->productFromShop->buy($order);
     }
@@ -111,7 +110,7 @@ class oxidProductFromShopTest extends BaseTestCase
             ->with('some-id')
             ->will($this->returnValue(true));
         $order = new Struct\Order();
-        $order->providerShop = 'some-id';
+        $order->orderShop = 'some-id';
 
         $this->productFromShop->buy($order);
     }
@@ -134,7 +133,7 @@ class oxidProductFromShopTest extends BaseTestCase
             ->will($this->returnValue(true));
         $address = new Struct\Address();
         $order = new Struct\Order();
-        $order->providerShop = 'some-id';
+        $order->orderShop = 'some-id';
 
         $order->billingAddress = $address;
         $order->deliveryAddress = $address;
@@ -153,12 +152,13 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->oxDb->expects($this->any())->method('getOne')->will($this->returnValue(null));
         $address = new Struct\Address();
         $order = new Struct\Order();
-        $order->providerShop = 'some-id';
+        $order->orderShop = 'some-id';
         $order->billingAddress = $address;
         $order->deliveryAddress = $address;
         $orderItem = new Struct\OrderItem();
         $orderItem->count = 1;
         $orderItem->product = new Struct\Product();
+        $orderItem->product->sourceId = 'some-product-id';
         $order->orderItems[] = $orderItem;
 
         $this->sdk
@@ -166,15 +166,10 @@ class oxidProductFromShopTest extends BaseTestCase
             ->method('getShop')
             ->with($this->equalTo('some-id'))
             ->will($this->returnValue(true));
-        $this->converter
-            ->expects($this->once())
-            ->method('fromBepadoToShop')
-            ->with($this->equalTo($orderItem->product))
-            ->will($this->returnValue($this->oxArticle));
         $this->oxBasket
             ->expects($this->once())
             ->method('addToBasket')
-            ->with($this->equalTo('some-id'))
+            ->with($this->equalTo('some-product-id'), $this->equalTo(1))
             ;
         $this->oxBasket->expects($this->once())->method('calculateBasket')->with($this->equalTo(true));
         $this->oxBasket->expects($this->any())->method('getProductsCount')->will($this->returnValue(1));
@@ -198,12 +193,13 @@ class oxidProductFromShopTest extends BaseTestCase
             ->will($this->returnValue(true));
         $address = new Struct\Address();
         $order = new Struct\Order();
-        $order->providerShop = 'some-id';
+        $order->orderShop = 'some-id';
         $order->billingAddress = $address;
         $order->deliveryAddress = $address;
         $orderItem = new Struct\OrderItem();
         $orderItem->count = 1;
         $orderItem->product = new Struct\Product();
+        $orderItem->product->sourceId = 'some-product-id';
         $order->orderItems[] = $orderItem;
 
         // expectations for called methods
@@ -220,15 +216,10 @@ class oxidProductFromShopTest extends BaseTestCase
         $expectedId = 'some-id';
         $this->oxOrder->expects($this->once())->method('getId')->will($this->returnValue($expectedId));
 
-        $this->converter
-            ->expects($this->once())
-            ->method('fromBepadoToShop')
-            ->with($this->equalTo($orderItem->product))
-            ->will($this->returnValue($this->oxArticle));
         $this->oxBasket
             ->expects($this->once())
             ->method('addToBasket')
-            ->with($this->equalTo('some-id'))
+            ->with($this->equalTo('some-product-id'), $this->equalTo(1))
         ;
         $this->oxBasket->expects($this->once())->method('calculateBasket')->with($this->equalTo(true));
         $this->oxBasket
@@ -260,36 +251,6 @@ class oxidProductFromShopTest extends BaseTestCase
     {
         $order = new Struct\Order();
         $order->orderItems = array();
-
-        $this->productFromShop->reserve($order);
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Stock of articles is not valid
-     */
-    public function testReserveWithInvalidStock()
-    {
-        $order = new Struct\Order();
-        $orderItem = new Struct\OrderItem();
-        $product = new Product();
-        $orderItem->count = 3;
-        $orderItem->product = $product;
-        $order->orderItems[] = $orderItem;
-        $this->converter
-            ->expects($this->once())
-            ->method('fromBepadoToShop')
-            ->with($this->equalTo($product))
-            ->will($this->returnValue($this->oxArticle));
-        $this->oxBasket->expects($this->once())->method('addToBasket')->with($this->equalTo('some-id'), $this->equalTo(3));
-        $this->oxBasket->expects($this->once())->method('calculateBasket')->with($this->equalTo(true));
-        $this->oxBasket
-            ->expects($this->once())
-            ->method('getProductsCount')
-            ->will($this->returnValue(3));
-
-        // expected method calls
-        $this->oxOrder->expects($this->once())->method('validateStock')->will($this->returnValue(false));
 
         $this->productFromShop->reserve($order);
     }
