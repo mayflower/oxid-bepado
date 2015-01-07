@@ -6,6 +6,10 @@ class mf_sdk_converter implements mf_converter_interface
 {
     const DEFAULT_PURCHASE_PRICE_CHAR = 'A';
 
+    const OXID_DELIVERY_UNIT_WEEK = 'WEEK';
+
+    const OXID_DELIVERY_UNIT_MONTH = 'MONTH';
+
     /**
      * @var VersionLayerInterface
      */
@@ -86,27 +90,27 @@ class mf_sdk_converter implements mf_converter_interface
         $sdkProduct->attributes = $this->mapAttributes($object);
 
         // deliveryDate
-        $delDate = explode('-', $object->getFieldData('oxdelivery'));
-        $delDate = mktime(0, 0, 0, $delDate[1], $delDate[2], $delDate[0]);
-        if ($delDate > microtime(true)) {
-            $sdkProduct->deliveryDate = $delDate;
+        $deliveryDate = DateTime::createFromFormat('Y-m-j', $object->getFieldData('oxdelivery'));
+        $deliveryDateTimestamp = $deliveryDate->getTimestamp();
+        if ($deliveryDateTimestamp > microtime(true)) {
+            $sdkProduct->deliveryDate = $deliveryDateTimestamp;
         }
 
         // deliveryWorkDays
-        $maxDelTime = $object->getFieldData('oxmaxdeltime');
-        $delUnit = $object->getFieldData('oxdeltimeunit');
+        $maxDeliveryTime = (int) $object->getFieldData('oxmaxdeltime');
+        $deliveryUnit = $object->getFieldData('oxdeltimeunit');
 
-        switch ($delUnit) {
-            case 'WEEK':
-                $delUnit = 5;
+        switch ($deliveryUnit) {
+            case self::OXID_DELIVERY_UNIT_MONTH:
+                $deliveryUnit = 20;
                 break;
-            case 'MONTH':
-                $delUnit = 20;
+            case self::OXID_DELIVERY_UNIT_WEEK:
+                $deliveryUnit = 5;
                 break;
             default:
-                $delUnit = 1;
+                $deliveryUnit = 1;
         }
-        $sdkProduct->deliveryWorkDays = $maxDelTime * $delUnit;
+        $sdkProduct->deliveryWorkDays = $maxDeliveryTime * $deliveryUnit;
 
         return $sdkProduct;
     }
