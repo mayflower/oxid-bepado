@@ -14,22 +14,29 @@ class EventListener
         /** @var mf_sdk_logger_helper $logger */
         $logger = self::getVersionLayer()->createNewObject('mf_sdk_logger_helper');
 
+        // add all SDK schema files to the list
         $schemaDir = __DIR__ . '/../../vendor/bepado/sdk/src/schema';
         $sqlFiles = array_filter(
             scandir($schemaDir),
             function ($file) { return substr($file, -4) === '.sql'; }
         );
+        $paths = array();
+        foreach ($sqlFiles as $file) {
+            $paths[] = $schemaDir.'/'.$file;
+        }
+
+        // add all our files to the list
         $schemaDir = __DIR__ . '/../install';
-        $sqlFiles = array_merge(
-            $sqlFiles,
-            array_filter(
+        $sqlFiles = array_filter(
                 scandir($schemaDir),
                 function ($file) { return substr($file, -4) === '.sql'; }
-            )
         );
+        foreach ($sqlFiles as $file) {
+            $paths[] = $schemaDir.'/'.$file;
+        }
 
-        foreach ($sqlFiles as $sqlFile) {
-            $sql = file_get_contents($schemaDir . '/' . $sqlFile);
+        foreach ($paths as $sqlFile) {
+            $sql = file_get_contents($sqlFile);
             $sql = str_replace("\n", "", $sql);
             $queries = explode(';', $sql);
 

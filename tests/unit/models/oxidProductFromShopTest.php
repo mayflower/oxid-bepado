@@ -235,7 +235,7 @@ class oxidProductFromShopTest extends BaseTestCase
             ->expects($this->any())
             ->method('getProductsCount')
             ->will($this->returnValue(1));
-        $shippingCosts = new Struct\ShippingCosts();
+        $shippingCosts = new Struct\TotalShippingCosts();
         $shippingCosts->shippingCosts = 10;
         $shippingCosts->grossShippingCosts = 10*1.19;
         $this->sdk
