@@ -365,33 +365,6 @@ class mf_sdk_product_helperTest extends BaseTestCase
     }
 
     /**
-     * @expectedException \oxNoArticleException
-     */
-    public function testReservationDefaultException()
-    {
-        $sdkOrder = new Struct\Order();
-        $orderItem = new Struct\OrderItem();
-        $sdkOrder->orderItems = array($orderItem);
-        $sdkReservation = new Reservation();
-        $oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
-
-        // expected method calls
-        $this->orderConverter
-            ->expects($this->once())
-            ->method('fromShopToBepado')
-            ->with($this->equalTo($oxOrder))
-            ->will($this->returnValue($sdkOrder));
-        $this->sdk
-            ->expects($this->once())
-            ->method('reserveProducts')
-            ->with($this->equalTo($sdkOrder))
-            ->will($this->returnValue($sdkReservation));
-        $sdkReservation->success = false;
-
-        $this->helper->reserveProductsInOrder($oxOrder);
-    }
-
-    /**
      * @expectedException \oxOutOfStockException
      * @expectedExceptionMessage test message: 10
      */
@@ -427,7 +400,6 @@ class mf_sdk_product_helperTest extends BaseTestCase
 
         $this->helper->reserveProductsInOrder($oxOrder);
     }
-
 
     /**
      * @expectedException \oxArticleInputException
