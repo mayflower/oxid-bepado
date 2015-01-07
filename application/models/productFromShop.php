@@ -262,6 +262,8 @@ class oxidProductFromShop implements ProductFromShop
     private function getOrCreateUser(Order $order)
     {
         $shopId = $order->orderShop;
+        $userName = $order->billingAddress->email;
+
         $shop = $this->getOrCreateSDK()->getShop($shopId);
 
         if (!$shop) {
@@ -275,7 +277,7 @@ class oxidProductFromShop implements ProductFromShop
 
         /** @var oxUser $shopUser */
         $shopUser = $this->_oVersionLayer->createNewObject('oxuser');
-        $selectQuery = $shopUser->buildSelectString(array('OXUSERNAME' => $shopId, 'OXACTIVE' => 1));
+        $selectQuery = $shopUser->buildSelectString(array('OXUSERNAME' => $userName, 'OXACTIVE' => 1));
 
         $userId = $this->getVersionLayer()->getDb(true)->getOne($selectQuery);
         if ($userId) {
@@ -285,7 +287,7 @@ class oxidProductFromShop implements ProductFromShop
         // creates the shop as an user if it does not exist
         if (!$shopUser->isLoaded()) {
             $values = array(
-                'oxuser__oxusername'   => $shopId,
+                'oxuser__oxusername'   => $userName,
                 'oxuser__oxurl'        => $shop->url,
                 'oxuser__oxactive'     => true,
             );
