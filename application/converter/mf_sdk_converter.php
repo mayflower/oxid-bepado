@@ -272,7 +272,7 @@ class mf_sdk_converter implements mf_converter_interface
             Product::ATTRIBUTE_DIMENSION => $sDimension,
             // reference quantity is always 1 in oxid shop
             Product::ATTRIBUTE_REFERENCE_QUANTITY => 1,
-            Product::ATTRIBUTE_QUANTITY => $oxProduct->oxarticles__oxunitquantity->value,        # @todo need to be found
+            Product::ATTRIBUTE_QUANTITY => $oxProduct->oxarticles__oxunitquantity->value,
         );
 
         // set optional unit
