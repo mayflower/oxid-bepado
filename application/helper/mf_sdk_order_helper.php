@@ -56,10 +56,6 @@ class mf_sdk_order_helper extends mf_abstract_helper
         if ($deleted || $oOrder->getFieldData('oxstorno')) {
             $orderStatus->status = OrderStatus::STATE_CANCELED;
             $message->message = 'Provider shop canceled the order';
-        } elseif ($this->isJustPayed($oOrder)) {
-            $orderStatus->status = OrderStatus::STATE_IN_PROCESS;
-            $message->message = 'Provider shop has received payment on %payedDate';
-            $message->values['payedDate'] = $oOrder->getFieldData('oxpaid');
         } elseif ($this->deliveryDataWasJustSet()) {
             $orderStatus->status = OrderStatus::STATE_DELIVERED;
             $message->message = 'Provider shop has processed and delivered order on %senddate.';
@@ -67,10 +63,12 @@ class mf_sdk_order_helper extends mf_abstract_helper
         } elseif ($this->deliveryDataWasJustRemoved()) {
             $orderStatus->status = OrderStatus::STATE_ERROR;
             $message->message = 'Provider shop removed the former order date';
+        } elseif ($this->isJustPayed($oOrder)) {
+            $orderStatus->status = OrderStatus::STATE_IN_PROCESS;
+            $message->message = 'Provider shop has received payment on %payedDate';
+            $message->values['payedDate'] = $oOrder->getFieldData('oxpaid');
         }
         $orderStatus->messages[] = $message;
-
-        file_put_contents('/tmp/changes', "OrderState: ".serialize($orderStatus).PHP_EOL.PHP_EOL, FILE_APPEND);
 
         // update non open states only to bepado, to not report every initialized order again
         if ($orderStatus->status === OrderStatus::STATE_OPEN) {
@@ -120,7 +118,7 @@ class mf_sdk_order_helper extends mf_abstract_helper
      */
     private function deliveryDataWasJustSet()
     {
-        return $this->getVersionLayer()->getConfig()->getRequestParameter('fnc') === 'sendorder';
+        return $this->getVersionLayer()->getConfig()->getRequestParameter('fnc') == 'sendorder';
     }
 
     /**
@@ -131,6 +129,6 @@ class mf_sdk_order_helper extends mf_abstract_helper
      */
     private function deliveryDataWasJustRemoved()
     {
-        return $this->getVersionLayer()->getConfig()->getRequestParameter('fnc') === 'resetorder';
+        return $this->getVersionLayer()->getConfig()->getRequestParameter('fnc') == 'resetorder';
     }
 }
