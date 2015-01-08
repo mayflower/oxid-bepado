@@ -89,3 +89,6 @@ INSERT INTO oxdelivery (`OXID`, `OXACTIVE`, `OXTITLE`, `OXSHOPID`) VALUES ('bepa
 /* Article can be marked as imported article in order */
 ALTER TABLE oxorderarticles ADD imported TINYINT;
 
+/* Field to persist the bepado order state to not send an state again */
+ALTER TABLE oxorder ADD mf_bepado_state VARCHAR(50);
+

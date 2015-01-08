@@ -50,20 +50,20 @@ class mf_oxOrder extends mf_oxOrder_parent
     /**
      * {@inheritDoc}
      */
-    public function save()
+    public function save($updateOrderState = true)
     {
-        $sOxId = parent::save();
-
+        $orderId = parent::save();
         $oOrder = oxNew("oxorder");
-        if ($sOxId != "-1") {
-            $oOrder->load($sOxId);
-        } else {
-            return;
+        $oOrder->load($orderId);
+        if (!$oOrder->isLoaded() || !$updateOrderState) {
+            return $orderId;
         }
 
         /** @var mf_sdk_order_helper $helper */
         $helper = $this->getVersionLayer()->createNewObject('mf_sdk_order_helper');
-        $helper->updateOrderStatus($oOrder);
+        $helper->checkForOrderStateUpdates($oOrder);
+
+        return $orderId;
     }
 
     /**
@@ -89,7 +89,7 @@ class mf_oxOrder extends mf_oxOrder_parent
 
         /** @var mf_sdk_order_helper $helper */
         $helper = $this->getVersionLayer()->createNewObject('mf_sdk_order_helper');
-        $helper->updateOrderStatus($oOrder, 1);
+        $helper->checkForOrderStateUpdates($oOrder, true);
 
         parent::delete($sOxId);
     }

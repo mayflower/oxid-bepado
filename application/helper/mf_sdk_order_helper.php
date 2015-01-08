@@ -11,157 +11,84 @@ class mf_sdk_order_helper extends mf_abstract_helper
      */
     protected $sdk;
 
-    /**
-     * @var Message
-     */
-    protected $message;
-
-    /**
-     * @var array
-     */
-    protected $values;
-
-    /**
-     * @var OrderStatus
-     */
-    protected $orderStatus;
-
-
-    public function updateOrderStatus($oOrder, $flag = null)
+    public function checkForOrderStateUpdates($oOrder, $deleted = null)
     {
-       if ($this->areExportItems($oOrder)) {
-            $this->updateStatus($oOrder, $flag);
+       if ($this->hasExportedArticles($oOrder)) {
+            $this->doUpdateOrderState($oOrder, $deleted);
        }
     }
 
     /**
-     * @param oxorder $oOrder
+     * Just one exported article is enough to decide whether an order needs to be checked for
+     * order state updates or not.
+     *
+     * @param oxOrder $oOrder
      * @return bool
      */
-    private function areExportItems($oOrder)
+    private function hasExportedArticles(oxOrder $oOrder)
     {
-        $oItems = $oOrder->getOrderArticles($oOrder);
-
+        /** @var mf_sdk_article_helper $helper */
         $helper = $this->getVersionLayer()->createNewObject('mf_sdk_article_helper');
 
-        foreach ($oItems as $oItem) {
+        foreach ($oOrder->getOrderArticles() as $oItem) {
             $oArticle = $oItem->getArticle();
-            $state = $helper->getArticleBepadoState($oArticle);
-
-            if ($state != 1) {
-                return false;
+            if ($helper->isArticleExported($oArticle)) {
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     /**
      * OrderStatus Id = Order providerOrderId = oxorder Id
      *
-     * @param oxorder $oOrder
-     * @param int|null $flag
+     * @param oxOrder  $oOrder
+     * @param int|null $deleted
      */
-    private function updateStatus($oOrder, $flag)
+    private function doUpdateOrderState(oxOrder $oOrder, $deleted)
     {
-        $this->orderStatus = new OrderStatus();
-        $this->orderStatus->id = $oOrder->getId();
-        $this->orderStatus->status = OrderStatus::STATE_OPEN;
+        $orderStatus = new OrderStatus();
+        $orderStatus->id = $oOrder->getId();
+        $orderStatus->status = OrderStatus::STATE_OPEN;
 
-        $this->message = new Message();
-        $this->message->message = 'Provider shop has received order.';
+        $message = new Message();
+        if ($deleted || $oOrder->getFieldData('oxstorno')) {
+            $orderStatus->status = OrderStatus::STATE_CANCELED;
+            $message->message = 'Provider shop canceled the order';
+        } elseif ($this->isJustPayed($oOrder)) {
+            $orderStatus->status = OrderStatus::STATE_IN_PROCESS;
+            $message->message = 'Provider shop has received payment on %payedDate';
+            $message->values['payedDate'] = $oOrder->getFieldData('oxpaid');
+        } elseif ($this->deliveryDataWasJustSet($oOrder)) {
+            $orderStatus->status = OrderStatus::STATE_DELIVERED;
+            $message->message = 'Provider shop has processed and delivered order on %senddate.';
+            $message->values['senddate'] = $oOrder->getFieldData('oxsenddate');
+        } elseif ($this->deliveryDataWasJustRemoved($oOrder)) {
+            $orderStatus->status = OrderStatus::STATE_ERROR;
+            $message->message = 'Provider shop removed the former order date';
+        }
+        $orderStatus->messages[] = $message;
 
-        $this->values = array(
-            'date'                        => date('o-m-d H:i:s'),
-            OrderStatus::STATE_OPEN       => 1,
-            'paydate'                     => 0,
-            OrderStatus::STATE_IN_PROCESS => 0,
-            'senddate'                    => 0,
-            OrderStatus::STATE_DELIVERED  => 0,
-            OrderStatus::STATE_CANCELED   => 0,
-            OrderStatus::STATE_ERROR      => 0
-        );
-
-        $this->isOrderInProcess($oOrder);
-        $this->isOrderDelivered($oOrder);
-        $this->isOrderCanceled($oOrder);
-        $this->isOrderError($oOrder, $flag);
-
-        if ($flag && !($this->values[OrderStatus::STATE_ERROR])) {
+        // update own state in DB when changed
+        if ($orderStatus->status === $oOrder->getFieldData('mf_bepado_state')) {
             return;
         }
 
-        $this->message->values = $this->values;
+        $oOrder->mf_bepado_state = new oxField($orderStatus->status);
+        $oOrder->save(false);
 
-        $this->orderStatus->messages = $this->message;
+        // update non open states only to bepado, to not report every initialized order again
+        if ($orderStatus->status === OrderStatus::STATE_OPEN) {
+            return;
+        }
 
         try{
-            #$this->getSdk()->updateOrderStatus($this->orderStatus);
+            $this->getSdk()->updateOrderStatus($orderStatus);
         } catch (\Exception $e){
             /** @var mf_sdk_logger_helper $helper */
             $helper = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
-            $helper->writeBepadoLog($e->getMessage(), $this->values);
-        }
-    }
-
-    private function isOrderInProcess($oOrder)
-    {
-        if ($oOrder->getFieldData('oxpaid') !== '0000-00-00 00:00:00') {
-            $this->message->message = 'Provider shop has received payment';
-            $this->values['paydate']                     = $oOrder->getFieldData('oxpaid');;
-            $this->values[OrderStatus::STATE_IN_PROCESS] = 1;
-            $this->values[OrderStatus::STATE_OPEN]       = 0;
-
-            $this->orderStatus->status = OrderStatus::STATE_IN_PROCESS;
-        }
-    }
-
-    private function isOrderDelivered($oOrder)
-    {
-        if ($this->getVersionLayer()->getConfig()->getRequestParameter('fnc') === 'sendorder') {
-            $this->message->message = 'Provider shop has processed and delivered order.';
-            $this->values[OrderStatus::STATE_DELIVERED]  = 1;
-            $this->values['senddate']                    = $oOrder->getFieldData('oxsenddate');
-            $this->values[OrderStatus::STATE_OPEN]       = 0;
-            $this->values[OrderStatus::STATE_IN_PROCESS] = 0;
-
-            $this->orderStatus->status = OrderStatus::STATE_DELIVERED;
-        }
-    }
-
-    private function isOrderCanceled($oOrder)
-    {
-        if ($oOrder->getFieldData('oxstorno')) {
-            $this->message->message = 'Provider shop has canceled order.';
-            $this->values[OrderStatus::STATE_CANCELED]   = 1;
-            $this->values[OrderStatus::STATE_OPEN]       = 0;
-            $this->values[OrderStatus::STATE_IN_PROCESS] = 0;
-
-            $this->orderStatus->status = OrderStatus::STATE_CANCELED;
-        }
-    }
-
-    private function isOrderError($oOrder, $flag)
-    {
-        if (
-            $oOrder->getFieldData('oxtransstatus') === 'NOT_FINISHED' &&
-            ($this->values[OrderStatus::STATE_DELIVERED] || $this->values[OrderStatus::STATE_IN_PROCESS])
-        ) {
-            $this->message->message = 'There was an error in the provider shop.';
-            $this->values[OrderStatus::STATE_ERROR]      = 1;
-            $this->values[OrderStatus::STATE_OPEN]       = 0;
-            $this->values[OrderStatus::STATE_IN_PROCESS] = 0;
-
-            $this->orderStatus->status = OrderStatus::STATE_ERROR;
-        }
-
-        if ($flag === 1 && ($this->values[OrderStatus::STATE_OPEN] || $this->values[OrderStatus::STATE_IN_PROCESS])) {
-            $this->message->message = 'Provider shop has deleted order without processing it.';
-            $this->values[OrderStatus::STATE_ERROR]      = 1;
-            $this->values[OrderStatus::STATE_OPEN]       = 0;
-            $this->values[OrderStatus::STATE_IN_PROCESS] = 0;
-
-            $this->orderStatus->status = OrderStatus::STATE_ERROR;
+            $helper->writeBepadoLog($e->getMessage(), array('OrderState' => $orderStatus));
         }
     }
 
@@ -177,5 +104,46 @@ class mf_sdk_order_helper extends mf_abstract_helper
         }
 
         return $this->sdk;
+    }
+
+    /**
+     * Orders can be switched from open to in_progress only to be marked as just payed.
+     *
+     * @param oxOrder $oOrder
+     *
+     * @return bool
+     */
+    private function isJustPayed(oxOrder $oOrder)
+    {
+        return $oOrder->getFieldData('oxpaid') !== '0000-00-00 00:00:00'
+            && $oOrder->getFieldData('mf_bepado_state') === OrderStatus::STATE_OPEN;
+    }
+
+    /**
+     * Returns true when somebody hits the "set delivery" date button. Should work on both
+     * order_main and order_overview as both should call oxOrder::save().
+     *
+     * @param oxOrder $oxOrder
+     *
+     * @return bool
+     */
+    private function deliveryDataWasJustSet(oxOrder $oxOrder)
+    {
+        return $this->getVersionLayer()->getConfig()->getRequestParameter('fnc') === 'sendorder'
+            && $oxOrder->getFieldData('mf_bepado_state') !== OrderStatus::STATE_DELIVERED;
+    }
+
+    /**
+     * Returns true when somebody hits the "reset delivery" date button. Should work on both
+     * order_main and order_overview as both should call oxOrder::save().
+     *
+     * @param oxOrder $oxOrder
+     *
+     * @return bool
+     */
+    private function deliveryDataWasJustRemoved(oxOrder $oxOrder)
+    {
+        return $this->getVersionLayer()->getConfig()->getRequestParameter('fnc') === 'resetorder'
+        && $oxOrder->getFieldData('mf_bepado_state') === OrderStatus::STATE_DELIVERED;
     }
 }
