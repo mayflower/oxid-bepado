@@ -82,7 +82,6 @@ class mf_sdk_order_helperTest extends BaseTestCase
             ->expects($this->any())
             ->method('getFieldData')
             ->will($this->returnValueMap($map));
-        $this->oxOrder->expects($this->once())->method('save')->with($this->equalTo(false));
 
         $this->sdk->expects($this->never())->method('updateOrderStatus');
 
@@ -103,7 +102,6 @@ class mf_sdk_order_helperTest extends BaseTestCase
             ->expects($this->any())
             ->method('getFieldData')
             ->will($this->returnValueMap($map));
-        $this->oxOrder->expects($this->once())->method('save')->with($this->equalTo(false));
 
         $expectedOrder = new OrderStatus();
         $expectedOrder->id = 'test-id';
@@ -132,7 +130,6 @@ class mf_sdk_order_helperTest extends BaseTestCase
             ->expects($this->any())
             ->method('getFieldData')
             ->will($this->returnValueMap($map));
-        $this->oxOrder->expects($this->once())->method('save')->with($this->equalTo(false));
 
         $expectedOrder = new OrderStatus();
         $expectedOrder->id = 'test-id';
@@ -172,7 +169,6 @@ class mf_sdk_order_helperTest extends BaseTestCase
             ->expects($this->any())
             ->method('getFieldData')
             ->will($this->returnValueMap($map));
-        $this->oxOrder->expects($this->once())->method('save')->with($this->equalTo(false));
 
         $expectedOrder = new OrderStatus();
         $expectedOrder->id = 'test-id';
@@ -211,7 +207,6 @@ class mf_sdk_order_helperTest extends BaseTestCase
             ->expects($this->any())
             ->method('getFieldData')
             ->will($this->returnValueMap($map));
-        $this->oxOrder->expects($this->once())->method('save')->with($this->equalTo(false));
 
         $expectedOrder = new OrderStatus();
         $expectedOrder->id = 'test-id';
@@ -239,7 +234,6 @@ class mf_sdk_order_helperTest extends BaseTestCase
             ->expects($this->any())
             ->method('getFieldData')
             ->will($this->returnValueMap($map));
-        $this->oxOrder->expects($this->once())->method('save')->with($this->equalTo(false));
 
         $expectedOrder = new OrderStatus();
         $expectedOrder->id = 'test-id';
