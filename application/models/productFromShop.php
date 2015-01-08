@@ -135,7 +135,8 @@ class oxidProductFromShop implements ProductFromShop
         }
 
         $oxBasket->setPayment($oxPaymentID);
-        $shippingCosts = $this->getOrCreateSDK()->calculateShippingCosts($order);
+        $shippingOrder = clone $order;
+        $shippingCosts = $this->getOrCreateSDK()->calculateShippingCosts($shippingOrder);
 
         /** @var oxPrice $oxPrice with the decision for the price mode*/
         $oxPrice = $this->getVersionLayer()->createNewObject('oxprice');
