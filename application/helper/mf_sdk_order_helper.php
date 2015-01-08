@@ -70,12 +70,14 @@ class mf_sdk_order_helper extends mf_abstract_helper
         }
         $orderStatus->messages[] = $message;
 
+        file_put_contents('/tmp/changes', "OrderState: ".serialize($orderStatus).PHP_EOL.PHP_EOL, FILE_APPEND);
+
         // update own state in DB when changed
-        if ($orderStatus->status === $oOrder->getFieldData('mf_bepado_state')) {
+        if ($orderStatus->status === $oOrder->getFieldData('mfbepadostate')) {
             return;
         }
 
-        $oOrder->mf_bepado_state = new oxField($orderStatus->status);
+        $oOrder->assign(array('oxorder__mfbepadostate' => $orderStatus->status));
         $oOrder->save(false);
 
         // update non open states only to bepado, to not report every initialized order again
@@ -115,8 +117,10 @@ class mf_sdk_order_helper extends mf_abstract_helper
      */
     private function isJustPayed(oxOrder $oOrder)
     {
+        file_put_contents('/tmp/changes', "Payed: \n".$oOrder->getFieldData('oxpaid').PHP_EOL, FILE_APPEND);
+        file_put_contents('/tmp/changes', "State: \n".$oOrder->getFieldData('mfbepadostate').PHP_EOL, FILE_APPEND);
         return $oOrder->getFieldData('oxpaid') !== '0000-00-00 00:00:00'
-            && $oOrder->getFieldData('mf_bepado_state') === OrderStatus::STATE_OPEN;
+            && ($oOrder->getFieldData('mfbepadostate') === OrderStatus::STATE_OPEN || null === $oOrder->getFieldData('mfbepadostate'));
     }
 
     /**
@@ -130,7 +134,7 @@ class mf_sdk_order_helper extends mf_abstract_helper
     private function deliveryDataWasJustSet(oxOrder $oxOrder)
     {
         return $this->getVersionLayer()->getConfig()->getRequestParameter('fnc') === 'sendorder'
-            && $oxOrder->getFieldData('mf_bepado_state') !== OrderStatus::STATE_DELIVERED;
+            && $oxOrder->getFieldData('mfbepadostate') !== OrderStatus::STATE_DELIVERED;
     }
 
     /**
@@ -144,6 +148,6 @@ class mf_sdk_order_helper extends mf_abstract_helper
     private function deliveryDataWasJustRemoved(oxOrder $oxOrder)
     {
         return $this->getVersionLayer()->getConfig()->getRequestParameter('fnc') === 'resetorder'
-        && $oxOrder->getFieldData('mf_bepado_state') === OrderStatus::STATE_DELIVERED;
+        && $oxOrder->getFieldData('mfbepadostate') === OrderStatus::STATE_DELIVERED;
     }
 }

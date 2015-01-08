@@ -93,7 +93,7 @@ class mf_sdk_order_helperTest extends BaseTestCase
     {
         $map = array(
             array('oxtransstatus', 'NOT_FINISHED'),
-            array('mf_bepado_state', OrderStatus::STATE_OPEN),
+            array('mfbepadostate', OrderStatus::STATE_OPEN),
             array('oxpaid', '2015-01-15 00:00:00'),
             array('oxsenddate', ''),
             array('oxstorno', '0'),
@@ -122,7 +122,7 @@ class mf_sdk_order_helperTest extends BaseTestCase
     {
         $map = array(
             array('oxtransstatus', 'NOT_FINISHED'),
-            array('mf_bepado_state', OrderStatus::STATE_IN_PROCESS),
+            array('mfbepadostate', OrderStatus::STATE_IN_PROCESS),
             array('oxpaid', '2015-01-15 00:00:00'),
             array('oxsenddate', '2015-01-15 00:00:00'),
             array('oxstorno', '0'),
@@ -162,7 +162,7 @@ class mf_sdk_order_helperTest extends BaseTestCase
 
         $map = array(
             array('oxtransstatus', 'NOT_FINISHED'),
-            array('mf_bepado_state', OrderStatus::STATE_DELIVERED),
+            array('mfbepadostate', OrderStatus::STATE_DELIVERED),
             array('oxpaid', '2015-01-15 00:00:00'),
             array('oxsenddate', '2015-01-15 00:00:00'),
             array('oxstorno', '0'),
@@ -201,7 +201,7 @@ class mf_sdk_order_helperTest extends BaseTestCase
 
         $map = array(
             array('oxtransstatus', 'NOT_FINISHED'),
-            array('mf_bepado_state', OrderStatus::STATE_DELIVERED),
+            array('mfbepadostate', OrderStatus::STATE_DELIVERED),
             array('oxpaid', '2015-01-15 00:00:00'),
             array('oxsenddate', '2015-01-15 00:00:00'),
             array('oxstorno', '0'),
@@ -229,7 +229,7 @@ class mf_sdk_order_helperTest extends BaseTestCase
     {
         $map = array(
             array('oxtransstatus', 'NOT_FINISHED'),
-            array('mf_bepado_state', OrderStatus::STATE_DELIVERED),
+            array('mfbepadostate', OrderStatus::STATE_DELIVERED),
             array('oxpaid', '2015-01-15 00:00:00'),
             array('oxsenddate', '2015-01-15 00:00:00'),
             array('oxstorno', '1'),
