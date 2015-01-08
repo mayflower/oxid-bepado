@@ -60,25 +60,17 @@ class mf_sdk_order_helper extends mf_abstract_helper
             $orderStatus->status = OrderStatus::STATE_IN_PROCESS;
             $message->message = 'Provider shop has received payment on %payedDate';
             $message->values['payedDate'] = $oOrder->getFieldData('oxpaid');
-        } elseif ($this->deliveryDataWasJustSet($oOrder)) {
+        } elseif ($this->deliveryDataWasJustSet()) {
             $orderStatus->status = OrderStatus::STATE_DELIVERED;
             $message->message = 'Provider shop has processed and delivered order on %senddate.';
             $message->values['senddate'] = $oOrder->getFieldData('oxsenddate');
-        } elseif ($this->deliveryDataWasJustRemoved($oOrder)) {
+        } elseif ($this->deliveryDataWasJustRemoved()) {
             $orderStatus->status = OrderStatus::STATE_ERROR;
             $message->message = 'Provider shop removed the former order date';
         }
         $orderStatus->messages[] = $message;
 
         file_put_contents('/tmp/changes', "OrderState: ".serialize($orderStatus).PHP_EOL.PHP_EOL, FILE_APPEND);
-
-        // update own state in DB when changed
-        if ($orderStatus->status === $oOrder->getFieldData('mfbepadostate')) {
-            return;
-        }
-
-        $oOrder->assign(array('oxorder__mfbepadostate' => $orderStatus->status));
-        $oOrder->save(false);
 
         // update non open states only to bepado, to not report every initialized order again
         if ($orderStatus->status === OrderStatus::STATE_OPEN) {
@@ -117,37 +109,28 @@ class mf_sdk_order_helper extends mf_abstract_helper
      */
     private function isJustPayed(oxOrder $oOrder)
     {
-        file_put_contents('/tmp/changes', "Payed: \n".$oOrder->getFieldData('oxpaid').PHP_EOL, FILE_APPEND);
-        file_put_contents('/tmp/changes', "State: \n".$oOrder->getFieldData('mfbepadostate').PHP_EOL, FILE_APPEND);
-        return $oOrder->getFieldData('oxpaid') !== '0000-00-00 00:00:00'
-            && ($oOrder->getFieldData('mfbepadostate') === OrderStatus::STATE_OPEN || null === $oOrder->getFieldData('mfbepadostate'));
+        return $oOrder->getFieldData('oxpaid') !== '0000-00-00 00:00:00';
     }
 
     /**
      * Returns true when somebody hits the "set delivery" date button. Should work on both
      * order_main and order_overview as both should call oxOrder::save().
      *
-     * @param oxOrder $oxOrder
-     *
      * @return bool
      */
-    private function deliveryDataWasJustSet(oxOrder $oxOrder)
+    private function deliveryDataWasJustSet()
     {
-        return $this->getVersionLayer()->getConfig()->getRequestParameter('fnc') === 'sendorder'
-            && $oxOrder->getFieldData('mfbepadostate') !== OrderStatus::STATE_DELIVERED;
+        return $this->getVersionLayer()->getConfig()->getRequestParameter('fnc') === 'sendorder';
     }
 
     /**
      * Returns true when somebody hits the "reset delivery" date button. Should work on both
      * order_main and order_overview as both should call oxOrder::save().
      *
-     * @param oxOrder $oxOrder
-     *
      * @return bool
      */
-    private function deliveryDataWasJustRemoved(oxOrder $oxOrder)
+    private function deliveryDataWasJustRemoved()
     {
-        return $this->getVersionLayer()->getConfig()->getRequestParameter('fnc') === 'resetorder'
-        && $oxOrder->getFieldData('mfbepadostate') === OrderStatus::STATE_DELIVERED;
+        return $this->getVersionLayer()->getConfig()->getRequestParameter('fnc') === 'resetorder';
     }
 }
