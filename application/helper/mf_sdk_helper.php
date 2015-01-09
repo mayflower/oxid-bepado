@@ -120,7 +120,7 @@ class mf_sdk_helper extends mf_abstract_helper
         $destFileName = $oShopConfig->getMasterPictureDir() . 'product/' . ($key) . '/' . $sImageName;
         $fileHandle = fopen($destFileName, 'w');
         if (!$fileHandle) {
-            throw new \Exception('Can not create file to write image data into.');
+            throw new \Exception(sprintf('Can not create the file %s to write image data into.', $destFileName));
         }
 
         $writeResult = fwrite($fileHandle, $data, $fileSize);
