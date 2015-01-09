@@ -174,6 +174,10 @@ class mf_sdk_converter implements mf_converter_interface
 
         /** @var mf_sdk_helper $sdkHelper */
         $sdkHelper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
+
+        file_put_contents('/tmp/changes', "Import Images: \n".serialize($object->images).PHP_EOL.PHP_EOL, FILE_APPEND);
+        file_put_contents('/tmp/changes', "Import Categories: \n".serialize($object->categories).PHP_EOL.PHP_EOL, FILE_APPEND);
+
         foreach ($object->images as $key => $imagePath) {
             if ($key < 12){
                 try {
@@ -182,7 +186,7 @@ class mf_sdk_converter implements mf_converter_interface
                 } catch (\Exception $e) {
                     $logger->writeBepadoLog(
                         sprintf(
-                            'Image % could not be saved during product conversion. Got the following exception: %',
+                            'Image %s could not be saved during product conversion. Got the following exception: %s',
                             $imagePath,
                             $e->getMessage()
                         )

@@ -301,7 +301,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->oxDb
             ->expects($this->once())
             ->method('execute')
-            ->with($this->equalTo("SELECT * FROM bepado_product WHERE `OXID` LIKE 'test-id'"))
+            ->with($this->equalTo("SELECT * FROM bepado_product_state WHERE `OXID` LIKE 'test-id'"))
             ->will($this->returnValue($resultSet));
 
         $this->helper->onArticleDelete($this->oxArticle);
@@ -315,7 +315,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->oxDb
             ->expects($this->once())
             ->method('execute')
-            ->with($this->equalTo("SELECT * FROM bepado_product WHERE `OXID` LIKE 'test-id'"))
+            ->with($this->equalTo("SELECT * FROM bepado_product_state WHERE `OXID` LIKE 'test-id'"))
             ->will($this->returnValue($resultSet));
 
         $this->sdk->expects($this->once())->method('recordDelete');

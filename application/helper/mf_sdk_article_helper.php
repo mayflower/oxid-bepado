@@ -172,7 +172,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
      */
     private function isArticleKnown($articleId)
     {
-        $sql = "SELECT * FROM bepado_product WHERE `OXID` LIKE '" . $articleId."'";
+        $sql = "SELECT * FROM bepado_product_state WHERE `OXID` LIKE '" . $articleId."'";
         $result = $this->getVersionLayer()->getDb(true)->execute($sql);
 
         return count($result->getArray()) > 0;
