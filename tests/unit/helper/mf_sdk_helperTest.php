@@ -7,6 +7,12 @@ require_once __DIR__ . '/../BaseTestCase.php';
  */
 class mf_sdk_helperTest extends BaseTestCase
 {
+    protected $oxGroups;
+    protected $oxDelivery;
+    protected $oxDeliverySet;
+    protected $oxBase;
+    protected $oxDb;
+    protected $logger;
     /**
      * @var mf_sdk_helper
      */
@@ -18,6 +24,14 @@ class mf_sdk_helperTest extends BaseTestCase
 
         $this->helper = new mf_sdk_helper();
         $this->helper->setVersionLayer($this->versionLayer);
+
+        $this->oxGroups = $this->getMockBuilder('oxGroups')->disableOriginalConstructor()->getMock();
+        $this->oxDelivery = $this->getMockBuilder('oxDelivery')->disableOriginalConstructor()->getMock();
+        $this->oxDeliverySet = $this->getMockBuilder('oxDeliverySet')->disableOriginalConstructor()->getMock();
+        $this->oxBase = $this->getMockBuilder('oxBase')->disableOriginalConstructor()->getMock();
+        $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
+        $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
+        $this->logger = $this->getMockBuilder('mf_sdk_logger_helper')->disableOriginalConstructor()->getMock();
     }
 
     /**
@@ -86,7 +100,6 @@ class mf_sdk_helperTest extends BaseTestCase
 
     public function testImageCreation()
     {
-        $this->markTestSkipped('No network available');
         $this->oxidConfig
             ->expects($this->any())
             ->method('getMasterPictureDir')
@@ -109,14 +122,87 @@ class mf_sdk_helperTest extends BaseTestCase
      */
     public function testImageCreateWithNonExistingFile()
     {
-        $this->markTestSkipped('No network available');
         $this->helper->createOxidImageFromPath('some-path', 1);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage No bepado user group found.
+     */
+    public function testOnModuleActivationGroupNotFound()
+    {
+        $this->oxDb->expects($this->any())->method('execute');
+        $this->oxGroups->expects($this->once())->method('load')->with($this->equalTo('bepadoshopgroup'));
+        $this->oxGroups->expects($this->once())->method('isLoaded')->will($this->returnValue(false));
+        $this->logger->expects($this->once())->method('writeBepadoLog')->with($this->equalTo('No bepado user group found.'));
+
+        $this->helper->onModuleActivation();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage No bepado shipping found
+     */
+    public function testOnModuleActivationShippingRuleNotFound()
+    {
+        $this->oxDb->expects($this->any())->method('execute');
+        $this->oxGroups->expects($this->once())->method('load');
+        $this->oxGroups->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+
+        $this->oxDelivery->expects($this->once())->method('load')->with($this->equalTo('bepadoshippingrule'));
+        $this->oxDelivery->expects($this->once())->method('isLoaded')->will($this->returnValue(false));
+        $this->logger->expects($this->once())->method('writeBepadoLog')->with($this->equalTo('No bepado shipping found.'));
+
+        $this->helper->onModuleActivation();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage No bepado shipping rule found
+     */
+    public function testOnModuleActivationShippingNotFound()
+    {
+        $this->oxDb->expects($this->any())->method('execute');
+        $this->oxGroups->expects($this->once())->method('load');
+        $this->oxGroups->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+
+        $this->oxDelivery->expects($this->once())->method('load');
+        $this->oxDelivery->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+
+        $this->oxDeliverySet->expects($this->once())->method('load')->with($this->equalTo('bepadoshipping'));
+        $this->oxDeliverySet->expects($this->once())->method('isLoaded')->will($this->returnValue(false));
+        $this->logger->expects($this->once())->method('writeBepadoLog')->with($this->equalTo('No bepado shipping rule found.'));
+
+        $this->helper->onModuleActivation();
+    }
+
+    public function testOnModuleActivationSuccess()
+    {
+        $this->oxDb->expects($this->any())->method('execute');
+        $this->oxGroups->expects($this->once())->method('load');
+        $this->oxGroups->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+
+        $this->oxDelivery->expects($this->once())->method('load');
+        $this->oxDelivery->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+
+        $this->oxDeliverySet->expects($this->once())->method('load');
+        $this->oxDeliverySet->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+
+        $this->oxBase->expects($this->at(0))->method('oxobject2delivery');
+        $this->oxBase->expects($this->at(1))->method('oxobject2delivery');
+
+        $this->helper->onModuleActivation();
     }
 
     protected function getObjectMapping()
     {
         return array(
-            'SDKConfig' => new SDKConfig(),
+            'SDKConfig'             => new SDKConfig(),
+            'oxgroups'              => $this->oxGroups,
+            'oxdelivery'            => $this->oxDelivery,
+            'oxdeliveryset'         => $this->oxDeliverySet,
+            'oxbase'                => $this->oxBase,
+            'mf_sdk_logger_helper'  => $this->logger,
         );
     }
 }

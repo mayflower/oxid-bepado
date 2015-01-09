@@ -61,16 +61,28 @@ class mf_sdk_order_helperTest extends BaseTestCase
             ->expects($this->any())
             ->method('getArticle')
             ->will($this->returnValue($this->oxArticle));
+    }
+
+    public function testNoExportedArticleDoesNothing()
+    {
 
         $this->mfArticleHelper
             ->expects($this->any())
             ->method('isArticleExported')
             ->with($this->equalTo($this->oxArticle))
-            ->will($this->returnValue(true));
+            ->will($this->returnValue(false));
+        $this->sdk->expects($this->never())->method('updateOrderStatus');
+
+        $this->helper->checkForOrderStateUpdates($this->oxOrder);
     }
 
     public function testUpdateOrderStatus_Open()
     {
+        $this->mfArticleHelper
+            ->expects($this->any())
+            ->method('isArticleExported')
+            ->with($this->equalTo($this->oxArticle))
+            ->will($this->returnValue(true));
         $map = array(
             array('oxtransstatus', 'NOT_FINISHED'),
             array('oxpaid', '0000-00-00 00:00:00'),
@@ -90,6 +102,11 @@ class mf_sdk_order_helperTest extends BaseTestCase
 
     public function testUpdateOrderStatus_justPayed()
     {
+        $this->mfArticleHelper
+            ->expects($this->any())
+            ->method('isArticleExported')
+            ->with($this->equalTo($this->oxArticle))
+            ->will($this->returnValue(true));
         $map = array(
             array('oxtransstatus', 'NOT_FINISHED'),
             array('mfbepadostate', OrderStatus::STATE_OPEN),
@@ -118,6 +135,11 @@ class mf_sdk_order_helperTest extends BaseTestCase
 
     public function testUpdateOrderStatus_deliveryDateJustSet()
     {
+        $this->mfArticleHelper
+            ->expects($this->any())
+            ->method('isArticleExported')
+            ->with($this->equalTo($this->oxArticle))
+            ->will($this->returnValue(true));
         $map = array(
             array('oxtransstatus', 'NOT_FINISHED'),
             array('mfbepadostate', OrderStatus::STATE_IN_PROCESS),
@@ -151,6 +173,11 @@ class mf_sdk_order_helperTest extends BaseTestCase
 
     public function testUpdateOrderStatus_deliveryDateJustRemoved()
     {
+        $this->mfArticleHelper
+            ->expects($this->any())
+            ->method('isArticleExported')
+            ->with($this->equalTo($this->oxArticle))
+            ->will($this->returnValue(true));
         $this->mfArticleHelper
             ->expects($this->any())
             ->method('isArticleExported')
@@ -194,6 +221,11 @@ class mf_sdk_order_helperTest extends BaseTestCase
             ->method('isArticleExported')
             ->with($this->equalTo($this->oxArticle))
             ->will($this->returnValue(true));
+        $this->mfArticleHelper
+            ->expects($this->any())
+            ->method('isArticleExported')
+            ->with($this->equalTo($this->oxArticle))
+            ->will($this->returnValue(true));
 
         $map = array(
             array('oxtransstatus', 'NOT_FINISHED'),
@@ -220,8 +252,56 @@ class mf_sdk_order_helperTest extends BaseTestCase
         $this->helper->checkForOrderStateUpdates($this->oxOrder, true);
     }
 
+    public function testUpdateOrderStatus_sdkException()
+    {
+        $this->mfArticleHelper
+            ->expects($this->any())
+            ->method('isArticleExported')
+            ->with($this->equalTo($this->oxArticle))
+            ->will($this->returnValue(true));
+        $this->mfArticleHelper
+            ->expects($this->any())
+            ->method('isArticleExported')
+            ->with($this->equalTo($this->oxArticle))
+            ->will($this->returnValue(true));
+
+        $map = array(
+            array('oxtransstatus', 'NOT_FINISHED'),
+            array('mfbepadostate', OrderStatus::STATE_DELIVERED),
+            array('oxpaid', '2015-01-15 00:00:00'),
+            array('oxsenddate', '2015-01-15 00:00:00'),
+            array('oxstorno', '0'),
+        );
+
+        $this->oxOrder
+            ->expects($this->any())
+            ->method('getFieldData')
+            ->will($this->returnValueMap($map));
+
+        $expectedOrder = new OrderStatus();
+        $expectedOrder->id = 'test-id';
+        $expectedOrder->status = OrderStatus::STATE_CANCELED;
+        $message = new \Bepado\SDK\Struct\Message();
+        $message->message = 'Provider shop canceled the order';
+        $expectedOrder->messages[] = $message;
+
+        $exception = new \Exception('test-message');
+        $this->sdk
+            ->expects($this->once())
+            ->method('updateOrderStatus')->with($this->equalTo($expectedOrder))
+            ->will($this->throwException($exception))
+        ;
+
+        $this->helper->checkForOrderStateUpdates($this->oxOrder, true);
+    }
+
     public function testUpdateOrderStatus_storno()
     {
+        $this->mfArticleHelper
+            ->expects($this->any())
+            ->method('isArticleExported')
+            ->with($this->equalTo($this->oxArticle))
+            ->will($this->returnValue(true));
         $map = array(
             array('oxtransstatus', 'NOT_FINISHED'),
             array('mfbepadostate', OrderStatus::STATE_DELIVERED),

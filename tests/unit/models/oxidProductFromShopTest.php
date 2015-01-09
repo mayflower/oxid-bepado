@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__.'/../BaseTestCase.php';
-
+require_once __DIR__.'/../wrapper/ResultSet.php';
 use Bepado\SDK\Struct as Struct;
 use Bepado\SDK\Struct\Product;
 
@@ -243,6 +243,73 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->assertEquals($expectedId, $actualId);
     }
 
+
+    public function testBuyWithNoShippingCosts()
+    {
+        $this->oxGroup->expects($this->any())->method('load')->will($this->returnValue(true));
+        $this->oxDb->expects($this->any())->method('getOne')->will($this->returnValue('some-id'));
+        $session = $this->getMockBuilder('oxSession')->disableOriginalConstructor()->getMock();
+        $this->versionLayer
+            ->expects($this->any())
+            ->method('getSession')
+            ->will($this->returnValue($session));
+        $this->sdk
+            ->expects($this->once())
+            ->method('getShop')
+            ->with($this->equalTo('some-id'))
+            ->will($this->returnValue(true));
+        $address = new Struct\Address();
+        $order = new Struct\Order();
+        $order->orderShop = 'some-id';
+        $order->billingAddress = $address;
+        $order->deliveryAddress = $address;
+        $orderItem = new Struct\OrderItem();
+        $orderItem->count = 1;
+        $orderItem->product = new Struct\Product();
+        $orderItem->product->sourceId = 'some-product-id';
+        $order->orderItems[] = $orderItem;
+
+        // expectations for called methods
+        $this->oxBasket
+            ->expects($this->once())
+            ->method('setCost')
+            ->with($this->equalTo('oxdelivery'), $this->equalTo($this->oxPrice));
+        $this->oxOrder
+            ->expects($this->once())
+            ->method('finalizeOrder')
+            ->with($this->equalTo($this->oxBasket), $this->equalTo($this->oxUser))
+            ->will($this->returnValue('success-token'));
+        $this->oxUser->expects($this->once())->method('onOrderExecute')->with($this->equalTo($this->oxBasket), $this->equalTo('success-token'));
+        $expectedId = 'some-id';
+        $this->oxOrder->expects($this->once())->method('getId')->will($this->returnValue($expectedId));
+
+        $this->oxBasket
+            ->expects($this->once())
+            ->method('addToBasket')
+            ->with($this->equalTo('some-product-id'), $this->equalTo(1))
+        ;
+        $this->oxBasket->expects($this->once())->method('calculateBasket')->with($this->equalTo(true));
+        $this->oxBasket
+            ->expects($this->any())
+            ->method('getProductsCount')
+            ->will($this->returnValue(1));
+        $shippingCosts = new Struct\TotalShippingCosts();
+        $shippingCosts->shippingCosts = 0;
+        $shippingCosts->grossShippingCosts = 0;
+        $this->sdk
+            ->expects($this->once())
+            ->method('calculateShippingCosts')
+            ->with($this->equalTo($order))
+            ->will($this->returnValue($shippingCosts));
+        $this->oxPrice->expects($this->once())->method('setPrice')->with($this->equalTo(0));
+
+        $session->expects($this->once())->method('delBasket');
+
+        $actualId = $this->productFromShop->buy($order);
+
+        $this->assertEquals($expectedId, $actualId);
+    }
+
     /**
      * @expectedException \Exception
      * @expectedExceptionMessage No valid products in basket
@@ -251,6 +318,29 @@ class oxidProductFromShopTest extends BaseTestCase
     {
         $order = new Struct\Order();
         $order->orderItems = array();
+
+        $this->productFromShop->reserve($order);
+    }
+
+    public function testReserve()
+    {
+        $order = new Struct\Order();
+        $orderItem = new Struct\OrderItem();
+        $orderItem->count = 1;
+        $orderItem->product = new Struct\Product();
+        $orderItem->product->sourceId = 'some-product-id';
+        $order->orderItems[] = $orderItem;
+
+        $this->oxBasket
+            ->expects($this->once())
+            ->method('addToBasket')
+            ->with($this->equalTo('some-product-id'), $this->equalTo(1))
+        ;
+        $this->oxBasket->expects($this->once())->method('calculateBasket')->with($this->equalTo(true));
+        $this->oxBasket
+            ->expects($this->any())
+            ->method('getProductsCount')
+            ->will($this->returnValue(1));
 
         $this->productFromShop->reserve($order);
     }
@@ -303,6 +393,20 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->assertCount(1, $actual);
         $actualArticle = array_shift($actual);
         $this->assertEquals(new Struct\Product(), $actualArticle);
+    }
+
+    public function testGetExportedProductIDs()
+    {
+        $list = new ResultSet();
+        $expectedIds = array('test-id');
+        $this->oxDb
+            ->expects($this->once())
+            ->method('execute')
+            ->with('SELECT p_source_id FROM bepado_product_state WHERE state = 1')
+            ->will($this->returnValue($list));
+        $ids = $this->productFromShop->getExportedProductIDs();
+
+        $this->assertEquals($expectedIds, $ids);
     }
 
     protected function getObjectMapping()
