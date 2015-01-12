@@ -18,12 +18,12 @@ For detailed information on how this is done go to the Bepado help and support s
 
 ## Get imported products into your shop
 
-If you have activated the module according to the [setup](https://github.com/Mayflower/oxid-bepado/tree/master/docs/setup.md) 
+If you have activated the module according to the [setup](setup.md) 
 instructions on this page, all products you chose for import will be loaded into your shop automatically. 
 
 Now you have to activate the products in your shop so they can be seen by your customers. Go to the article list in your 
 shops admin panel and find the articles marked with this little icon:
-![import-icon](https://github.com/Mayflower/oxid-bepado/tree/master/application/out/img/bepado_in.png?raw=true) 
+![import-icon](../application/out/img/bepado_in.png?raw=true) 
 
 *Note:* As you will see you are able to edit the imported products. It is not wise to do that though, because the module will 
 trigger updates with Bepado to keep your imported products up tp date.
@@ -36,8 +36,8 @@ That's all there is to importing products from Bepado!
 
 For your convenience we have implemented some markers to show you which products in your orders are imported. 
 If you check the articles in your orders, Bepado products are marked with this icon:
-![bepado-pic](https://github.com/Mayflower/oxid-bepado/tree/master/application/out/img/bepado.png?raw=true) 
+![bepado-pic](../application/out/img/bepado.png?raw=true) 
 
 Even in your packing lists Bepado products won't have a square to tick off but this icon:
-![bepado-icon](https://github.com/Mayflower/oxid-bepado/tree/master/application/out/img/bepado_b.png?raw=true) 
+![bepado-icon](../application/out/img/bepado_b.png?raw=true) 
 to show everyone to not search for this article, because it will be delivered by a Bepado store.
