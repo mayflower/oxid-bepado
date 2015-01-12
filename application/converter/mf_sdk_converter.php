@@ -4,7 +4,7 @@ use Bepado\SDK\Struct\Product;
 
 class mf_sdk_converter implements mf_converter_interface
 {
-    const DEFAULT_PURCHASE_PRICE_CHAR = 'A';
+    const DEFAULT_PURCHASE_PRICE_CHAR = 'B';
 
     const OXID_DELIVERY_UNIT_WEEK = 'WEEK';
 
