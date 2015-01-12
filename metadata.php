@@ -131,7 +131,7 @@ $aModule = array(
             'group'       => 'main',
             'name'        => 'sPurchaseGroupChar',
             'type'        => 'select',
-            'value'       => 'A',
+            'value'       => 'B',
             'constraints' => 'A|B|C',
             'position'    => 1
         ),
