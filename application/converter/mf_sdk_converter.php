@@ -251,7 +251,7 @@ class mf_sdk_converter implements mf_converter_interface
             });
             if (count($matchingCategory) === 1) {
                 $category = array_shift($matchingCategory);
-                $aCategory[] = $category->bepado_categories__path->rawValue;
+                $aCategory[] = $category->bepado_categories__title->rawValue;
             }
         }
 
