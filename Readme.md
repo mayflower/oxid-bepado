@@ -1,48 +1,25 @@
-# Setup
+#Mayflower OXID-Bepado-Module
 
-## 1 Anlegen des Modul-Ordners
-
-Klonen Sie das Modul in den Ordner `/modules/bepado`, dh. Sie gehen in den Ordner `/modules` und führen
-folgenden git Befehl aus:
-
-```
-    git clone https://github.com/Mayflower/oxid-bepado.git bepado 
-```
-
-Dieser Befehl legt den Ordner `bepado` für sie an. Wollen Sie dem Modul einen anderen 
-Ordnernamen geben, beachten Sie, dass dieser der `id` in der `metadata.php` des Moduls entsprechen muss.
-
-## 2 Bepado SDK installieren mit Composer
-
-Wechseln Sie in den Modulordner und führen ein `composer install` aus. Für nähere Informationen
-sei [Composer-Doku]("https://getcomposer.org/doc/00-intro.md") zu empfehlen.
-
-## 3 Autoloader in Oxid  hinzufügen
-
-Um den composer autoloader benutzen zu können muss man in der `functions.php` folgende Zeile hinzufügen:
-
-``` php
-    require_once __DIR__."/bepado/vendor/autoload.php";
-```
-
-## 4 Modul im Admin-Bereich aktivieren
-
-Durch die Aktivierung des Moduls im Admin-Bereich werden gleichzeitig die Tabellen, die das SDK benötigt ebenso wie Änderungen an den Tabellen
-des Oxid Shops vorgenommen. Darum ist es danach von Nöten die Views zu updaten. (Services->Tools)
-
-## 5 Produktiv/DemoMode
-
-Frisch installiert kommuniziert das SDK mit der Sandbox von Bepado. Um auf Live umzustellen, kann man dies in den allg. ModuleSettings tun.
+This respository contains a module-extension for the **OXID eShop Community Edition v4.9** by [OXID eSales]("https://www.oxid-esales.com/").
+Its purpos is to connect your OXID shop to the [Bepado]("http://info.bepado.de/faq") network and hence enabling you to 
+offer imported products from remote shops to top off your range of products. Your customer will have the experience of ordering 
+his/her products in your shop while this module and *Bepado* will handle the transaction concerning remote products with 
+no inconvenience to yourself as shop owner.
+Accordingly you can export your products to *Bepado* so other shops can sell them and hence enlarging your pool of customers.
 
 
+## Setup
+
+Siehe Mayflower-Oxid-Bepado-Modul [Setup](https://github.com/Mayflower/oxid-bepado/tree/master/docs/setup.md)
 
 
-# (TODO fix that)
-## Alte Doku
+## Documentation
 
-2. $this->aUserComponents['mfcmp_bepado'] = 0
-3. $this->iDebug = true
+Für den **Export** von Produkten aus dem eigenen Shop siehe [Export](https://github.com/Mayflower/oxid-bepado/tree/master/docs/export.md)
 
-# Todos
+Für den **Import** fremder Produkte in den eigenen Shop siehe [Import](https://github.com/Mayflower/oxid-bepado/tree/master/docs/import.md)
 
-1. PDO Config aus Oxid Konfiguration holen
+
+## Licence
+
+*(tbd)*
