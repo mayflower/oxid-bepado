@@ -52,7 +52,7 @@ class mf_sdk_converterTest extends BaseTestCase
         'oxarticles__oxtitle'        => 'test-title',
         'oxarticles__oxshortdesc'    => 'test short description',
         'oxarticles__oxprice'        => 92.44,
-        'oxarticles__oxpricea'       => 90,
+        'oxarticles__oxpriceb'       => 90,
         'oxarticles__oxstock'        => 10,
         'oxarticles__oxweight'       => 11,
         'oxarticles__oxwidth'        => 12,
@@ -188,7 +188,7 @@ class mf_sdk_converterTest extends BaseTestCase
             if (!oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
                 if ('oxarticles__oxprice' === $field) {
                     $value = 110.00359999999999;
-                } elseif ('oxarticles__oxpricea' === $field) {
+                } elseif ('oxarticles__oxpriceb' === $field) {
                     $value = 107.10;
                 } elseif ('oxarticles__oxdeltimeunit' === $field) {
                     $value = 'DAY';
@@ -207,7 +207,7 @@ class mf_sdk_converterTest extends BaseTestCase
         $shopUrl = oxRegistry::getConfig()->getShopUrl();
         $this->productValues['url'] = $shopUrl . 'index.php?cl=details&amp;anid=some-id';
 
-        $this->articleValues['oxarticles__oxpricea'] = null;
+        $this->articleValues['oxarticles__oxpriceb'] = null;
 
         /** @var oxArticle $oxArticle */
         $oxArticle = oxNew('oxarticle');
@@ -223,7 +223,7 @@ class mf_sdk_converterTest extends BaseTestCase
         $shopUrl = oxRegistry::getConfig()->getShopUrl();
         $this->productValues['url'] = $shopUrl . 'index.php?cl=details&amp;anid=some-id';
 
-        $this->articleValues['oxarticles__oxpricea'] = 0.0;
+        $this->articleValues['oxarticles__oxpriceb'] = 0.0;
 
         /** @var oxArticle $oxArticle */
         $oxArticle = oxNew('oxarticle');
