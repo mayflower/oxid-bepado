@@ -21,8 +21,9 @@ directory has to be exactly the same as the `id` in the modules `metadata.php` (
 
 ## 2 Installing the Bepado SDK with Composer
 
-Channge to the modules directory and execute `composer install`. (for further information on Composer see the 
-[Composer documentation]("https://getcomposer.org/doc/00-intro.md"))
+Change to the modules directory and execute `composer install`. 
+
+(for further information on Composer see the Composer documentation: https://getcomposer.org/doc/00-intro.md )
 
 
 ## 3 Add the autoloader to OXID
@@ -42,13 +43,16 @@ the settings tab. Here you enter your *ApiKey* and *ApiEndPointUrl*, which were 
 with *Bepado*.
 
 Afterwards go to the main tab and activate the module. You were successful if you see a green item left of the modules name.
-Note that the structure of your database is altered by activating the module. To use its functionality you have to 
+
+Note that the structure of your database has been altered by activating the module. To use its functionality you have to 
 update the OXID views. Go to *Services -> Tools -> Update views* to do that.
 
 
 ## 5 Test mode vs. active mode
 
-In the settings of the *Bepado* module you can unset the test mode which is default. If you are in the test mode, the module 
+In the settings of the *Bepado* module you can unset the test mode (which is the default setting). 
+
+If you are in the test mode, the module 
 will connect you to the *Bepado* sandbox where you can test the modules functionality. Changing into the active mode 
 will connect you to the live *Bepado* network and allow you to start your *Bepado* experience.
 
