@@ -16,16 +16,16 @@ For further information about the *Bepado* network go to http://info.bepado.de/ 
 ## Setup
 
 For information on how to set up this module extension go to 
-[setup](https://github.com/Mayflower/oxid-bepado/tree/master/docs/setup.md)
+[setup](docs/setup.md)
 
 
 ## Documentation
 
 For Information on how to **IMPORT** products from *Bepado* to your shop go to 
-[import](https://github.com/Mayflower/oxid-bepado/tree/master/docs/import.md)
+[import](docs/import.md)
 
 For Information on how to **EXPORT** products from your shop to *Bepado* go to 
-[export](https://github.com/Mayflower/oxid-bepado/tree/master/docs/export.md)
+[export](docs/export.md)
 
 
 ## Licence
