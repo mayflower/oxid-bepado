@@ -12,23 +12,26 @@ class mf_category_main extends mf_category_main_parent
     {
         $aCategories = $this->getSdkCategories();
 
-        $soxId = parent::getEditObjectId();
+        $oxidCategoryId = parent::getEditObjectId();
         if (!isset($aCategories)) {
             $aCategories = [];
         }
 
-        $oCat = $this->getVersionLayer()->createNewObject('oxbase');
-        $oCat->init('bepado_categories');
-        if ($soxId != "-1" && isset($soxId)){
+        $bepadoCategory = $this->getVersionLayer()->createNewObject('oxbase');
+        $bepadoCategory->init('bepado_categories');
+
+        if ($oxidCategoryId != "-1" && isset($oxidCategoryId)){
             try {
-                $oCat->load($soxId);
+                $query = $bepadoCategory->buildSelectString(array('catnid' => $oxidCategoryId));
+                $bepadoCategoryId = $this->getVersionLayer()->getDb(true)->getOne($query);
+                $bepadoCategory->load($bepadoCategoryId);
             } catch (\Exception $e) {
                 // do nothing
             }
         }
 
         $this->_aViewData['googleCategories'] = $aCategories;
-        $this->_aViewData['bepardoCategory'] = $oCat;
+        $this->_aViewData['bepardoCategory'] = $bepadoCategory;
 
         return parent::render();
     }
@@ -41,11 +44,28 @@ class mf_category_main extends mf_category_main_parent
         $aParams = parent::_parseRequestParametersForSave(
             $myConfig->getRequestParameter("mf_editval")
         );
-        $oCat = oxNew('oxbase');
-        $oCat->init('bepado_categories');
-        $oCat->assign($aParams);
-        $oCat->save();
 
+        $googleCategoryPath = isset($aParams['bepado_categories__path']) ? $aParams['bepado_categories__path'] : null;
+        if (null === $googleCategoryPath) {
+            return;
+        }
+        $googleCategories = $this->getSdkCategories();
+        if (!isset($googleCategories[$googleCategoryPath])) {
+            return;
+        }
+        $oxidCategoryId = parent::getEditObjectId();
+        /** @var oxBase $bepadoCategory */
+        $bepadoCategory = oxNew('oxbase');
+        $bepadoCategory->init('bepado_categories');
+        $query = $bepadoCategory->buildSelectString(array('catnid' => $oxidCategoryId));
+        $bepadoCategoryId = $this->getVersionLayer()->getDb(true)->getOne($query);
+        $bepadoCategory->load($bepadoCategoryId);
+        $bepadoCategory->assign(array(
+            'bepado_categories__catnid' => $oxidCategoryId,
+            'bepado_categories__path'   => $googleCategoryPath,
+            'bepado_categories__title'  => $googleCategories[$googleCategoryPath],
+        ));
+        $bepadoCategory->save();
     }
 
     /**
