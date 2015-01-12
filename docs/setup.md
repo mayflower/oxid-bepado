@@ -23,7 +23,7 @@ directory has to be exactly the same as the `id` in the modules `metadata.php` (
 
 Change to the modules directory and execute `composer install`. 
 
-(for further information on Composer see the Composer documentation: https://getcomposer.org/doc/00-intro.md )
+(for further information on Composer see the [Composer documentation](https://getcomposer.org/doc/00-intro.md))
 
 
 ## 3 Add the autoloader to OXID
