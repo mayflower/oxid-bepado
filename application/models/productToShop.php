@@ -58,11 +58,8 @@ class oxidProductToShop implements ProductToShop
         } else {
             $this->insertArticleWithBepadoState($oxArticle, $oBepadoProductState, $product);
         }
-        file_put_contents('/tmp/changes', "Import Categories: \n".serialize($product->categories).PHP_EOL.PHP_EOL, FILE_APPEND);
 
-        xdebug_start_trace("/tmp/xdebug");
         $this->computeCategoryChanges($oxArticle, $product);
-        xdebug_stop_trace();
     }
 
     /**
@@ -224,8 +221,8 @@ class oxidProductToShop implements ProductToShop
                 'oxobject2category__oxobjectid' => $oxArticle->getId(),
                 'oxobject2category__oxcatnid'   => $oxidCategory->getId(),
             );
-            file_put_contents('/tmp/changes', "Values: \n".serialize($values).PHP_EOL, FILE_APPEND);
             $object2category->assign($values);
+
             $object2category->save();
         }
     }
