@@ -82,7 +82,7 @@ class oxidProductToShopTest extends BaseTestCase
         $this->convertedOxArticle->expects($this->once())->method('save');
 
         // create an entry for the state
-        $this->convertedOxArticle->expects($this->once())->method('getId')->will($this->returnValue('test-id'));
+        $this->convertedOxArticle->expects($this->any())->method('getId')->will($this->returnValue('test-id'));
         $this->bepadoProductState
             ->expects($this->once())
             ->method('assign')

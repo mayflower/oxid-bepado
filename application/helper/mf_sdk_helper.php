@@ -19,13 +19,13 @@ class mf_sdk_helper extends mf_abstract_helper
         // module config
         $sLocalEndpoint = $oShopConfig->getConfigParam('sBepadoLocalEndpoint');
         $sApiKey = $oShopConfig->getConfigParam('sBepadoApiKey');
-        $prodMode = $oShopConfig->getConfigParam('prodMode');
+        $sandboxMode = $oShopConfig->getConfigParam('sandboxMode');
 
         $config->setApiEndpointUrl($sLocalEndpoint);
         $config->setApiKey($sApiKey);
-        $config->setProdMode($prodMode);
+        $config->setSandboxMode($sandboxMode);
 
-        if (!$prodMode) {
+        if ($sandboxMode) {
             $config->setSocialnetworkHost(SDKConfig::SOCIALNETWORK_HOST_DEMO);
             $config->setTransactionHost(SDKConfig::TRANSACTION_HOST_DEMO);
             $config->setSearchHost(SDKConfig::SEARCH_HOST_DEMO);

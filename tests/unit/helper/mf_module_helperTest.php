@@ -26,7 +26,7 @@ class mf_module_helperTest extends BaseTestCase
             ->setApiEndpointUrl('some-url')
             ->setApiKey('some-key')
             ->setSocialnetworkHost('some-host')
-            ->setProdMode(true)
+            ->setSandboxMode(true)
         ;
         $this->sdkHelper = $this->getMockBuilder('mf_sdk_helper')->disableOriginalConstructor()->getMock();
         $this->sdk = $this->getMockBuilder('sdkMock')->disableOriginalConstructor()->getMock();
