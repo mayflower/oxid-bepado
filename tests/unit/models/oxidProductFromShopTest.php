@@ -57,7 +57,7 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->sdkConfig = new SDKConfig();
         $this->sdkConfig->setApiEndpointUrl('test-endpoint');
         $this->sdkConfig->setApiKey('test-api-key');
-        $this->sdkConfig->setProdMode(false);
+        $this->sdkConfig->setSandboxMode(true);
         $this->sdkHelper->expects($this->any())->method('createSdkConfigFromOxid')->will($this->returnValue($this->sdkConfig));
         $this->sdkHelper->expects($this->any())->method('instantiateSdk')->will($this->returnValue($this->sdk));
         $this->oxArticle->expects($this->any())->method('getId')->will($this->returnValue('some-id'));

@@ -42,13 +42,13 @@ class mf_sdk_helperTest extends BaseTestCase
 
         $oxConfig->expects($this->at(2))
             ->method('getConfigParam')
-            ->with($this->equalTo('prodMode'))
-            ->will($this->returnValue(false));
+            ->with($this->equalTo('sandboxMode'))
+            ->will($this->returnValue(true));
         $sdConfig = $this->helper->createSdkConfigFromOxid();
 
         $this->assertEquals('test-endpoint', $sdConfig->getApiEndpointUrl());
         $this->assertEquals('test-key', $sdConfig->getApiKey());
-        $this->assertFalse($sdConfig->getProdMode());
+        $this->assertTrue($sdConfig->getSandboxMode());
         $this->assertNotNull($sdConfig->getSocialnetworkHost());
         $this->assertNotNull($sdConfig->getTransactionHost());
         $this->assertNotNull($sdConfig->getSearchHost());
@@ -72,13 +72,13 @@ class mf_sdk_helperTest extends BaseTestCase
 
         $oxConfig->expects($this->at(2))
             ->method('getConfigParam')
-            ->with($this->equalTo('prodMode'))
-            ->will($this->returnValue(true));
+            ->with($this->equalTo('sandboxMode'))
+            ->will($this->returnValue(false));
         $sdConfig = $this->helper->createSdkConfigFromOxid();
 
         $this->assertEquals('test-endpoint', $sdConfig->getApiEndpointUrl());
         $this->assertEquals('test-key', $sdConfig->getApiKey());
-        $this->assertTrue($sdConfig->getProdMode());
+        $this->assertFalse($sdConfig->getSandboxMode());
         $this->assertNull($sdConfig->getSocialnetworkHost());
         $this->assertNull($sdConfig->getTransactionHost());
         $this->assertNull($sdConfig->getSearchHost());
@@ -120,4 +120,3 @@ class mf_sdk_helperTest extends BaseTestCase
         );
     }
 }
- 

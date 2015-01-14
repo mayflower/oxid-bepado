@@ -123,9 +123,9 @@ $aModule = array(
         ),
         array(
             'group' => 'main',
-            'name'  => 'prodMode',
+            'name'  => 'sandboxMode',
             'type'  => 'bool',
-            'value' => false,
+            'value' => true,
         ),
         array(
             'group'       => 'main',

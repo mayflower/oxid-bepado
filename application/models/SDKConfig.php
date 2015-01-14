@@ -29,7 +29,7 @@ class SDKConfig
     /**
      * @var string
      */
-    private $prodMode;
+    private $sandboxMode;
 
     /**
      * @var string
@@ -89,19 +89,19 @@ class SDKConfig
     /**
      * @return string
      */
-    public function getProdMode()
+    public function getSandboxMode()
     {
-        return $this->prodMode;
+        return $this->sandboxMode;
     }
 
     /**
-     * @param string $urlHost
+     * @param string $sandboxMode
      *
      * @return SDKConfig
      */
-    public function setProdMode($urlHost)
+    public function setSandboxMode($sandboxMode)
     {
-        $this->prodMode = $urlHost;
+        $this->sandboxMode = $sandboxMode;
 
         return $this;
     }
