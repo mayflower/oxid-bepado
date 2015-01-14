@@ -51,13 +51,15 @@ class oxidProductToShop implements ProductToShop
 
         if ($id = $this->getVersionLayer()->getDb(true)->getOne($select)) {
             $oBepadoProductState->load($id);
-
         }
+
         if ($oBepadoProductState->isLoaded()) {
             $this->updateArticle($oxArticle, $oBepadoProductState->getId());
         } else {
             $this->insertArticleWithBepadoState($oxArticle, $oBepadoProductState, $product);
         }
+
+        $this->computeCategoryChanges($oxArticle, $product);
     }
 
     /**
@@ -181,5 +183,47 @@ class oxidProductToShop implements ProductToShop
 
         $persistedoxArticle->assign($aParams);
         $persistedoxArticle->save();
+    }
+
+    /**
+     * @param $oxArticle oxArticle
+     * @param $product   Struct\Product
+     */
+    private function computeCategoryChanges(oxArticle $oxArticle, Struct\Product $product)
+    {
+        // clear possible former mapping entries
+        $query = "DELETE FROM oxobject2category WHERE OXOBJECTID LIKE '".$oxArticle->getId()."'";
+        $this->getVersionLayer()->getDb(true)->query($query);
+
+        if (count($product->categories) === 0) {
+            return;
+        }
+
+        /** @var oxList $bepadoCategoryMapping */
+        $bepadoCategoryMapping = $this->getVersionLayer()->createNewObject('oxlist');
+        $bepadoCategoryMapping->init('oxbase', 'bepado_categories');
+        $bepadoCategoryMapping->getBaseObject();
+        $bepadoCategoryMapping->getList();
+        $bepadoCategories = $bepadoCategoryMapping->getArray();
+
+        foreach ($product->categories as $categoryPath) {
+            $match = array_filter($bepadoCategories, function ($category) use ($categoryPath) {
+                return $categoryPath === $category->getFieldData('bepado_categories__path');
+            });
+
+            if (!$match || !is_array($match)) {
+                continue; // bepado category not mapped a an oxid category
+            }
+
+            $oxidCategory = array_shift($match);
+            $object2category = $this->getVersionLayer()->createNewObject('oxObject2Category');
+            $values = array(
+                'oxobject2category__oxobjectid' => $oxArticle->getId(),
+                'oxobject2category__oxcatnid'   => $oxidCategory->getId(),
+            );
+            $object2category->assign($values);
+
+            $object2category->save();
+        }
     }
 }

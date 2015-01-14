@@ -7,16 +7,21 @@ class mf_category_list extends mf_category_list_parent
     {
         parent::render();
 
-        $oCat = oxNew('oxlist');
-        $oCat->init('oxbase', 'bepado_categories');
-        $oCat->getBaseObject();
-        $oCat->getList();
-        $oCat = $oCat->getArray();
+        $bepadoCategories = oxNew('oxlist');
+        $bepadoCategories->init('oxbase', 'bepado_categories');
+        $bepadoCategories->getBaseObject();
+        $bepadoCategories->getList();
+        $bepadoCategories = $bepadoCategories->getArray();
 
         foreach ($this->_aViewData['mylist'] as $key => $value) {
-            if (array_key_exists($key, $oCat)) {
+            // the bepado categories got an extra field (catnid) for the mapped oxid categories
+            $matchingCategory = array_filter($bepadoCategories, function($category) use ($key) {
+                return $category->getFieldData('bepado_categories__catnid') == $key;
+            });
+            if (count($matchingCategory) === 1) {
+                $category = array_shift($matchingCategory);
                 $value->oxcategories__bepadocategory = new oxField(
-                    $oCat[$key]->bepado_categories__title->rawValue,
+                    $category->bepado_categories__title->rawValue,
                     oxField::T_TEXT
                 );
             }

@@ -175,9 +175,6 @@ class mf_sdk_converter implements mf_converter_interface
         /** @var mf_sdk_helper $sdkHelper */
         $sdkHelper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
 
-        file_put_contents('/tmp/changes', "Import Images: \n".serialize($object->images).PHP_EOL.PHP_EOL, FILE_APPEND);
-        file_put_contents('/tmp/changes', "Import Categories: \n".serialize($object->categories).PHP_EOL.PHP_EOL, FILE_APPEND);
-
         foreach ($object->images as $key => $imagePath) {
             if ($key < 12){
                 try {
@@ -238,15 +235,19 @@ class mf_sdk_converter implements mf_converter_interface
         $aCategory = [];
         $aIds = $oxProduct->getCategoryIds();
 
-        $oCat = $this->getVersionLayer()->createNewObject('oxlist');
-        $oCat->init('oxbase', 'bepado_categories');
-        $oCat->getBaseObject();
-        $oCat->getList();
-        $oCat = $oCat->getArray();
+        $bepadoCategories = $this->getVersionLayer()->createNewObject('oxlist');
+        $bepadoCategories->init('oxbase', 'bepado_categories');
+        $bepadoCategories->getBaseObject();
+        $bepadoCategories->getList();
+        $bepadoCategories = $bepadoCategories->getArray();
 
-        foreach ($aIds as $id) {
-            if (array_key_exists($id, $oCat)) {
-                $aCategory[] = $oCat[$id]->bepado_categories__title->rawValue;
+        foreach ($aIds as $oxidCategoryId) {
+            $matchingCategory = array_filter($bepadoCategories, function($category) use ($oxidCategoryId) {
+                return $category->getFieldData('bepado_categories__catnid') == $oxidCategoryId;
+            });
+            if (count($matchingCategory) === 1) {
+                $category = array_shift($matchingCategory);
+                $aCategory[] = $category->bepado_categories__title->rawValue;
             }
         }
 
