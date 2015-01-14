@@ -51,13 +51,18 @@ class oxidProductToShop implements ProductToShop
 
         if ($id = $this->getVersionLayer()->getDb(true)->getOne($select)) {
             $oBepadoProductState->load($id);
-
         }
+
         if ($oBepadoProductState->isLoaded()) {
             $this->updateArticle($oxArticle, $oBepadoProductState->getId());
         } else {
             $this->insertArticleWithBepadoState($oxArticle, $oBepadoProductState, $product);
         }
+        file_put_contents('/tmp/changes', "Import Categories: \n".serialize($product->categories).PHP_EOL.PHP_EOL, FILE_APPEND);
+
+        xdebug_start_trace("/tmp/xdebug");
+        $this->computeCategoryChanges($oxArticle, $product);
+        xdebug_stop_trace();
     }
 
     /**
@@ -181,5 +186,46 @@ class oxidProductToShop implements ProductToShop
 
         $persistedoxArticle->assign($aParams);
         $persistedoxArticle->save();
+    }
+
+    /**
+     * @param $oxArticle oxArticle
+     * @param $product   Struct\Product
+     */
+    private function computeCategoryChanges(oxArticle $oxArticle, Struct\Product $product)
+    {
+        // clear possible former mapping entries
+        $query = "DELETE FROM oxobject2category WHERE OXOBJECTID LIKE '".$oxArticle->getId()."'";
+        $this->getVersionLayer()->getDb(true)->query($query);
+
+        if (count($product->categories) === 0) {
+            return;
+        }
+
+        /** @var oxList $bepadoCategoryMapping */
+        $bepadoCategoryMapping = $this->getVersionLayer()->createNewObject('oxlist');
+        $bepadoCategoryMapping->init('oxbase', 'bepado_categories');
+        $bepadoCategoryMapping->getBaseObject();
+        $bepadoCategoryMapping->getList();
+
+
+        foreach ($product->categories as $categoryPath) {
+            $match = array_filter($bepadoCategoryMapping->getArray(), function ($item) use ($categoryPath) {
+                return $categoryPath === $item->getFieldData('path');
+            });
+
+            if (!$match || !is_array($match)) {
+                continue; // bepado category not mapped a an oxid category
+            }
+
+            $oxidCategory = array_shift($match);
+            $object2category = $this->getVersionLayer()->createNewObject('oxObject2Category');
+            $values = array(
+                'oxobject2category_oxobjectid' => $oxArticle->getId(),
+                'oxobject2category_oxcatnid'   => $oxidCategory->getId(),
+            );
+            $object2category->assign($values);
+            $object2category->save();
+        }
     }
 }
