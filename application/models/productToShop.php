@@ -207,11 +207,11 @@ class oxidProductToShop implements ProductToShop
         $bepadoCategoryMapping->init('oxbase', 'bepado_categories');
         $bepadoCategoryMapping->getBaseObject();
         $bepadoCategoryMapping->getList();
-
+        $bepadoCategories = $bepadoCategoryMapping->getArray();
 
         foreach ($product->categories as $categoryPath) {
-            $match = array_filter($bepadoCategoryMapping->getArray(), function ($item) use ($categoryPath) {
-                return $categoryPath === $item->getFieldData('path');
+            $match = array_filter($bepadoCategories, function ($category) use ($categoryPath) {
+                return $categoryPath === $category->getFieldData('bepado_categories__path');
             });
 
             if (!$match || !is_array($match)) {
@@ -221,9 +221,10 @@ class oxidProductToShop implements ProductToShop
             $oxidCategory = array_shift($match);
             $object2category = $this->getVersionLayer()->createNewObject('oxObject2Category');
             $values = array(
-                'oxobject2category_oxobjectid' => $oxArticle->getId(),
-                'oxobject2category_oxcatnid'   => $oxidCategory->getId(),
+                'oxobject2category__oxobjectid' => $oxArticle->getId(),
+                'oxobject2category__oxcatnid'   => $oxidCategory->getId(),
             );
+            file_put_contents('/tmp/changes', "Values: \n".serialize($values).PHP_EOL, FILE_APPEND);
             $object2category->assign($values);
             $object2category->save();
         }
