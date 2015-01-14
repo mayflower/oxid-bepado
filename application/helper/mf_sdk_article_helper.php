@@ -222,6 +222,26 @@ class mf_sdk_article_helper extends mf_abstract_helper
     }
 
     /**
+     * @param oxBasket $basket
+     * @return bool
+     */
+    public function hasBasketImportedArticles(oxBasket $basket)
+    {
+        /** @var  oxBasketItem[] $aBasket */
+        $aBasket = $basket->getContents();
+
+        foreach ($aBasket as $basketItem) {
+            /** @var mf_bepado_oxarticle $basketArticle */
+            $basketArticle = $basketItem->getArticle();
+
+            if ($this->isArticleImported($basketArticle)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Just a little helper to create an SDK instance
      *
      * @return SDK
