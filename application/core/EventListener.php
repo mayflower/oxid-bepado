@@ -9,7 +9,7 @@ class EventListener
      */
     public static $_oVersionLayer;
 
-    public function onActivate()
+    public static function onActivate()
     {
         /** @var mf_sdk_logger_helper $logger */
         $logger = self::getVersionLayer()->createNewObject('mf_sdk_logger_helper');
@@ -97,10 +97,11 @@ class EventListener
      *
      * @return VersionLayerInterface
      */
-    private function getVersionLayer()
+    private static function getVersionLayer()
     {
         /** @var VersionLayerFactory $factory */
         $factory = oxNew('VersionLayerFactory');
+
         $oVersionLayer = $factory->create();
 
         return $oVersionLayer;
