@@ -24,24 +24,36 @@ class mf_oxOrder extends mf_oxOrder_parent
      */
     public function finalizeOrder(oxBasket $oBasket, $oUser, $blRecalculatingOrder = false)
     {
+        /** @var mf_sdk_article_helper $articleHelper */
+        $articleHelper = $this->getVersionLayer()->createNewObject('mf_sdk_article_helper');
+
+        $hasImports = $articleHelper->hasBasketImportedArticles($oBasket);
+
+        if ($hasImports) {
+            $blRecalculatingOrder = true;
+        }
+
         $returnValue = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
-        /** @var mf_sdk_logger_helper $logger */
-        $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
-        /** @var mf_sdk_product_helper $helper */
-        $helper = $this->getVersionLayer()->createNewObject('mf_sdk_product_helper');
 
-        $reservation = null;
-        try {
-            $reservation = $helper->reserveProductsInOrder($this);
-            if (!$reservation) {
-                return $returnValue;
+        if ($hasImports) {
+            /** @var mf_sdk_logger_helper $logger */
+            $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
+            /** @var mf_sdk_product_helper $productHelper */
+            $productHelper = $this->getVersionLayer()->createNewObject('mf_sdk_product_helper');
+
+            $reservation = null;
+            try {
+                $reservation = $productHelper->reserveProductsInOrder($this);
+                if (!$reservation) {
+                    return $returnValue;
+                }
+
+                $productHelper->checkoutProducts($reservation, $this);
+            } catch(Exception $e) {
+                $logger->writeBepadoLog('Problem while checking out the product: '.$e->getMessage());
+                $this->getVersionLayer()->getDb()->rollbackTransaction();
+                return oxOrder::ORDER_STATE_INVALIDPAYMENT;
             }
-
-            $helper->checkoutProducts($reservation, $this);
-        } catch(Exception $e) {
-            $logger->writeBepadoLog('Problem while checking out the product: '.$e->getMessage());
-            $this->getVersionLayer()->getDb()->rollbackTransaction();
-            return oxOrder::ORDER_STATE_INVALIDPAYMENT;
         }
 
         return $returnValue;
