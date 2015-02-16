@@ -66,7 +66,11 @@ class mf_sdk_converter implements mf_converter_interface
 
         $sdkProduct->vat = $object->getArticleVat() / 100;
         // Price are net or brut depending on ShopConfig
-        $sdkProduct->price = $object->getPrice()->getNettoPrice();
+        if (oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
+            $sdkProduct->price = $object->getPrice()->getNettoPrice();
+        } else {
+            $sdkProduct->price = $object->getPrice()->getBruttoPrice()*100/($object->getArticleVat()+100);
+        }
 
         // create the purchase price with the matching mode
         $purchasePrice = new oxPrice();
@@ -76,9 +80,15 @@ class mf_sdk_converter implements mf_converter_interface
         } else {
             $purchasePrice->setBruttoPriceMode();
         }
+
+
         $purchasePrice->setPrice($object->{$this->computePurchasePriceField($object)}->value);
         $sdkProduct->purchasePrice = $purchasePrice->getNettoPrice();
-
+        if (oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
+            $sdkProduct->purchasePrice = $purchasePrice->getNettoPrice();
+        } else {
+            $sdkProduct->purchasePrice = $purchasePrice->getBruttoPrice()*100/($object->getArticleVat()+100);
+        }
         if (!$sdkProduct->purchasePrice) {
             $sdkProduct->purchasePrice = $sdkProduct->price;
         }
@@ -111,7 +121,7 @@ class mf_sdk_converter implements mf_converter_interface
                 $deliveryUnit = 1;
         }
         $sdkProduct->deliveryWorkDays = $maxDeliveryTime * $deliveryUnit;
-
+        file_put_contents('/tmp/changes', "sdkProduct: ".serialize($sdkProduct).PHP_EOL.PHP_EOL, FILE_APPEND);
         return $sdkProduct;
     }
 
