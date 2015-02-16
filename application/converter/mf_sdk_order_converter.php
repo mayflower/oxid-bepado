@@ -86,7 +86,7 @@ class mf_sdk_order_converter extends mf_abstract_converter implements mf_convert
     private function createSDKPaymentType(oxOrder $object)
     {
         $oxPayment = $this->getVersionLayer()->createNewObject('oxpayment');
-        $oxPayment->load($object->oxorder__oxpaymentid->value);
+        $oxPayment->load($object->oxorder__oxpaymenttype->value);
 
         return $oxPayment->isLoaded() && null !== $oxPayment->getFieldData('bepadopaymenttype')
             ? $oxPayment->getFieldData('bepadopaymenttype')
