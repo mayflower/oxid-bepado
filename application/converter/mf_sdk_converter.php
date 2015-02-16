@@ -121,7 +121,7 @@ class mf_sdk_converter implements mf_converter_interface
                 $deliveryUnit = 1;
         }
         $sdkProduct->deliveryWorkDays = $maxDeliveryTime * $deliveryUnit;
-        file_put_contents('/tmp/changes', "sdkProduct: ".serialize($sdkProduct).PHP_EOL.PHP_EOL, FILE_APPEND);
+
         return $sdkProduct;
     }
 
