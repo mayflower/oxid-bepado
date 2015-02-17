@@ -237,9 +237,10 @@ class mf_sdk_converterTest extends BaseTestCase
     protected function getObjectMapping()
     {
         return array(
-            'oxshop'         => $this->oxShop,
-            'mf_sdk_helper'  => $this->sdkHelper,
-            'oxlist'         => $this->oxList,
+            'oxshop'           => $this->oxShop,
+            'mf_sdk_helper'    => $this->sdkHelper,
+            'oxlist'           => $this->oxList,
+            'mf_module_helper' => oxNew('mf_module_helper'),
         );
     }
 }
