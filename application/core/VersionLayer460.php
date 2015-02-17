@@ -1,7 +1,10 @@
 <?php
 
-//require_once getShopBasePath() . 'core/interface/VersionLayerInterface.php';
-
+/**
+ * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
+ *
+ * @codeCoverageIgnore
+ */
 class VersionLayer460 implements VersionLayerInterface
 {
 

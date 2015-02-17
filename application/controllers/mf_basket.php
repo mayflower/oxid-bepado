@@ -36,12 +36,4 @@ class mf_basket extends mf_basket_parent
 
         return $this->_oVersionLayer;
     }
-
-    /**
-     * @param VersionLayerInterface $versionLayer
-     */
-    public function setVersionLayer(VersionLayerInterface $versionLayer)
-    {
-        $this->_oVersionLayer = $versionLayer;
-    }
 }

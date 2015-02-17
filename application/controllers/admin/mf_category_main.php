@@ -1,6 +1,8 @@
 <?php
 
-
+/**
+ * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
+ */
 class mf_category_main extends mf_category_main_parent
 {
     /**
@@ -95,5 +97,13 @@ class mf_category_main extends mf_category_main_parent
         }
 
         return $this->_oVersionLayer;
+    }
+
+    /**
+     * @param VersionLayerInterface $versionLayer
+     */
+    public function setVersionLayer(VersionLayerInterface $versionLayer)
+    {
+        $this->_oVersionLayer = $versionLayer;
     }
 }

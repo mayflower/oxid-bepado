@@ -1,6 +1,16 @@
 <?php
 
 /**
+ * As the base oxid eShop is not able to test that class, we won't be able to do that too.
+ *
+ * @codeCoverageIgnore
+ *
+ * This class extends the base oxOrder to get access into some methods.
+ * We need to extend the finalize method to check for possible imported articles and create an
+ * checkout in the the remote shop by the use of the SDK. We also need to get access to save() and
+ * delete to recognize changes in an order state and send that information to bepado to inform the
+ * remote shop.
+ *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
 class mf_oxOrder extends mf_oxOrder_parent

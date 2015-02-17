@@ -86,4 +86,88 @@ class mf_module_helperTest extends BaseTestCase
                 'sPurchaseGroupChar' => 'A',
             )));
     }
+
+    public function testNetPriceCalculationShopIsNetNetGoesIn()
+    {
+        $versionLayer = $this->getMock('VersionLayerInterface');
+        $oxidConfig = $this->getMock('oxConfig');
+        $versionLayer->expects($this->any())->method('getConfig')->will($this->returnValue($oxidConfig));
+        $oxidConfig->expects($this->any())
+            ->method('getConfigParam')
+            ->will($this->returnValue(true));
+        $this->helper->setVersionLayer($versionLayer);
+
+        /** @var oxPrice $price */
+        $price = oxNew('oxPrice');
+        $price->setNettoPriceMode();
+        $price->setVat(19);
+        $price->setPrice(2.00);
+
+
+        $actualPrice = $this->helper->createNetPrice($price);
+        $this->assertEquals(2.00, $actualPrice);
+    }
+
+    public function testNetPriceCalculationShopIsBrutBrutGoesIn()
+    {
+        $versionLayer = $this->getMock('VersionLayerInterface');
+        $oxidConfig = $this->getMock('oxConfig');
+        $versionLayer->expects($this->any())->method('getConfig')->will($this->returnValue($oxidConfig));
+        $oxidConfig->expects($this->any())
+            ->method('getConfigParam')
+            ->will($this->returnValue(false));
+        $this->helper->setVersionLayer($versionLayer);
+
+        /** @var oxPrice $price */
+        $price = oxNew('oxPrice');
+        $price->setBruttoPriceMode();
+        $price->setVat(19);
+        $price->setPrice(2.00);
+
+
+        $actualPrice = $this->helper->createNetPrice($price);
+        $this->assertEquals(1.680672268907563, $actualPrice);
+    }
+
+    public function testNetPriceCalculationShopIsNetBrutGoesIn()
+    {
+        $versionLayer = $this->getMock('VersionLayerInterface');
+        $oxidConfig = $this->getMock('oxConfig');
+        $versionLayer->expects($this->any())->method('getConfig')->will($this->returnValue($oxidConfig));
+        $oxidConfig->expects($this->any())
+            ->method('getConfigParam')
+            ->will($this->returnValue(true));
+        $this->helper->setVersionLayer($versionLayer);
+
+        /** @var oxPrice $price */
+        $price = oxNew('oxPrice');
+        $price->setBruttoPriceMode();
+        $price->setVat(19);
+        $price->setPrice(2.00);
+
+
+        $actualPrice = $this->helper->createNetPrice($price);
+        $this->assertEquals(2.00, $actualPrice);
+    }
+
+    public function testNetPriceCalculationShopIsBrutNetGoesIn()
+    {
+        $versionLayer = $this->getMock('VersionLayerInterface');
+        $oxidConfig = $this->getMock('oxConfig');
+        $versionLayer->expects($this->any())->method('getConfig')->will($this->returnValue($oxidConfig));
+        $oxidConfig->expects($this->any())
+            ->method('getConfigParam')
+            ->will($this->returnValue(false));
+        $this->helper->setVersionLayer($versionLayer);
+
+        /** @var oxPrice $price */
+        $price = oxNew('oxPrice');
+        $price->setNettoPriceMode();
+        $price->setVat(19);
+        $price->setPrice(2.00);
+
+
+        $actualPrice = $this->helper->createNetPrice($price);
+        $this->assertEquals(1.680672268907563, $actualPrice);
+    }
 }
