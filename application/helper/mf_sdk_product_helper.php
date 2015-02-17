@@ -148,10 +148,9 @@ class mf_sdk_product_helper extends mf_abstract_helper
 
         $reservation = $this->getSdk()->reserveProducts($sdkOrder);
 
-        file_put_contents("/tmp/changes", "Reservation: \n".serialize($reservation->messages).PHP_EOL, FILE_APPEND);
         if (!$reservation instanceof Reservation) {
             $exception = new oxNoArticleException();
-            $exception->setMessage('Something went wrong while reservation');
+            $exception->setMessage('Expected \Bepado\SDK\Struct\Reservation got '.get_class($reservation));
             throw $exception;
         }
         if (!$reservation->success) {

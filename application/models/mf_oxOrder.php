@@ -39,10 +39,6 @@ class mf_oxOrder extends mf_oxOrder_parent
 
         $hasImports = $articleHelper->hasBasketImportedArticles($oBasket);
 
-        if ($hasImports) {
-            $blRecalculatingOrder = true;
-        }
-
         $returnValue = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
 
         if ($hasImports) {
