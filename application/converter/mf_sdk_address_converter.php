@@ -58,6 +58,11 @@ class mf_sdk_address_converter extends mf_abstract_converter implements mf_conve
             }
         }
 
+        // when converting from oxUser the mail isn't in __oxmail
+        if (null === $sdkAddress->email && null != $object->getFieldData('oxuser__oxusername')) {
+            $sdkAddress->email = $object->getFieldData('oxuser__oxusername');
+        }
+
         return $sdkAddress;
     }
 

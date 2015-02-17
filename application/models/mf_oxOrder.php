@@ -46,20 +46,20 @@ class mf_oxOrder extends mf_oxOrder_parent
         $returnValue = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
 
         if ($hasImports) {
-            /** @var mf_sdk_logger_helper $logger */
-            $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
             /** @var mf_sdk_product_helper $productHelper */
             $productHelper = $this->getVersionLayer()->createNewObject('mf_sdk_product_helper');
 
             $reservation = null;
             try {
-                $reservation = $productHelper->reserveProductsInOrder($this);
+                $reservation = $productHelper->reserveProductsInOrder($this, $oUser);
                 if (!$reservation) {
                     return $returnValue;
                 }
 
                 $productHelper->checkoutProducts($reservation, $this);
             } catch(Exception $e) {
+                /** @var mf_sdk_logger_helper $logger */
+                $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
                 $logger->writeBepadoLog('Problem while checking out the product: '.$e->getMessage());
                 $this->getVersionLayer()->getDb()->rollbackTransaction();
                 return oxOrder::ORDER_STATE_INVALIDPAYMENT;
