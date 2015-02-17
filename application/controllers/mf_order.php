@@ -21,7 +21,7 @@ class mf_order extends mf_order_parent
     {
         $parent = parent::render();
 
-        $oxBasket = $this->_aViewData['oxcmp_basket'];
+        $oxBasket = $this->getBasket();
 
         /** @var mf_sdk_product_helper $helper */
         $helper = $this->getVersionLayer()->createNewObject('mf_sdk_product_helper');
@@ -44,13 +44,5 @@ class mf_order extends mf_order_parent
         }
 
         return $this->_oVersionLayer;
-    }
-
-    /**
-     * @param VersionLayerInterface $versionLayer
-     */
-    public function setVersionLayer(VersionLayerInterface $versionLayer)
-    {
-        $this->_oVersionLayer = $versionLayer;
     }
 }
