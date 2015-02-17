@@ -48,7 +48,6 @@ class mf_module_helper extends mf_abstract_helper
         return $isVerified;
     }
 
-
     /**
      * @param SDKConfig $config
      *
@@ -66,5 +65,32 @@ class mf_module_helper extends mf_abstract_helper
         }
 
         return true;
+    }
+
+    /**
+     * Based on the shop config this method creates the net price on its own,
+     * cause the calculation got rounded in the oxPrice methods.
+     *
+     * @param oxPrice $oxPrice
+     * @return float
+     */
+    public function createNetPrice(oxPrice $oxPrice) {
+        $value = 0;
+
+        if ($this->getVersionLayer()->getConfig()->getConfigParam('blEnterNetPrice')) {
+            if ($oxPrice->isNettoMode()) {
+                $value = $oxPrice->getNettoPrice();
+            } else {
+                $value = $oxPrice->getBruttoPrice();
+            }
+        } else {
+            if ($oxPrice->isNettoMode()) {
+                $value = $oxPrice->getNettoPrice()*100/($oxPrice->getVat()+100);
+            } else {
+                $value = $oxPrice->getBruttoPrice()*100/($oxPrice->getVat()+100);
+            }
+        }
+
+        return $value;
     }
 }
