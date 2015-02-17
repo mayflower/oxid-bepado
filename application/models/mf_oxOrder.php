@@ -60,7 +60,7 @@ class mf_oxOrder extends mf_oxOrder_parent
             } catch(Exception $e) {
                 /** @var mf_sdk_logger_helper $logger */
                 $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
-                $logger->writeBepadoLog('Problem while checking out the product: '.$e->getMessage());
+                $logger->writeBepadoLog('Problem while reserve or checking out the product: '.$e->getMessage());
                 $this->getVersionLayer()->getDb()->rollbackTransaction();
                 return oxOrder::ORDER_STATE_INVALIDPAYMENT;
             }

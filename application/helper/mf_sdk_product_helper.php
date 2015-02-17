@@ -148,32 +148,25 @@ class mf_sdk_product_helper extends mf_abstract_helper
 
         $reservation = $this->getSdk()->reserveProducts($sdkOrder);
 
+        file_put_contents("/tmp/changes", "Reservation: \n".serialize($reservation->messages).PHP_EOL, FILE_APPEND);
         if (!$reservation instanceof Reservation) {
             $exception = new oxNoArticleException();
             $exception->setMessage('Something went wrong while reservation');
             throw $exception;
         }
         if (!$reservation->success) {
+            $computedMessages = array();
             foreach ($reservation->messages as $shopId => $messages) {
                 foreach ($messages as $message) {
                     $keys = array();
                     foreach ($message->values as $key => $values) {
                         $keys[] = '%'.$key;
                     }
-                    $computedMessage = str_replace($keys, $message->values, $message->message);
-
-                    if (isset($message->values['availability'])) {
-                        $exception = new oxOutOfStockException();
-                        $exception->setRemainingAmount($message->values['availablity']);
-                        $exception->setMessage($computedMessage);
-                        throw $exception;
-                    } else {
-                        $exception = new oxArticleInputException();
-                        $exception->setMessage($computedMessage);
-                        throw $exception;
-                    }
+                    $computedMessages[] = str_replace($keys, $message->values, $message->message);
                 }
             }
+
+            throw new \Exception(sprintf('Errors while reservation: %s', implode(', ', $computedMessages)));
         }
 
         return $reservation;
