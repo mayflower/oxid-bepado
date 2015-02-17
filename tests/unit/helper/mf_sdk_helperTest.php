@@ -38,37 +38,7 @@ class mf_sdk_helperTest extends BaseTestCase
      * As i wanna check the real values delivered by the config, we need to do an extra action
      * instead of the the default value of the base test case.
      */
-    public function testConfigCreation()
-    {
-        $oxConfig = $this->getMock('oxConfig');
-        $versionLayer = $this->getMock('VersionLayerInterface');
-        $versionLayer->expects($this->once())->method('getConfig')->will($this->returnValue($oxConfig));
-        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new SDKConfig()));
-        $this->helper->setVersionLayer($versionLayer);
-        $oxConfig->expects($this->at(0))
-            ->method('getConfigParam')
-            ->with($this->equalTo('sBepadoLocalEndpoint'))
-            ->will($this->returnValue('test-endpoint'));
-        $oxConfig->expects($this->at(1))
-            ->method('getConfigParam')
-            ->with($this->equalTo('sBepadoApiKey'))
-            ->will($this->returnValue('test-key'));
-
-        $oxConfig->expects($this->at(2))
-            ->method('getConfigParam')
-            ->with($this->equalTo('sandboxMode'))
-            ->will($this->returnValue(true));
-        $sdConfig = $this->helper->createSdkConfigFromOxid();
-
-        $this->assertEquals('test-endpoint', $sdConfig->getApiEndpointUrl());
-        $this->assertEquals('test-key', $sdConfig->getApiKey());
-        $this->assertTrue($sdConfig->getSandboxMode());
-        $this->assertNotNull($sdConfig->getSocialnetworkHost());
-        $this->assertNotNull($sdConfig->getTransactionHost());
-        $this->assertNotNull($sdConfig->getSearchHost());
-    }
-
-    public function testConfigCreationInProductMode()
+    public function testConfigCreationNonSandboxMode()
     {
         $oxConfig = $this->getMock('oxConfig');
         $versionLayer = $this->getMock('VersionLayerInterface');
@@ -96,6 +66,36 @@ class mf_sdk_helperTest extends BaseTestCase
         $this->assertNull($sdConfig->getSocialnetworkHost());
         $this->assertNull($sdConfig->getTransactionHost());
         $this->assertNull($sdConfig->getSearchHost());
+    }
+
+    public function testConfigCreationInSandboxMode()
+    {
+        $oxConfig = $this->getMock('oxConfig');
+        $versionLayer = $this->getMock('VersionLayerInterface');
+        $versionLayer->expects($this->once())->method('getConfig')->will($this->returnValue($oxConfig));
+        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new SDKConfig()));
+        $this->helper->setVersionLayer($versionLayer);
+        $oxConfig->expects($this->at(0))
+            ->method('getConfigParam')
+            ->with($this->equalTo('sBepadoLocalEndpoint'))
+            ->will($this->returnValue('test-endpoint'));
+        $oxConfig->expects($this->at(1))
+            ->method('getConfigParam')
+            ->with($this->equalTo('sBepadoApiKey'))
+            ->will($this->returnValue('test-key'));
+
+        $oxConfig->expects($this->at(2))
+            ->method('getConfigParam')
+            ->with($this->equalTo('sandboxMode'))
+            ->will($this->returnValue(true));
+        $sdConfig = $this->helper->createSdkConfigFromOxid();
+
+        $this->assertEquals('test-endpoint', $sdConfig->getApiEndpointUrl());
+        $this->assertEquals('test-key', $sdConfig->getApiKey());
+        $this->assertTrue($sdConfig->getSandboxMode());
+        $this->assertEquals('search.server1230-han.de-nserver.de', $sdConfig->getSearchHost());
+        $this->assertEquals('transaction.server1230-han.de-nserver.de', $sdConfig->getTransactionHost());
+        $this->assertEquals('sn.server1230-han.de-nserver.de', $sdConfig->getSocialnetworkHost());
     }
 
     public function testImageCreation()
