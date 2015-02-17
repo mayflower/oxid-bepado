@@ -83,7 +83,7 @@ class mf_sdk_converter implements mf_converter_interface
             $sdkProduct->purchasePrice = $sdkProduct->price;
         }
         $sdkProduct->currency = $currency->name;
-        $sdkProduct->availability = $object->oxarticles__oxstock->value;
+        $sdkProduct->availability = (int) $object->oxarticles__oxstock->value;
 
         $sdkProduct->images = $this->mapImages($object);
         $sdkProduct->categories = $this->mapCategories($object);
