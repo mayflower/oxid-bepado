@@ -21,7 +21,7 @@ directory has to be exactly the same as the `id` in the modules `metadata.php` (
 
 ## 2 Installing the Bepado SDK with Composer
 
-Change to the modules directory and execute `composer install`. 
+Change to the `/modules/bepado` directory and execute `composer install`. 
 
 (for further information on Composer see the [Composer documentation](https://getcomposer.org/doc/00-intro.md))
 
@@ -38,11 +38,17 @@ To use the Composer autoloader add the following line in the `/modules/functions
 
 ## 4 Activate the module in the admin panel
 
-Go to the admin panel of your shop and find the menue item *Extensions -> Modules*. Klick on the *Bepado* module and go to 
-the settings tab. Here you enter your *ApiKey* and *ApiEndPointUrl*, which were given to you when you registered your shop 
-with *Bepado*.
+Go to the admin panel of your shop and find the menue item *Extensions -> Modules*. Click on the *Bepado* module and go to 
+the settings tab. Here you find the general parameters where you have to enter your *ApiKey* and *ApiEndPointUrl*.
+These were given to you when you registered your shop with *Bepado*.
 
-Afterwards go to the main tab and activate the module. You were successful if you see a green item left of the modules name.
+![bepado-settings](img/settings.png?raw=true) 
+
+Furthermore you can select which *OXID* price attribute should hold the purchase price of *Bepado* products.
+
+(don't forget to save the changes)
+
+Afterwards go to the overview tab and activate the module. You were successful if you see a green item left of the modules name.
 
 Note that the structure of your database has been altered by activating the module. To use its functionality you have to 
 update the OXID views. Go to *Services -> Tools -> Update views* to do that.
@@ -50,9 +56,9 @@ update the OXID views. Go to *Services -> Tools -> Update views* to do that.
 
 ## 5 Test mode vs. active mode
 
-In the settings of the *Bepado* module you can unset the test mode (which is the default setting). 
+In the settings of the *Bepado* module you can unset the sandbox mode (which is the default setting). 
 
-If you are in the test mode, the module 
-will connect you to the *Bepado* sandbox where you can test the modules functionality. Changing into the active mode 
-will connect you to the live *Bepado* network and allow you to start your *Bepado* experience.
+If you are in the sandbox mode, the module will connect you to the *Bepado* sandbox where you can test the modules 
+functionality. Changing into the active mode will connect you to the live *Bepado* network and allow you to 
+start your *Bepado* experience.
 
