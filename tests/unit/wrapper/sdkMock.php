@@ -56,4 +56,9 @@ class sdkMock
     {
 
     }
+
+    public function getCategories()
+    {
+
+    }
 }

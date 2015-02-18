@@ -7,6 +7,12 @@ require_once __DIR__ . '/../BaseTestCase.php';
  */
 class mf_sdk_helperTest extends BaseTestCase
 {
+    protected $oxGroups;
+    protected $oxDelivery;
+    protected $oxDeliverySet;
+    protected $oxBase;
+    protected $oxDb;
+    protected $logger;
     /**
      * @var mf_sdk_helper
      */
@@ -18,43 +24,21 @@ class mf_sdk_helperTest extends BaseTestCase
 
         $this->helper = new mf_sdk_helper();
         $this->helper->setVersionLayer($this->versionLayer);
+
+        $this->oxGroups = $this->getMockBuilder('oxGroups')->disableOriginalConstructor()->getMock();
+        $this->oxDelivery = $this->getMockBuilder('oxDelivery')->disableOriginalConstructor()->getMock();
+        $this->oxDeliverySet = $this->getMockBuilder('oxDeliverySet')->disableOriginalConstructor()->getMock();
+        $this->oxBase = $this->getMockBuilder('oxBase')->disableOriginalConstructor()->getMock();
+        $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
+        $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
+        $this->logger = $this->getMockBuilder('mf_sdk_logger_helper')->disableOriginalConstructor()->getMock();
     }
 
     /**
      * As i wanna check the real values delivered by the config, we need to do an extra action
      * instead of the the default value of the base test case.
      */
-    public function testConfigCreation()
-    {
-        $oxConfig = $this->getMock('oxConfig');
-        $versionLayer = $this->getMock('VersionLayerInterface');
-        $versionLayer->expects($this->once())->method('getConfig')->will($this->returnValue($oxConfig));
-        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new SDKConfig()));
-        $this->helper->setVersionLayer($versionLayer);
-        $oxConfig->expects($this->at(0))
-            ->method('getConfigParam')
-            ->with($this->equalTo('sBepadoLocalEndpoint'))
-            ->will($this->returnValue('test-endpoint'));
-        $oxConfig->expects($this->at(1))
-            ->method('getConfigParam')
-            ->with($this->equalTo('sBepadoApiKey'))
-            ->will($this->returnValue('test-key'));
-
-        $oxConfig->expects($this->at(2))
-            ->method('getConfigParam')
-            ->with($this->equalTo('sandboxMode'))
-            ->will($this->returnValue(true));
-        $sdConfig = $this->helper->createSdkConfigFromOxid();
-
-        $this->assertEquals('test-endpoint', $sdConfig->getApiEndpointUrl());
-        $this->assertEquals('test-key', $sdConfig->getApiKey());
-        $this->assertTrue($sdConfig->getSandboxMode());
-        $this->assertNotNull($sdConfig->getSocialnetworkHost());
-        $this->assertNotNull($sdConfig->getTransactionHost());
-        $this->assertNotNull($sdConfig->getSearchHost());
-    }
-
-    public function testConfigCreationInProductMode()
+    public function testConfigCreationNonSandboxMode()
     {
         $oxConfig = $this->getMock('oxConfig');
         $versionLayer = $this->getMock('VersionLayerInterface');
@@ -84,9 +68,38 @@ class mf_sdk_helperTest extends BaseTestCase
         $this->assertNull($sdConfig->getSearchHost());
     }
 
+    public function testConfigCreationInSandboxMode()
+    {
+        $oxConfig = $this->getMock('oxConfig');
+        $versionLayer = $this->getMock('VersionLayerInterface');
+        $versionLayer->expects($this->once())->method('getConfig')->will($this->returnValue($oxConfig));
+        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new SDKConfig()));
+        $this->helper->setVersionLayer($versionLayer);
+        $oxConfig->expects($this->at(0))
+            ->method('getConfigParam')
+            ->with($this->equalTo('sBepadoLocalEndpoint'))
+            ->will($this->returnValue('test-endpoint'));
+        $oxConfig->expects($this->at(1))
+            ->method('getConfigParam')
+            ->with($this->equalTo('sBepadoApiKey'))
+            ->will($this->returnValue('test-key'));
+
+        $oxConfig->expects($this->at(2))
+            ->method('getConfigParam')
+            ->with($this->equalTo('sandboxMode'))
+            ->will($this->returnValue(true));
+        $sdConfig = $this->helper->createSdkConfigFromOxid();
+
+        $this->assertEquals('test-endpoint', $sdConfig->getApiEndpointUrl());
+        $this->assertEquals('test-key', $sdConfig->getApiKey());
+        $this->assertTrue($sdConfig->getSandboxMode());
+        $this->assertEquals('search.server1230-han.de-nserver.de', $sdConfig->getSearchHost());
+        $this->assertEquals('transaction.server1230-han.de-nserver.de', $sdConfig->getTransactionHost());
+        $this->assertEquals('sn.server1230-han.de-nserver.de', $sdConfig->getSocialnetworkHost());
+    }
+
     public function testImageCreation()
     {
-        $this->markTestSkipped('No network available');
         $this->oxidConfig
             ->expects($this->any())
             ->method('getMasterPictureDir')
@@ -109,14 +122,87 @@ class mf_sdk_helperTest extends BaseTestCase
      */
     public function testImageCreateWithNonExistingFile()
     {
-        $this->markTestSkipped('No network available');
         $this->helper->createOxidImageFromPath('some-path', 1);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage No bepado user group found.
+     */
+    public function testOnModuleActivationGroupNotFound()
+    {
+        $this->oxDb->expects($this->any())->method('execute');
+        $this->oxGroups->expects($this->once())->method('load')->with($this->equalTo('bepadoshopgroup'));
+        $this->oxGroups->expects($this->once())->method('isLoaded')->will($this->returnValue(false));
+        $this->logger->expects($this->once())->method('writeBepadoLog')->with($this->equalTo('No bepado user group found.'));
+
+        $this->helper->onModuleActivation();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage No bepado shipping found
+     */
+    public function testOnModuleActivationShippingRuleNotFound()
+    {
+        $this->oxDb->expects($this->any())->method('execute');
+        $this->oxGroups->expects($this->once())->method('load');
+        $this->oxGroups->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+
+        $this->oxDelivery->expects($this->once())->method('load')->with($this->equalTo('bepadoshippingrule'));
+        $this->oxDelivery->expects($this->once())->method('isLoaded')->will($this->returnValue(false));
+        $this->logger->expects($this->once())->method('writeBepadoLog')->with($this->equalTo('No bepado shipping found.'));
+
+        $this->helper->onModuleActivation();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage No bepado shipping rule found
+     */
+    public function testOnModuleActivationShippingNotFound()
+    {
+        $this->oxDb->expects($this->any())->method('execute');
+        $this->oxGroups->expects($this->once())->method('load');
+        $this->oxGroups->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+
+        $this->oxDelivery->expects($this->once())->method('load');
+        $this->oxDelivery->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+
+        $this->oxDeliverySet->expects($this->once())->method('load')->with($this->equalTo('bepadoshipping'));
+        $this->oxDeliverySet->expects($this->once())->method('isLoaded')->will($this->returnValue(false));
+        $this->logger->expects($this->once())->method('writeBepadoLog')->with($this->equalTo('No bepado shipping rule found.'));
+
+        $this->helper->onModuleActivation();
+    }
+
+    public function testOnModuleActivationSuccess()
+    {
+        $this->oxDb->expects($this->any())->method('execute');
+        $this->oxGroups->expects($this->once())->method('load');
+        $this->oxGroups->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+
+        $this->oxDelivery->expects($this->once())->method('load');
+        $this->oxDelivery->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+
+        $this->oxDeliverySet->expects($this->once())->method('load');
+        $this->oxDeliverySet->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+
+        $this->oxBase->expects($this->at(0))->method('oxobject2delivery');
+        $this->oxBase->expects($this->at(1))->method('oxobject2delivery');
+
+        $this->helper->onModuleActivation();
     }
 
     protected function getObjectMapping()
     {
         return array(
-            'SDKConfig' => new SDKConfig(),
+            'SDKConfig'             => new SDKConfig(),
+            'oxgroups'              => $this->oxGroups,
+            'oxdelivery'            => $this->oxDelivery,
+            'oxdeliveryset'         => $this->oxDeliverySet,
+            'oxbase'                => $this->oxBase,
+            'mf_sdk_logger_helper'  => $this->logger,
         );
     }
 }

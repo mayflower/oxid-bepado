@@ -29,7 +29,7 @@ class mf_sdk_converterTest extends BaseTestCase
         'fixedPrice'       => false,   # won't skip this in usual shops
         'currency'         => 'EUR',
         'freeDelivery'     => false,
-        'deliveryDate'     => 1421622000,
+        'deliveryDate'     => 2424121200,
         'availability'     => 10,
         'images'           => array('imgage-url-1'),
         'categories'       => array(),
@@ -61,7 +61,7 @@ class mf_sdk_converterTest extends BaseTestCase
         'oxarticles__oxunitquantity' => 10,
         'oxarticles__oxunitname'     => '_UNIT_G',
         'oxarticles__oxpic1'         => 'imgage-url-1',
-        'oxarticles__oxdelivery'     => '2015-01-19',
+        'oxarticles__oxdelivery'     => '2046-10-26',
         'oxarticles__oxmaxdeltime'   => '2',
         'oxarticles__oxdeltimeunit'  => 'WEEK'
     );
@@ -133,9 +133,9 @@ class mf_sdk_converterTest extends BaseTestCase
 
             if (!oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
                 if ('price' === $property) {
-                    $value = 77.68;
+                    $value = 77.680672268907557;
                 } elseif ('purchasePrice' === $property) {
-                    $value = 75.63;
+                    $value = 75.630252100840337;
                 }
             }
 
@@ -237,9 +237,10 @@ class mf_sdk_converterTest extends BaseTestCase
     protected function getObjectMapping()
     {
         return array(
-            'oxshop'         => $this->oxShop,
-            'mf_sdk_helper'  => $this->sdkHelper,
-            'oxlist'         => $this->oxList,
+            'oxshop'           => $this->oxShop,
+            'mf_sdk_helper'    => $this->sdkHelper,
+            'oxlist'           => $this->oxList,
+            'mf_module_helper' => oxNew('mf_module_helper'),
         );
     }
 }

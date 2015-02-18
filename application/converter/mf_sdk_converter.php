@@ -30,6 +30,11 @@ class mf_sdk_converter implements mf_converter_interface
     );
 
     /**
+     * @var mf_module_helper
+     */
+    private $moduleHelper;
+
+    /**
      * {@inheritDoc}
      *
      * @param oxarticle $object
@@ -65,35 +70,20 @@ class mf_sdk_converter implements mf_converter_interface
         }
 
         $sdkProduct->vat = $object->getArticleVat() / 100;
-        // Price are net or brut depending on ShopConfig
-        if (oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
-            $sdkProduct->price = $object->getPrice()->getNettoPrice();
-        } else {
-            $sdkProduct->price = $object->getPrice()->getBruttoPrice()*100/($object->getArticleVat()+100);
-        }
+        $sdkProduct->price = $this->getModuleHelper()->createNetPrice($object->getPrice());
 
         // create the purchase price with the matching mode
         $purchasePrice = new oxPrice();
         $purchasePrice->setVat($object->getArticleVat()) /100;
-        if (oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
-            $purchasePrice->setNettoPriceMode();
-        } else {
-            $purchasePrice->setBruttoPriceMode();
-        }
-
 
         $purchasePrice->setPrice($object->{$this->computePurchasePriceField($object)}->value);
-        $sdkProduct->purchasePrice = $purchasePrice->getNettoPrice();
-        if (oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
-            $sdkProduct->purchasePrice = $purchasePrice->getNettoPrice();
-        } else {
-            $sdkProduct->purchasePrice = $purchasePrice->getBruttoPrice()*100/($object->getArticleVat()+100);
-        }
+        $sdkProduct->purchasePrice = $this->getModuleHelper()->createNetPrice($purchasePrice);
+
         if (!$sdkProduct->purchasePrice) {
             $sdkProduct->purchasePrice = $sdkProduct->price;
         }
         $sdkProduct->currency = $currency->name;
-        $sdkProduct->availability = $object->oxarticles__oxstock->value;
+        $sdkProduct->availability = (int) $object->oxarticles__oxstock->value;
 
         $sdkProduct->images = $this->mapImages($object);
         $sdkProduct->categories = $this->mapCategories($object);
@@ -121,7 +111,7 @@ class mf_sdk_converter implements mf_converter_interface
                 $deliveryUnit = 1;
         }
         $sdkProduct->deliveryWorkDays = $maxDeliveryTime * $deliveryUnit;
-        file_put_contents('/tmp/changes', "sdkProduct: ".serialize($sdkProduct).PHP_EOL.PHP_EOL, FILE_APPEND);
+
         return $sdkProduct;
     }
 
@@ -343,5 +333,14 @@ class mf_sdk_converter implements mf_converter_interface
     {
 
         return 'BEP-' . mt_rand(0,9999) . '-' . mt_rand(0,9999);
+    }
+
+    private function getModuleHelper()
+    {
+        if (null == $this->moduleHelper) {
+            $this->moduleHelper = $this->getVersionLayer()->createNewObject('mf_module_helper');
+        }
+
+        return $this->moduleHelper;
     }
 }

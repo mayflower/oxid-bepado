@@ -28,7 +28,7 @@ class VersionLayerFactory
     {
         list($sLayerClassFile, $sLayerClass) = $this->_loadLayerConfig();
 
-        if ($sLayerClassFile === null || $sLayerClass === null) {
+        if ($sLayerClassFile === '' || $sLayerClass === '') {
             list($sLayerClassFile, $sLayerClass) = $this->_loadVersionLayer();
         }
 
@@ -180,4 +180,3 @@ class VersionLayerFactory
         return $this->_sVersion;
     }
 }
- 

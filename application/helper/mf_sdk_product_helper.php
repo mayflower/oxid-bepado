@@ -119,49 +119,53 @@ class mf_sdk_product_helper extends mf_abstract_helper
      *
      * @param oxOrder $oxOrder
      *
+     * @param oxUser $oxUser
+     * @return Reservation|bool
      * @throws oxArticleInputException
      * @throws oxNoArticleException
      * @throws oxOutOfStockException
-     *
-     * @return Reservation|bool
      */
-    public function reserveProductsInOrder(oxOrder $oxOrder)
+    public function reserveProductsInOrder(oxOrder $oxOrder, oxUser $oxUser)
     {
         /** @var mf_sdk_order_converter $converter */
         $converter = $this->getVersionLayer()->createNewObject('mf_sdk_order_converter');
+        /** @var mf_sdk_address_converter $addressConverter */
+        $addressConverter = $this->getVersionLayer()->createNewObject('mf_sdk_address_converter');
+
         $sdkOrder = $converter->fromShopToBepado($oxOrder);
+        if (null == $sdkOrder->deliveryAddress || null == $sdkOrder->deliveryAddress->firstName) {
+            $sdkOrder->deliveryAddress = $addressConverter->fromShopToBepado($oxUser, 'oxuser__ox');
+        }
+
+        if (null == $sdkOrder->billingAddress || null == $sdkOrder->billingAddress->firstName) {
+            // todo use a persisted (session -> delivery id) address when exists
+            $sdkOrder->billingAddress = $addressConverter->fromShopToBepado($oxUser, 'oxuser__ox');
+        }
 
         if (count($sdkOrder->orderItems) === 0) {
             return false;
         }
 
         $reservation = $this->getSdk()->reserveProducts($sdkOrder);
+
         if (!$reservation instanceof Reservation) {
             $exception = new oxNoArticleException();
-            $exception->setMessage('Something went wrong while reservation');
+            $exception->setMessage('Expected \Bepado\SDK\Struct\Reservation got '.get_class($reservation));
             throw $exception;
         }
         if (!$reservation->success) {
+            $computedMessages = array();
             foreach ($reservation->messages as $shopId => $messages) {
                 foreach ($messages as $message) {
                     $keys = array();
                     foreach ($message->values as $key => $values) {
                         $keys[] = '%'.$key;
                     }
-                    $computedMessage = str_replace($keys, $message->values, $message->message);
-
-                    if (isset($message->values['availability'])) {
-                        $exception = new oxOutOfStockException();
-                        $exception->setRemainingAmount($message->values['availablity']);
-                        $exception->setMessage($computedMessage);
-                        throw $exception;
-                    } else {
-                        $exception = new oxArticleInputException();
-                        $exception->setMessage($computedMessage);
-                        throw $exception;
-                    }
+                    $computedMessages[] = str_replace($keys, $message->values, $message->message);
                 }
             }
+
+            throw new \Exception(sprintf('Errors while reservation: %s', implode(', ', $computedMessages)));
         }
 
         return $reservation;

@@ -57,8 +57,7 @@ class oxidProductFromShop implements ProductFromShop
     {
         $ids = array();
         $sql = "SELECT p_source_id FROM bepado_product_state WHERE state = ".SDKConfig::ARTICLE_STATE_EXPORTED;
-        $oxDB = $this->_oVersionLayer->getDb(true);
-        $list = $oxDB->execute($sql);
+        $list = $this->getVersionLayer()->getDb(true)->execute($sql);
 
         while (!$list->EOF) {
             $ids[] = $list->fields['p_source_id'];
@@ -191,9 +190,7 @@ class oxidProductFromShop implements ProductFromShop
         $oxAddress = array(
             $type.'company'   => $address->company,
             $type.'fname'     => $address->firstName.(
-                strlen($address->middleName) > 0
-                    ? ' '.$address->middleName
-                    : ''
+                strlen($address->middleName) > 0 ? ' '.$address->middleName : ''
                 ),
             $type.'lname'      => $address->surName,
             $type.'street'    => $address->street,

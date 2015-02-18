@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "bepado/sdk",
-            "version": "v1.6.2",
+            "version": "v1.6.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/shopware/bepado-sdk.git",
-                "reference": "27c3b9379d85174d9ace7a0c5800d2a304c48978"
+                "reference": "7825372f7509ee41a04e78c9e0fbf1107be6d564"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shopware/bepado-sdk/zipball/27c3b9379d85174d9ace7a0c5800d2a304c48978",
-                "reference": "27c3b9379d85174d9ace7a0c5800d2a304c48978",
+                "url": "https://api.github.com/repos/shopware/bepado-sdk/zipball/7825372f7509ee41a04e78c9e0fbf1107be6d564",
+                "reference": "7825372f7509ee41a04e78c9e0fbf1107be6d564",
                 "shasum": ""
             },
             "require-dev": {
@@ -39,7 +39,7 @@
                 "MIT"
             ],
             "description": "The PHP Software Development Kit for Shop developers.",
-            "time": "2014-12-17 14:59:17"
+            "time": "2015-02-17 13:27:12"
         }
     ],
     "packages-dev": [],
