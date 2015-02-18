@@ -101,6 +101,11 @@ $aModule = array(
             'block'    => 'admin_order_article_listitem',
             'file'     => $aPaths['blocks'] . '/mf_order_article.tpl'
         ),
+        array(
+            'template' => 'page/checkout/payment.tpl',
+            'block'    => 'checkout_payment_errors',
+            'file'     => $aPaths['blocks'] . '/mf_checkout_payment_errors.tpl'
+        ),
     ),
     'templates' => array(
         'mf_module_config.tpl'     => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl',

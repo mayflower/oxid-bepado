@@ -15,6 +15,9 @@
  */
 class mf_oxOrder extends mf_oxOrder_parent
 {
+
+    const BEPADO_RESPONSE_ORDER_PROBLEM_STATE = 9;
+
     /**
      * @var VersionLayerInterface
      */
@@ -58,7 +61,7 @@ class mf_oxOrder extends mf_oxOrder_parent
                 $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
                 $logger->writeBepadoLog('Problem while reserve or checking out the product: '.$e->getMessage());
                 $this->getVersionLayer()->getDb()->rollbackTransaction();
-                return oxOrder::ORDER_STATE_INVALIDPAYMENT;
+                return self::BEPADO_RESPONSE_ORDER_PROBLEM_STATE;
             }
         }
 
