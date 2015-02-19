@@ -17,14 +17,16 @@ $aPaths = array(
 
 $aModule = array(
     'id' => 'bepado',
-    'title' => 'Bepado',
+    'title' => 'Bepado-Plugin',
     'description' => array(
-        'de' => 'Bepado Modul',
-        'en' => 'Bepado module',
+        'de' => 'Verbinden Sie ihren Oxid eShop mit dem Bepado Netzwerk',
+        'en' => 'To connect your Oxid eShop with the Bepado network',
     ),
-    'version' => '0.1',
+    'version' => '1.0.0-RC4',
     'author'  => 'Mayflower GmbH',
-    'email'   => 'info@mayflower.de',
+    'email'   => 'kontakt@mayflower.de',
+    'url'     => 'www.mayflower.de',
+    'thumbnail' => 'thumbnail.jpg',
     'extend'  => array(
         'module_config'         => $aPaths['controllers'] . '/admin/mf_Module_Config',
         'article_extend'        => $aPaths['controllers'] . '/admin/mf_article_extend',
