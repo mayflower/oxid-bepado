@@ -57,6 +57,7 @@ class mf_oxOrder extends mf_oxOrder_parent
 
                 $productHelper->checkoutProducts($reservation, $this);
             } catch(Exception $e) {
+                $this->delete();
                 /** @var mf_sdk_logger_helper $logger */
                 $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
                 $logger->writeBepadoLog('Problem while reserve or checking out the product: '.$e->getMessage());
