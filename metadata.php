@@ -64,13 +64,14 @@ $aModule = array(
         'VersionLayer500'       => $aPaths['core'] . '/VersionLayer500.php',
         'VersionLayerFactory'   => $aPaths['core'] . '/VersionLayerFactory.php',
 
-        'mf_abstract_helper'    => $aPaths['helper'] . '/mf_abstract_helper.php',
-        'mf_sdk_helper'         => $aPaths['helper'] . '/mf_sdk_helper.php',
-        'mf_sdk_product_helper' => $aPaths['helper'] . '/mf_sdk_product_helper.php',
-        'mf_sdk_logger_helper'  => $aPaths['helper'] . '/mf_sdk_logger_helper.php',
-        'mf_sdk_article_helper' => $aPaths['helper'] . '/mf_sdk_article_helper.php',
-        'mf_sdk_order_helper'   => $aPaths['helper'] . '/mf_sdk_order_helper.php',
-        'mf_module_helper'      => $aPaths['helper'] . '/mf_module_helper.php',
+        'mf_abstract_helper'          => $aPaths['helper'] . '/mf_abstract_helper.php',
+        'mf_sdk_helper'               => $aPaths['helper'] . '/mf_sdk_helper.php',
+        'mf_sdk_product_helper'       => $aPaths['helper'] . '/mf_sdk_product_helper.php',
+        'mf_sdk_logger_helper'        => $aPaths['helper'] . '/mf_sdk_logger_helper.php',
+        'mf_sdk_article_helper'       => $aPaths['helper'] . '/mf_sdk_article_helper.php',
+        'mf_sdk_order_helper'         => $aPaths['helper'] . '/mf_sdk_order_helper.php',
+        'mf_module_helper'            => $aPaths['helper'] . '/mf_module_helper.php',
+        'mf_article_number_generator' => $aPaths['helper'] . '/mf_article_number_generator.php',
     ),
     'blocks' => array(
         array(

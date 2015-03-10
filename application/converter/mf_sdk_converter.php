@@ -141,7 +141,6 @@ class mf_sdk_converter implements mf_converter_interface
         $currency = array_shift($currency);
         $rate = $currency->rate;
 
-        $aParams['oxarticles__oxartnum'] = $this->generateArtNum();
         $aParams['oxarticles__oxean'] = $object->ean;
         $aParams['oxarticles__oxexturl'] = $object->url;
         $aParams['oxarticles__oxtitle'] = $object->title;
@@ -327,12 +326,6 @@ class mf_sdk_converter implements mf_converter_interface
         $purchaseGroupChar = strtolower($purchaseGroupChar);
 
         return 'oxarticles__oxprice'.$purchaseGroupChar;
-    }
-
-    private function generateArtNum()
-    {
-
-        return 'BEP-' . mt_rand(0,9999) . '-' . mt_rand(0,9999);
     }
 
     private function getModuleHelper()
