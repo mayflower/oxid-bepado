@@ -22,6 +22,7 @@ class oxidProductToShopTest extends BaseTestCase
     protected $convertedOxArticle;
     protected $oxArticle;
     protected $oxBase;
+    protected $articleNumberGenerator;
 
     public function setUp()
     {
@@ -37,6 +38,7 @@ class oxidProductToShopTest extends BaseTestCase
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
 
         // helper/converter for our module
+        $this->articleNumberGenerator = $this->getMockBuilder('mf_article_number_generator')->disableOriginalConstructor()->getMock();
         $this->sdkHelper = $this->getMock('mf_sdk_helper', array('createSdkConfigFromOxid'));
         $this->converter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
         $this->converter->expects($this->any())->method('fromBepadoToShop')->will($this->returnValue($this->convertedOxArticle));
@@ -72,12 +74,17 @@ class oxidProductToShopTest extends BaseTestCase
             ->will($this->returnValue(false));
 
         // assign data and save the article
+        $this->articleNumberGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->will($this->returnValue('article-number'));
         $this->convertedOxArticle
             ->expects($this->once())
             ->method('assign')
             ->with($this->equalTo(array(
                 'oxarticles__oxactive' => 0,
                 'oxarticles__oxstockflag' => 3,
+                'oxarticles__oxartnum'    => 'article-number',
             )));
         $this->convertedOxArticle->expects($this->once())->method('save');
 
@@ -127,6 +134,13 @@ class oxidProductToShopTest extends BaseTestCase
             ->method('isLoaded')
             ->will($this->returnValue(true));
         $this->bepadoProductState->expects($this->once())->method('getId')->will($this->returnValue('test-id'));
+        // the product state entry won't be changed on update
+        $this->bepadoProductState->expects($this->never())->method('save');
+        // the article number should be created on insert only
+        $this->articleNumberGenerator
+            ->expects($this->never())
+            ->method('generate');
+
         // expected methods on the existing oxArticle
         $this->oxArticle
             ->expects($this->once())
@@ -262,10 +276,11 @@ class oxidProductToShopTest extends BaseTestCase
     protected function getObjectMapping()
     {
         return array(
-            'oxbase'           => $this->bepadoProductState,
-            'oxarticle'        => $this->oxArticle,
-            'mf_sdk_converter' => $this->converter,
-            'mf_sdk_helper'    => $this->sdkHelper,
+            'oxbase'                      => $this->bepadoProductState,
+            'oxarticle'                   => $this->oxArticle,
+            'mf_sdk_converter'            => $this->converter,
+            'mf_sdk_helper'               => $this->sdkHelper,
+            'mf_article_number_generator' => $this->articleNumberGenerator,
         );
     }
 }

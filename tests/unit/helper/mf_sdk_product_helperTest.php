@@ -22,11 +22,13 @@ class mf_sdk_product_helperTest extends BaseTestCase
     protected $oxOrder;
     protected $articleHelper;
     protected $loggerHelper;
+    protected $oxUser;
+    protected $addressConverter;
 
     /**
      * @var mf_sdk_product_helper
      */
-    private $helper;
+    protected $helper;
 
     public function setUp()
     {
@@ -45,6 +47,8 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
         $this->articleHelper = $this->getMockBuilder('mf_sdk_article_helper')->disableOriginalConstructor()->getMock();
         $this->loggerHelper = $this->getMockBuilder('mf_sdk_logger_helper')->disableOriginalConstructor()->getMock();
+        $this->oxUser = $this->getMockBuilder('oxUser')->disableOriginalConstructor()->getMock();
+        $this->addressConverter = $this->getMockBuilder('mf_sdk_address_converter')->disableOriginalConstructor()->getMock();
 
         $sdkConfig = new SDKConfig();
         $this->sdkHelper
@@ -343,8 +347,12 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->method('reserveProducts')
             ->with($this->equalTo($sdkOrder))
             ->will($this->returnValue($sdkReservation));
+        $this->addressConverter
+            ->expects($this->any())
+            ->method('fromShopToBepado')
+            ->with($this->equalTo($this->oxUser), $this->equalTo('oxuser__ox'));
 
-        $this->helper->reserveProductsInOrder($oxOrder);
+        $this->helper->reserveProductsInOrder($oxOrder, $this->oxUser);
     }
 
     public function testReservationWithEmptyOrderItems()
@@ -359,118 +367,9 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->with($this->equalTo($oxOrder))
             ->will($this->returnValue($sdkOrder));
 
-        $result = $this->helper->reserveProductsInOrder($oxOrder);
+        $result = $this->helper->reserveProductsInOrder($oxOrder, $this->oxUser);
 
         $this->assertFalse($result);
-    }
-
-    /**
-     * @expectedException \oxOutOfStockException
-     * @expectedExceptionMessage test message: 10
-     */
-    public function testReservationStockExceeded()
-    {
-        $sdkOrder = new Struct\Order();
-        $orderItem = new Struct\OrderItem();
-        $sdkOrder->orderItems = array($orderItem);
-        $sdkReservation = new Reservation();
-        $oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
-
-        // expected method calls
-        $this->orderConverter
-            ->expects($this->once())
-            ->method('fromShopToBepado')
-            ->with($this->equalTo($oxOrder))
-            ->will($this->returnValue($sdkOrder));
-        $this->sdk
-            ->expects($this->once())
-            ->method('reserveProducts')
-            ->with($this->equalTo($sdkOrder))
-            ->will($this->returnValue($sdkReservation));
-        $sdkReservation->success = false;
-        $sdkReservation->messages = array(
-            'some-id' => array(
-                new Message( array(
-                        'message' => 'test message: %availability',
-                        'values' => array('availability' => 10)
-                    )
-                )
-            )
-        );
-
-        $this->helper->reserveProductsInOrder($oxOrder);
-    }
-
-    /**
-     * @expectedException \oxArticleInputException
-     * @expectedExceptionMessage test message: 10
-     */
-    public function testReservationPriceChanged()
-    {
-        $sdkOrder = new Struct\Order();
-        $orderItem = new Struct\OrderItem();
-        $sdkOrder->orderItems = array($orderItem);
-        $sdkReservation = new Reservation();
-        $oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
-
-        // expected method calls
-        $this->orderConverter
-            ->expects($this->once())
-            ->method('fromShopToBepado')
-            ->with($this->equalTo($oxOrder))
-            ->will($this->returnValue($sdkOrder));
-        $this->sdk
-            ->expects($this->once())
-            ->method('reserveProducts')
-            ->with($this->equalTo($sdkOrder))
-            ->will($this->returnValue($sdkReservation));
-        $sdkReservation->success = false;
-        $sdkReservation->messages =  array(
-            'some-id' => array(
-                new Message(array(
-                        'message' => 'test message: %price',
-                        'values' => array('price' => 10)
-                    )
-            ))
-        );
-
-        $this->helper->reserveProductsInOrder($oxOrder);
-    }
-
-    /**
-     * @expectedException \oxArticleInputException
-     * @expectedExceptionMessage Products cannot be shipped to DEU
-     */
-    public function testReservationNotShippedToCountry()
-    {
-        $sdkOrder = new Struct\Order();
-        $orderItem = new Struct\OrderItem();
-        $sdkOrder->orderItems = array($orderItem);
-        $sdkReservation = new Reservation();
-        $oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
-
-        // expected method calls
-        $this->orderConverter
-            ->expects($this->once())
-            ->method('fromShopToBepado')
-            ->with($this->equalTo($oxOrder))
-            ->will($this->returnValue($sdkOrder));
-        $this->sdk
-            ->expects($this->once())
-            ->method('reserveProducts')
-            ->with($this->equalTo($sdkOrder))
-            ->will($this->returnValue($sdkReservation));
-        $sdkReservation->success = false;
-        $sdkReservation->messages =  array(
-            'some-id' => array(
-                new Message(array(
-                        'message' => 'Products cannot be shipped to %country',
-                        'values' => array('country' => 'DEU')
-                    )
-                ))
-        );
-
-        $this->helper->reserveProductsInOrder($oxOrder);
     }
 
     public function testCheckoutProduct()
@@ -494,12 +393,13 @@ class mf_sdk_product_helperTest extends BaseTestCase
     protected function getObjectMapping()
     {
         return array(
-            'SDKConfig'              => new SDKConfig(),
-            'mf_sdk_helper'          => $this->sdkHelper,
-            'mf_sdk_order_converter' => $this->orderConverter,
-            'oxorder'                => $this->oxOrder,
-            'mf_sdk_article_helper'  => $this->articleHelper,
-            'mf_sdk_logger_helper'  => $this->loggerHelper,
+            'SDKConfig'                => new SDKConfig(),
+            'mf_sdk_helper'            => $this->sdkHelper,
+            'mf_sdk_order_converter'   => $this->orderConverter,
+            'oxorder'                  => $this->oxOrder,
+            'mf_sdk_article_helper'    => $this->articleHelper,
+            'mf_sdk_logger_helper'     => $this->loggerHelper,
+            'mf_sdk_address_converter' => $this->addressConverter,
         );
     }
 }

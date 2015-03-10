@@ -138,9 +138,12 @@ class oxidProductToShop implements ProductToShop
      */
     private function insertArticleWithBepadoState(oxArticle $oxArticle, oxBase $oBepadoProductState, Struct\Product $product)
     {
+        /** @var mf_article_number_generator $articleNumberGenerator */
+        $articleNumberGenerator = $this->getVersionLayer()->createNewObject('mf_article_number_generator');
         $oxArticle->assign(array(
-            'oxarticles__oxactive' => 0,
+            'oxarticles__oxactive'    => 0,
             'oxarticles__oxstockflag' => 3,
+            'oxarticles__oxartnum'    => $articleNumberGenerator->generate(),
 
         ));
         $oxArticle->save();
