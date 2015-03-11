@@ -1,7 +1,7 @@
 #Mayflower OXID-Bepado-Module
 
 This repository contains a module-extension for the **OXID eShop Community Edition v4.9** 
-by [OXID eSales](https://www.oxid-esales.com/).
+by [OXID eSales](https://www.oxid-esales.com/). It supports **OXID eShop Enterprise Edition** as well.
 
 Its purpose is to connect your OXID shop to the *Bepado* network and hence enabling you to 
 offer imported products from remote shops to top off your range of products. Your customer will 
@@ -11,6 +11,8 @@ handle the transaction concerning remote products with no inconvenience to yours
 Accordingly you can export your products to *Bepado* so other shops can sell them and hence 
 enlarging your pool of customers.
 
+
+## What is Bepado?
 
 For further information about the *Bepado* network go to http://info.bepado.de/ (german site).
 
