@@ -1,6 +1,6 @@
 #Mayflower OXID-Bepado-Module
 
-This respository contains a module-extension for the **OXID eShop Community Edition v4.9** 
+This repository contains a module-extension for the **OXID eShop Community Edition v4.9** 
 by [OXID eSales](https://www.oxid-esales.com/).
 
 Its purpose is to connect your OXID shop to the *Bepado* network and hence enabling you to 
