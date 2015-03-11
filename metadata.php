@@ -22,10 +22,10 @@ $aModule = array(
         'de' => 'Verbinden Sie ihren Oxid eShop mit dem Bepado Netzwerk',
         'en' => 'To connect your Oxid eShop with the Bepado network',
     ),
-    'version' => '1.0.0-RC4',
+    'version' => '1.0.0',
     'author'  => 'Mayflower GmbH',
     'email'   => 'kontakt@mayflower.de',
-    'url'     => 'www.mayflower.de',
+    'url'     => 'www.mayflower.de/OXID-Bepado-Modul-von_mayflower',
     'thumbnail' => 'thumbnail.jpg',
     'extend'  => array(
         'module_config'         => $aPaths['controllers'] . '/admin/mf_Module_Config',
