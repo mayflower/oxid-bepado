@@ -40,4 +40,4 @@ The Mayflower OXID-Bepado-Modules code is subject to the GPLv3 for compatibility
 ### Users of OXID Enterprise Edition
 
 If you are a Enterprise Edition user, please [contact us](mailto:kontakt@mayflower.de) for further information how to 
-use the shop connector for your Enterprise Edition.
+license and use the shop connector for your Enterprise Edition.
