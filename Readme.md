@@ -34,8 +34,7 @@ For Information on how to **EXPORT** products from your shop to *Bepado* go to
 
 ## License
 
-The Mayflower OXID-Bepado-Modules code is subject to the GPLv3 for compatibility with OXID eShop Community Edition 
-(see [GPLv3](docs/license.md)) and subject to a proprietary license for the OXID eShop Enterprise Edition.
+The Mayflower OXID-Bepado-Modules code is subject to the [GPLv3](docs/license.md) for compatibility with OXID eShop Community Edition and subject to a proprietary license for the OXID eShop Enterprise Edition.
 
 ### Users of OXID Enterprise Edition
 
