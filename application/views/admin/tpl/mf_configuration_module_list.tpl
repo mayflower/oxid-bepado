@@ -22,7 +22,7 @@
 
 <div id="liste">
     <form name="search" id="search" action="[{ $oViewConf->getSelfLink() }]" method="post">
-        [{include file="_formparams.tpl" cl="selectlist_list" lstrt=$lstrt actedit=$actedit oxid=$oxid fnc="" language=$actlang editlanguage=$actlang}]
+        [{include file="_formparams.tpl" cl="mf_configuration_module_list" lstrt=$lstrt actedit=$actedit oxid=$oxid fnc="" language=$actlang editlanguage=$actlang}]
         <table cellspacing="0" cellpadding="0" border="0" width="100%">
 
         </table>
@@ -34,8 +34,8 @@
 <script type="text/javascript">
     if (parent.parent)
     {   parent.parent.sShopTitle   = "[{$actshopobj->oxshops__oxname->getRawValue()|oxaddslashes}]";
-        parent.parent.sMenuItem    = "[{ oxmultilang ident="GENERAL_MENUITEM" }]";
-        parent.parent.sMenuSubItem = "[{ oxmultilang ident="BIS_LIST_OF_QUESTION_LIST_MENUSUBITEM" }]";
+        parent.parent.sMenuItem    = "[{ oxmultilang ident="MF_CONFIGURATION" }]";
+        parent.parent.sMenuSubItem = "[{ oxmultilang ident="MF_CONFIGURATION_MODULE_LIST_MENUSUBITEM" }]";
         parent.parent.sWorkArea    = "[{$_act}]";
         parent.parent.setTitle();
     }

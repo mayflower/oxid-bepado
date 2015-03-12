@@ -3,8 +3,9 @@
 <OX>
     <OXMENU id="NAVIGATION_BEPADO">
         <MAINMENU id="mf_bepado_setting">
-            <SUBMENU id="mf_bepado_setting_module" cl="mf_bepado_setting_module" list="mf_bepado_setting_module_list">
-                <TAB id="mf_bepado_setting_module_main" cl="mf_bepado_setting_module_main" />
+            <SUBMENU id="mf_configuration_module" cl="mf_configuration_module" list="mf_configuration_module_list">
+                <TAB id="mf_configuration_module_main" cl="mf_configuration_module_main" />
+                <TAB id="mf_configuration_module_extend" cl="mf_configuration_module_extend" />
             </SUBMENU>
         </MAINMENU>
     </OXMENU>

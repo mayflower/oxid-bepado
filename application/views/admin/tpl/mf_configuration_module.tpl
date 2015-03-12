@@ -11,7 +11,7 @@
         border="0"
         onload="top.loadEditFrame('[{$oViewConf->getSelfLink()}]&[{ $editurl }][{ if $oxid }]&oxid=[{$oxid}][{/if}]');">
     <frame
-            src="[{$oViewConf->getSelfLink()}]&[{ $listurl }][{ if $oxid }]&oxid=[{$oxid}][{/if}]"
+            src="[{$oViewConf->getSelfLink()}]&[{ $listurl }]&oxid=configuration_module"
             name="list"
             id="list"
             frameborder="0"

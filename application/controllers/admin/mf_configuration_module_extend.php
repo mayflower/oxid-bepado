@@ -3,11 +3,11 @@
 /**
  * @author Maximilian Berghoff <Maximilian.Berghoff@mayflower.de>
  */
-class mf_bepado_setting_module_main extends oxAdminDetails
+class mf_configuration_module_extend extends oxAdminDetails
 {
     public function render()
     {
         parent::render();
-        return 'mf_bepado_setting_module_main.tpl';
+        return 'mf_configuration_module_extend.tpl';
     }
 }

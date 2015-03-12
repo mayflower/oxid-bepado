@@ -36,9 +36,10 @@ $aModule = array(
         'list_order'             => $aPaths['controllers'] . '/admin/mf_list_order',
         'order_article'          => $aPaths['controllers'] . '/admin/mf_order_article',
         'order_package'          => $aPaths['controllers'] . '/admin/mf_order_package',
-        'mf_bepado_setting_module'      => $aPaths['controllers'] . '/admin/mf_bepado_setting_module',
-        'mf_bepado_setting_module_main' => $aPaths['controllers'] . '/admin/mf_bepado_setting_module_main',
-        'mf_bepado_setting_module_list' => $aPaths['controllers'] . '/admin/mf_bepado_setting_module_list',
+        'mf_configuration_module'      => $aPaths['controllers'] . '/admin/mf_configuration_module',
+        'mf_configuration_module_main' => $aPaths['controllers'] . '/admin/mf_configuration_module_main',
+        'mf_configuration_module_extend' => $aPaths['controllers'] . '/admin/mf_configuration_module_extend',
+        'mf_configuration_module_list' => $aPaths['controllers'] . '/admin/mf_configuration_module_list',
 
         'basket'                => $aPaths['controllers'] . '/mf_basket',
         'order'                 => $aPaths['controllers'] . '/mf_order',
@@ -114,9 +115,10 @@ $aModule = array(
         'mf_category_list.tpl'     => $aPaths['views'] . '/admin/tpl/mf_category_list.tpl',
         'mf_order_package.tpl'     => $aPaths['views'] . '/admin/tpl/mf_order_package.tpl',
         'mf_sdk_result.tpl' => $aPaths['views'] . '/tpl/mf_sdk_result.tpl',
-        'mf_bepado_setting_module.tpl'      => $aPaths['views'] . '/admin/tpl/mf_bepado_setting_module.tpl',
-        'mf_bepado_setting_module_main.tpl' => $aPaths['views'] . '/admin/tpl/mf_bepado_setting_module_main.tpl',
-        'mf_bepado_setting_module_list.tpl' => $aPaths['views'] . '/admin/tpl/mf_bepado_setting_module_list.tpl',
+        'mf_configuration_module.tpl'      => $aPaths['views'] . '/admin/tpl/mf_configuration_module.tpl',
+        'mf_configuration_module_main.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_module_main.tpl',
+        'mf_configuration_module_extend.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_module_extend.tpl',
+        'mf_configuration_module_list.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_module_list.tpl',
     ),
     'settings' => array(
         array(

@@ -50,9 +50,12 @@ $aLang = array(
     'HELP_BEPADO_CATEGORY'             => 'Hier stellen Sie ein, welche Bepado-Kategorie Ihrer Shop-Kategorie entspricht.',
     'BEPADO_CATEGORY_SELECT'           => '-- keine --',
 
-    'NAVIGATION_BEPADO'        => 'Bepado Module',
-    'mf_bepado_setting'        => 'Konfiguration',
-    'mf_bepado_setting_module' => 'Modul',
-    'mf_bepado_setting_module_main' => 'Main',
-    'mf_bepado_setting_unit'   => 'Einheiten',
+    'NAVIGATION_BEPADO'                        => 'Bepado Module',
+    'mf_bepado_setting'                        => 'Konfiguration',
+    'mf_configuration_module'                  => 'Modul',
+    'mf_configuration_module_main'             => 'Main',
+    'mf_configuration_module_extend'             => 'Erweitert',
+    'mf_bepado_setting_unit'                   => 'Einheiten',
+    'MF_CONFIGURATION'                         => 'Bepado Konfiguration',
+    'MF_CONFIGURATION_MODULE_LIST_MENUSUBITEM' => 'Modul',
 );

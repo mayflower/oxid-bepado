@@ -9,16 +9,16 @@
 <form name="transfer" id="transfer" action="[{ $oViewConf->getSelfLink() }]" method="post">
     [{ $oViewConf->getHiddenSid() }]
     <input type="hidden" name="oxid" value="[{ $oxid }]">
-    <input type="hidden" name="cl" value="selectlist_main">
+    <input type="hidden" name="cl" value="mf_configuration_module_main">
     <input type="hidden" name="editlanguage" value="[{ $editlanguage }]">
 </form>
 
 <form name="myedit" id="myedit" action="[{ $oViewConf->getSelfLink() }]" method="post">
     [{ $oViewConf->getHiddenSid() }]
-    <input type="hidden" name="cl" value="selectlist_main">
+    <input type="hidden" name="cl" value="mf_configuration_module_main">
     <input type="hidden" name="fnc" value="">
     <input type="hidden" name="oxid" value="[{ $oxid }]">
-    <input type="hidden" name="editval[oxselectlist__oxid]" value="[{ $oxid }]">
+    <input type="hidden" name="editval[oxid]" value="[{ $oxid }]">
 
     <table cellspacing="0" cellpadding="0" border="0" width="98%">
         <tr>
