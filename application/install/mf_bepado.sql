@@ -29,14 +29,11 @@ CREATE TABLE IF NOT EXISTS `bepado_categories` (
 ALTER TABLE bepado_categories ADD path VARCHAR(255) NOT NULL;
 ALTER TABLE bepado_categories ADD catnid VARCHAR(255) NOT NULL;
 
-/* Adds column for the payment type mapping */
-ALTER TABLE oxpayments ADD bepadopaymenttype VARCHAR(100);
-
 /* Special user group for remote shops */
 INSERT INTO oxgroups (`OXID`, `OXACTIVE`, `OXTITLE`) VALUES ('bepadoshopgroup', '0', 'Bepado Remote Shop');
 
-/* Chance to map an user to a bepado shop. All shops will get its own user */
-ALTER TABLE oxuser ADD bepadoshopid VARCHAR(100);
+/* Insert an own payment type for bebado. */
+INSERT INTO oxpayments (`OXID`, `OXACTIVE`, `OXDESC`) VALUES ('bepadopaymenttype', '1', 'Bezahlung an Bepado Handelspartner');
 
 /* Create an bepado shipping type and rule, cause the shop will get access to prices by shipping rules */
 INSERT INTO oxdeliveryset (`OXID`, `OXACTIVE`, `OXTITLE`, `OXSHOPID`) VALUES ('bepadoshipping', '1', 'Bepado Shipping', 'oxbaseshop');

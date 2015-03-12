@@ -2,6 +2,7 @@
 
 require_once __DIR__.'/../BaseTestCase.php';
 require_once __DIR__.'/../wrapper/ResultSet.php';
+
 use Bepado\SDK\Struct as Struct;
 use Bepado\SDK\Struct\Product;
 
@@ -138,41 +139,6 @@ class oxidProductFromShopTest extends BaseTestCase
         $order->billingAddress = $address;
         $order->deliveryAddress = $address;
         $order->orderItems = array();
-
-        $this->productFromShop->buy($order);
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage No Payment method found.
-     */
-    public function testBuyWithNoPaymentAction()
-    {
-        $this->oxGroup->expects($this->any())->method('load')->will($this->returnValue(true));
-        $this->oxDb->expects($this->any())->method('getOne')->will($this->returnValue(null));
-        $address = new Struct\Address();
-        $order = new Struct\Order();
-        $order->orderShop = 'some-id';
-        $order->billingAddress = $address;
-        $order->deliveryAddress = $address;
-        $orderItem = new Struct\OrderItem();
-        $orderItem->count = 1;
-        $orderItem->product = new Struct\Product();
-        $orderItem->product->sourceId = 'some-product-id';
-        $order->orderItems[] = $orderItem;
-
-        $this->sdk
-            ->expects($this->once())
-            ->method('getShop')
-            ->with($this->equalTo('some-id'))
-            ->will($this->returnValue(true));
-        $this->oxBasket
-            ->expects($this->once())
-            ->method('addToBasket')
-            ->with($this->equalTo('some-product-id'), $this->equalTo(1))
-            ;
-        $this->oxBasket->expects($this->once())->method('calculateBasket')->with($this->equalTo(true));
-        $this->oxBasket->expects($this->any())->method('getProductsCount')->will($this->returnValue(1));
 
         $this->productFromShop->buy($order);
     }
