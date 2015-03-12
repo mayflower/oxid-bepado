@@ -40,6 +40,12 @@ $aModule = array(
         'mf_configuration_module_main' => $aPaths['controllers'] . '/admin/mf_configuration_module_main',
         'mf_configuration_module_extend' => $aPaths['controllers'] . '/admin/mf_configuration_module_extend',
         'mf_configuration_module_list' => $aPaths['controllers'] . '/admin/mf_configuration_module_list',
+        'mf_configuration_category'      => $aPaths['controllers'] . '/admin/mf_configuration_category',
+        'mf_configuration_category_main' => $aPaths['controllers'] . '/admin/mf_configuration_category_main',
+        'mf_configuration_category_list' => $aPaths['controllers'] . '/admin/mf_configuration_category_list',
+        'mf_configuration_unit'      => $aPaths['controllers'] . '/admin/mf_configuration_unit',
+        'mf_configuration_unit_main' => $aPaths['controllers'] . '/admin/mf_configuration_unit_main',
+        'mf_configuration_unit_list' => $aPaths['controllers'] . '/admin/mf_configuration_unit_list',
 
         'basket'                => $aPaths['controllers'] . '/mf_basket',
         'order'                 => $aPaths['controllers'] . '/mf_order',
@@ -119,6 +125,12 @@ $aModule = array(
         'mf_configuration_module_main.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_module_main.tpl',
         'mf_configuration_module_extend.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_module_extend.tpl',
         'mf_configuration_module_list.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_module_list.tpl',
+        'mf_configuration_category.tpl'      => $aPaths['views'] . '/admin/tpl/mf_configuration_category.tpl',
+        'mf_configuration_category_main.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_category_main.tpl',
+        'mf_configuration_category_list.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_category_list.tpl',
+        'mf_configuration_unit.tpl'      => $aPaths['views'] . '/admin/tpl/mf_configuration_unit.tpl',
+        'mf_configuration_unit_main.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_unit_main.tpl',
+        'mf_configuration_unit_list.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_unit_list.tpl',
     ),
     'settings' => array(
         array(

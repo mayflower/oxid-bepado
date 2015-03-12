@@ -2,10 +2,16 @@
 
 <OX>
     <OXMENU id="NAVIGATION_BEPADO">
-        <MAINMENU id="mf_bepado_setting">
+        <MAINMENU id="mf_bepado_configuration">
             <SUBMENU id="mf_configuration_module" cl="mf_configuration_module" list="mf_configuration_module_list">
                 <TAB id="mf_configuration_module_main" cl="mf_configuration_module_main" />
                 <TAB id="mf_configuration_module_extend" cl="mf_configuration_module_extend" />
+            </SUBMENU>
+            <SUBMENU id="mf_configuration_category" cl="mf_configuration_category" list="mf_configuration_category_list">
+                <TAB id="mf_configuration_category_main" cl="mf_configuration_category_main" />
+            </SUBMENU>
+            <SUBMENU id="mf_configuration_unit" cl="mf_configuration_unit" list="mf_configuration_unit_list">
+                <TAB id="mf_configuration_unit_main" cl="mf_configuration_unit_main" />
             </SUBMENU>
         </MAINMENU>
     </OXMENU>
