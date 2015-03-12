@@ -148,7 +148,7 @@ class oxidProductFromShop implements ProductFromShop
             throw new Exception('No valid products in basket');
         }
 
-        $oxBasket->setPayment($this->createPaymentID($order));
+        $oxBasket->setPayment(SDKConfig::DEFAULT_PAYMENT_TYPE);
         $shippingOrder = clone $order;
         $shippingCosts = $this->getOrCreateSDK()->calculateShippingCosts($shippingOrder);
 
@@ -169,14 +169,6 @@ class oxidProductFromShop implements ProductFromShop
         $iSuccess = $oxOrder->finalizeOrder($oxBasket, $shopUser);
         $shopUser->onOrderExecute($oxBasket, $iSuccess);
         $this->cleanUp();
-
-        /*
-        $oBepadoOrderState = $this->getVersionLayer()->createNewObject('oxbase');
-        $oBepadoOrderState->init('bepado_product_state');
-        $values = array('oxid_order_id' => $oxOrder->getId(), 'bepado_order_id' => $order->providerOrderId);
-        $oBepadoOrderState->assign($values);
-        $oBepadoOrderState->save();
-        */
 
         return $oxOrder->getId();
     }
@@ -223,27 +215,6 @@ class oxidProductFromShop implements ProductFromShop
         );
 
         return $oxAddress;
-    }
-
-    /**
-     * Creates the payment method based on the default payment method (invoice).
-     * The shop needs a mapping for that.
-     *
-     * @return array
-     *
-     * @throws Exception
-     */
-    private function createPaymentID()
-    {
-        $oxPayment = $this->_oVersionLayer->createNewObject('oxpayment');
-        $select = $oxPayment->buildSelectString(array('bepadopaymenttype' => SDKConfig::DEFAULT_PAYMENT_METHOD));
-        $paymentID = $this->_oVersionLayer->getDb(true)->getOne($select);
-
-        if (!$paymentID) {
-            throw new \Exception('Your shop needs to create at least one payment mapping for the default method: '.SDKConfig::DEFAULT_PAYMENT_METHOD);
-        }
-
-        return $paymentID;
     }
 
     /**

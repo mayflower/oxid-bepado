@@ -143,41 +143,6 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->productFromShop->buy($order);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Your shop needs to create at least one payment mapping for the default method: invoice
-     */
-    public function testBuyWithNoPaymentAction()
-    {
-        $this->oxGroup->expects($this->any())->method('load')->will($this->returnValue(true));
-        $this->oxDb->expects($this->any())->method('getOne')->will($this->returnValue(null));
-        $address = new Struct\Address();
-        $order = new Struct\Order();
-        $order->orderShop = 'some-id';
-        $order->billingAddress = $address;
-        $order->deliveryAddress = $address;
-        $orderItem = new Struct\OrderItem();
-        $orderItem->count = 1;
-        $orderItem->product = new Struct\Product();
-        $orderItem->product->sourceId = 'some-product-id';
-        $order->orderItems[] = $orderItem;
-
-        $this->sdk
-            ->expects($this->once())
-            ->method('getShop')
-            ->with($this->equalTo('some-id'))
-            ->will($this->returnValue(true));
-        $this->oxBasket
-            ->expects($this->once())
-            ->method('addToBasket')
-            ->with($this->equalTo('some-product-id'), $this->equalTo(1))
-            ;
-        $this->oxBasket->expects($this->once())->method('calculateBasket')->with($this->equalTo(true));
-        $this->oxBasket->expects($this->any())->method('getProductsCount')->will($this->returnValue(1));
-
-        $this->productFromShop->buy($order);
-    }
-
     public function testBuy()
     {
         $this->oxGroup->expects($this->any())->method('load')->will($this->returnValue(true));
