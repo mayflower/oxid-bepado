@@ -36,7 +36,7 @@ ALTER TABLE oxpayments ADD bepadopaymenttype VARCHAR(100);
 INSERT INTO oxgroups (`OXID`, `OXACTIVE`, `OXTITLE`) VALUES ('bepadoshopgroup', '0', 'Bepado Remote Shop');
 
 /* Chance to map an user to a bepado shop. All shops will get its own user */
-ALTER TABLE oxuser ADD bepadoshopid VARCHAR(100);
+INSERT INTO oxpayments (`OXID`, `OXACTIVE`, `OXDESC`) VALUES ('bepadopaymenttype', '1', 'Bezahlung an Bepado Handelspartner');
 
 /* Create an bepado shipping type and rule, cause the shop will get access to prices by shipping rules */
 INSERT INTO oxdeliveryset (`OXID`, `OXACTIVE`, `OXTITLE`, `OXSHOPID`) VALUES ('bepadoshipping', '1', 'Bepado Shipping', 'oxbaseshop');

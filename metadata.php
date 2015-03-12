@@ -90,11 +90,6 @@ $aModule = array(
             'file'     => $aPaths['blocks'] . '/mf_category_main.tpl'
         ),
         array(
-            'template' => 'payment_main.tpl',
-            'block'    => 'admin_payment_main_fields',
-            'file'     => $aPaths['blocks'] . '/payment_main.tpl'
-        ),
-        array(
             'template' => 'list_order.tpl',
             'block'    => 'admin_list_order_item',
             'file'     => $aPaths['blocks'] . '/mf_list_order.tpl'

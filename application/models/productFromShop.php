@@ -148,13 +148,7 @@ class oxidProductFromShop implements ProductFromShop
             throw new Exception('No valid products in basket');
         }
 
-        // create and set the payment method
-        $oxPaymentID = $this->createPaymentID($order);
-        if (!$oxPaymentID) {
-            throw new Exception('No Payment method found.');
-        }
-
-        $oxBasket->setPayment($oxPaymentID);
+        $oxBasket->setPayment(SDKConfig::DEFAULT_PAYMENT_TYPE);
         $shippingOrder = clone $order;
         $shippingCosts = $this->getOrCreateSDK()->calculateShippingCosts($shippingOrder);
 
@@ -175,14 +169,6 @@ class oxidProductFromShop implements ProductFromShop
         $iSuccess = $oxOrder->finalizeOrder($oxBasket, $shopUser);
         $shopUser->onOrderExecute($oxBasket, $iSuccess);
         $this->cleanUp();
-
-        /*
-        $oBepadoOrderState = $this->getVersionLayer()->createNewObject('oxbase');
-        $oBepadoOrderState->init('bepado_product_state');
-        $values = array('oxid_order_id' => $oxOrder->getId(), 'bepado_order_id' => $order->providerOrderId);
-        $oBepadoOrderState->assign($values);
-        $oBepadoOrderState->save();
-        */
 
         return $oxOrder->getId();
     }
@@ -229,22 +215,6 @@ class oxidProductFromShop implements ProductFromShop
         );
 
         return $oxAddress;
-    }
-
-    /**
-     * Create the payment ID from the mapped payment data.
-     *
-     * @param Order $order
-     *
-     * @return array
-     */
-    private function createPaymentID(Order $order)
-    {
-        $oxPayment = $this->_oVersionLayer->createNewObject('oxpayment');
-        $select = $oxPayment->buildSelectString(array('bepadopaymenttype' => $order->paymentType));
-        $paymentID = $this->_oVersionLayer->getDb(true)->getOne($select);
-
-        return $paymentID ?: null;
     }
 
     /**
