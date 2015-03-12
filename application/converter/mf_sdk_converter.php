@@ -1,13 +1,42 @@
 <?php
 
+/*
+ * Copyright (C) 2015  Mayflower GmbH
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 use Bepado\SDK\Struct\Product;
 
+/**
+ * Base converter, which converts oxArticles into SDK Products and back.
+ *
+ * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
+ */
 class mf_sdk_converter implements mf_converter_interface
 {
+    /**
+     * Default value for the purchase price chat.
+     * This char decides which price should be chose for the purchase prise.
+     */
     const DEFAULT_PURCHASE_PRICE_CHAR = 'B';
 
+    /**
+     * Value for the delivery unit week.
+     */
     const OXID_DELIVERY_UNIT_WEEK = 'WEEK';
 
+    /**
+     * Value for the delivery unit week.
+     */
     const OXID_DELIVERY_UNIT_MONTH = 'MONTH';
 
     /**
@@ -15,6 +44,11 @@ class mf_sdk_converter implements mf_converter_interface
      */
     private $_oVersionLayer;
 
+    /**
+     * Little mapper for the units.
+     *
+     * @var array
+     */
     private $oxidUnitMapper = array(
         '_UNIT_KG' => 'kg',
         '_UNIT_G' => 'g',
@@ -328,6 +362,11 @@ class mf_sdk_converter implements mf_converter_interface
         return 'oxarticles__oxprice'.$purchaseGroupChar;
     }
 
+    /**
+     * Getter for the module helper.
+     *
+     * @return mf_module_helper
+     */
     private function getModuleHelper()
     {
         if (null == $this->moduleHelper) {

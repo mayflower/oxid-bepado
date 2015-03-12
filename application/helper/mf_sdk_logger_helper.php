@@ -1,6 +1,24 @@
 <?php
 
+/*
+ * Copyright (C) 2015  Mayflower GmbH
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
+/**
+ * This helper supports in the work with the own logging.
+ *
+ * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
+ */
 class mf_sdk_logger_helper extends mf_abstract_helper
 {
     /**
@@ -11,6 +29,8 @@ class mf_sdk_logger_helper extends mf_abstract_helper
     protected $_sFileName = 'BEPADO_LOG.txt';
 
     /**
+     * Writes a log message the bepado log file.
+     *
      * @param string $sLogTxt
      * @param array $values
      */
@@ -34,6 +54,8 @@ class mf_sdk_logger_helper extends mf_abstract_helper
     }
 
     /**
+     * Creates the string with information of the data, the message and a serialized value (optional).
+     *
      * @param string $sLogTxt
      * @param array $values
      * @return string
@@ -47,4 +69,4 @@ class mf_sdk_logger_helper extends mf_abstract_helper
 
         return $string;
     }
-} 
+}

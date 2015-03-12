@@ -1,6 +1,22 @@
 <?php
 
+/*
+ * Copyright (C) 2015  Mayflower GmbH
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 /**
+ * This extension add additional information to the category main view.
+ *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
 class mf_category_main extends mf_category_main_parent
@@ -10,6 +26,12 @@ class mf_category_main extends mf_category_main_parent
      */
     private $_oVersionLayer;
 
+    /**
+     * A category view (main) will get an additional select box
+     * to map the bepado categories.
+     *
+     * @return string
+     */
     public function render()
     {
         $aCategories = $this->getSdkCategories();
@@ -38,6 +60,10 @@ class mf_category_main extends mf_category_main_parent
         return parent::render();
     }
 
+    /**
+     * On save there will be a check for a chosen category mapping
+     * to persist this one in an additional database table.
+     */
     public function save()
     {
         parent::save();
@@ -76,6 +102,8 @@ class mf_category_main extends mf_category_main_parent
     }
 
     /**
+     * Serves a list of bepado categories.
+     *
      * @return array
      */
     private function getSdkCategories()

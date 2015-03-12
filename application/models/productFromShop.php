@@ -1,5 +1,19 @@
 <?php
 
+/*
+ * Copyright (C) 2015  Mayflower GmbH
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 use Bepado\SDK\ProductFromShop;
 use Bepado\SDK\SDK;
 use Bepado\SDK\SecurityException;
@@ -7,6 +21,13 @@ use Bepado\SDK\Struct\Address;
 use Bepado\SDK\Struct\Order;
 use Bepado\SDK\Struct\OrderItem;
 
+/**
+ * Implementation of one of the base SDK models.
+ *
+ * Is needed for the bepado communication from the own shop to bepado.
+ *
+ * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
+ */
 class oxidProductFromShop implements ProductFromShop
 {
     /**

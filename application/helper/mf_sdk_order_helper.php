@@ -1,9 +1,28 @@
 <?php
 
+/*
+ * Copyright (C) 2015  Mayflower GmbH
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 use Bepado\SDK\SDK;
 use Bepado\SDK\Struct\Message;
 use Bepado\SDK\Struct\OrderStatus;
 
+/**
+ * This helper will support the work with orders.
+ *
+ * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
+ */
 class mf_sdk_order_helper extends mf_abstract_helper
 {
     /**
@@ -11,6 +30,12 @@ class mf_sdk_order_helper extends mf_abstract_helper
      */
     protected $sdk;
 
+    /**
+     * Computes an order contains exported articles and takes care on state updates.
+     *
+     * @param $oOrder
+     * @param null|bool $deleted
+     */
     public function checkForOrderStateUpdates($oOrder, $deleted = null)
     {
        if ($this->hasExportedArticles($oOrder)) {
@@ -85,6 +110,8 @@ class mf_sdk_order_helper extends mf_abstract_helper
     }
 
     /**
+     * Create the SDK by the help of an helper.
+     *
      * @return SDK
      */
     private function getSDK()

@@ -1,13 +1,32 @@
 <?php
+
+/*
+ * Copyright (C) 2015  Mayflower GmbH
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 use Bepado\SDK\SDK;
 use Bepado\SDK\Struct as Struct;
 
 /**
+ * This helper will serve function for the work the the SDK.
+ *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
 class mf_sdk_helper extends mf_abstract_helper
 {
     /**
+     * Creates the config the SDK does need to be instantiated.
+     *
      * @return SDKConfig
      */
     public function createSdkConfigFromOxid()
@@ -77,6 +96,7 @@ class mf_sdk_helper extends mf_abstract_helper
 
         return $sdk;
     }
+
     /**
      * Bepado send's urls to the images of external products. The oxid shop
      * need that image as local files in its own structure, so we need to
@@ -172,6 +192,17 @@ class mf_sdk_helper extends mf_abstract_helper
         }
     }
 
+    /**
+     * The action that should happen on module activation.
+     *
+     * The sdk databases tables will be created by the sql queries delivered by the SDK
+     *
+     * This module adds some own database tables and extends some other.
+     *
+     * Base mapping for user/user group and payment methods will be created.
+     *
+     * @throws Exception
+     */
     public function onModuleActivation()
     {
         /** @var mf_sdk_logger_helper $logger */
