@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<OX>
+    <OXMENU id="NAVIGATION_BEPADO">
+        <MAINMENU id="mf_bepado_setting">
+            <SUBMENU id="mf_bepado_setting_module" cl="mf_bepado_setting_module" list="mf_bepado_setting_module_list">
+                <TAB id="mf_bepado_setting_module_main" cl="mf_bepado_setting_module_main" />
+            </SUBMENU>
+        </MAINMENU>
+    </OXMENU>
+</OX>

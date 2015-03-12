@@ -28,14 +28,18 @@ $aModule = array(
     'url'     => 'http://www.mayflower.de/OXID-Bepado-Modul',
     'thumbnail' => 'thumbnail.jpg',
     'extend'  => array(
-        'module_config'         => $aPaths['controllers'] . '/admin/mf_Module_Config',
-        'article_extend'        => $aPaths['controllers'] . '/admin/mf_article_extend',
-        'article_list'          => $aPaths['controllers'] . '/admin/mf_article_list',
-        'category_main'         => $aPaths['controllers'] . '/admin/mf_category_main',
-        'category_list'         => $aPaths['controllers'] . '/admin/mf_category_list',
-        'list_order'            => $aPaths['controllers'] . '/admin/mf_list_order',
-        'order_article'         => $aPaths['controllers'] . '/admin/mf_order_article',
-        'order_package'         => $aPaths['controllers'] . '/admin/mf_order_package',
+        'module_config'          => $aPaths['controllers'] . '/admin/mf_Module_Config',
+        'article_extend'         => $aPaths['controllers'] . '/admin/mf_article_extend',
+        'article_list'           => $aPaths['controllers'] . '/admin/mf_article_list',
+        'category_main'          => $aPaths['controllers'] . '/admin/mf_category_main',
+        'category_list'          => $aPaths['controllers'] . '/admin/mf_category_list',
+        'list_order'             => $aPaths['controllers'] . '/admin/mf_list_order',
+        'order_article'          => $aPaths['controllers'] . '/admin/mf_order_article',
+        'order_package'          => $aPaths['controllers'] . '/admin/mf_order_package',
+        'mf_bepado_setting_module'      => $aPaths['controllers'] . '/admin/mf_bepado_setting_module',
+        'mf_bepado_setting_module_main' => $aPaths['controllers'] . '/admin/mf_bepado_setting_module_main',
+        'mf_bepado_setting_module_list' => $aPaths['controllers'] . '/admin/mf_bepado_setting_module_list',
+
         'basket'                => $aPaths['controllers'] . '/mf_basket',
         'order'                 => $aPaths['controllers'] . '/mf_order',
 
@@ -110,6 +114,9 @@ $aModule = array(
         'mf_category_list.tpl'     => $aPaths['views'] . '/admin/tpl/mf_category_list.tpl',
         'mf_order_package.tpl'     => $aPaths['views'] . '/admin/tpl/mf_order_package.tpl',
         'mf_sdk_result.tpl' => $aPaths['views'] . '/tpl/mf_sdk_result.tpl',
+        'mf_bepado_setting_module.tpl'      => $aPaths['views'] . '/admin/tpl/mf_bepado_setting_module.tpl',
+        'mf_bepado_setting_module_main.tpl' => $aPaths['views'] . '/admin/tpl/mf_bepado_setting_module_main.tpl',
+        'mf_bepado_setting_module_list.tpl' => $aPaths['views'] . '/admin/tpl/mf_bepado_setting_module_list.tpl',
     ),
     'settings' => array(
         array(
