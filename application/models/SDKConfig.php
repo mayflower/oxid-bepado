@@ -13,6 +13,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+use Bepado\SDK\Struct\Order;
 
 /**
  * A model for sdk configuration values to instantiate the sdk.
@@ -28,6 +29,7 @@ class SDKConfig
     const SEARCH_HOST_DEMO = 'search.server1230-han.de-nserver.de';
     const TRANSACTION_HOST_DEMO = 'transaction.server1230-han.de-nserver.de';
     const SOCIALNETWORK_HOST_DEMO = 'sn.server1230-han.de-nserver.de';
+    const DEFAULT_PAYMENT_METHOD = Order::PAYMENT_INVOICE;
 
     /**
      * @var

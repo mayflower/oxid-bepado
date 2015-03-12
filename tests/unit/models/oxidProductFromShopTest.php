@@ -2,6 +2,7 @@
 
 require_once __DIR__.'/../BaseTestCase.php';
 require_once __DIR__.'/../wrapper/ResultSet.php';
+
 use Bepado\SDK\Struct as Struct;
 use Bepado\SDK\Struct\Product;
 
@@ -144,7 +145,7 @@ class oxidProductFromShopTest extends BaseTestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage No Payment method found.
+     * @expectedExceptionMessage Your shop needs to create at least one payment mapping for the default method: invoice
      */
     public function testBuyWithNoPaymentAction()
     {
