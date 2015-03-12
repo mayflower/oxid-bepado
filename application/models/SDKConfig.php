@@ -1,17 +1,30 @@
 <?php
+
+/*
+ * Copyright (C) 2015  Mayflower GmbH
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 /**
+ * A model for sdk configuration values to instantiate the sdk.
+ *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
 class SDKConfig
 {
     const ARTICLE_STATE_NONE = 0;
-
     const ARTICLE_STATE_EXPORTED = 1;
-
     const ARTICLE_STATE_IMPORTED = 2;
-
     const SHOP_ID_LOCAL = '_self_';
-
     const SEARCH_HOST_DEMO = 'search.server1230-han.de-nserver.de';
     const TRANSACTION_HOST_DEMO = 'transaction.server1230-han.de-nserver.de';
     const SOCIALNETWORK_HOST_DEMO = 'sn.server1230-han.de-nserver.de';

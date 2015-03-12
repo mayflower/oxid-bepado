@@ -1,6 +1,22 @@
 <?php
 
+/*
+ * Copyright (C) 2015  Mayflower GmbH
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 /**
+ * Version layer of version 4.6.*.
+ *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  *
  * @codeCoverageIgnore
@@ -9,9 +25,7 @@ class VersionLayer460 implements VersionLayerInterface
 {
 
     /**
-     * Returns the current basket from session.
-     *
-     * @return oxBasket
+     * {@inheritDocs}
      */
     public function getBasket()
     {
@@ -19,9 +33,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns the OXID session object.
-     *
-     * @return oxSession
+     * {@inheritDocs}
      */
     public function getSession()
     {
@@ -29,9 +41,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Return the OXID configuration object.
-     *
-     * @return oxConfig
+     * {@inheritDocs}
      */
     public function getConfig()
     {
@@ -39,10 +49,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns the OxDb
-     *
-     * @param boolean $bAssoc Should the mode be switched to assoc?
-     * @return mixed
+     * {@inheritDocs}
      */
     public function getDb($bAssoc = false)
     {
@@ -50,9 +57,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns the OXID delivery set list.
-     *
-     * @return oxDeliverySetList
+     * {@inheritDocs}
      */
     public function getDeliverySetList()
     {
@@ -60,9 +65,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Return the OXID utilities object.
-     *
-     * @return oxUtils
+     * {@inheritDocs}
      */
     public function getUtils()
     {
@@ -70,13 +73,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns a request parameter.
-     *
-     * @param string $sName         Name of the request parameter.
-     * @param mixed  $mDefaultValue Return value if $sName isn't set.
-     * @param bool   $blRaw         return raw value.
-     *
-     * @return mixed
+     * {@inheritDocs}
      */
     public function getRequestParam($sName, $mDefaultValue = null, $blRaw = false)
     {
@@ -90,9 +87,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns the OXID languages object.
-     *
-     * @return oxLang
+     * {@inheritDocs}
      */
     public function getLang()
     {
@@ -100,9 +95,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns the OXID server utilities object.
-     *
-     * @return oxUtilsServer
+     * {@inheritDocs}
      */
     public function getUtilsServer()
     {
@@ -110,9 +103,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns the OXID URL utilities object.
-     *
-     * @return oxUtilsUrl
+     * {@inheritDocs}
      */
     public function getUtilsUrl()
     {
@@ -120,9 +111,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns the OXID view utilities object.
-     *
-     * @return oxUtilsView
+     * {@inheritDocs}
      */
     public function getUtilsView()
     {
@@ -130,9 +119,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns the OXID object utilities object.
-     *
-     * @return oxUtilsObject
+     * {@inheritDocs}
      */
     public function getUtilsObject()
     {
@@ -140,9 +127,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns the OXID date utilities object.
-     *
-     * @return oxUtilsDate
+     * {@inheritDocs}
      */
     public function getUtilsDate()
     {
@@ -150,9 +135,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns the OXID string utilities object.
-     *
-     * @return oxUtilsString
+     * {@inheritDocs}
      */
     public function getUtilsString()
     {
@@ -160,9 +143,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns the OXID file utilities object.
-     *
-     * @return oxUtilsFile
+     * {@inheritDocs}
      */
     public function getUtilsFile()
     {
@@ -170,9 +151,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns the OXID picture utilities object.
-     *
-     * @return oxUtilsPic
+     * {@inheritDocs}
      */
     public function getUtilsPic()
     {
@@ -180,9 +159,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Returns the OXID counting utilities object.
-     *
-     * @return oxUtilsCount
+     * {@inheritDocs}
      */
     public function getUtilsCount()
     {
@@ -190,11 +167,7 @@ class VersionLayer460 implements VersionLayerInterface
     }
 
     /**
-     * Little Wrapper for the oxNew() function.
-     *
-     * @param $className
-     *
-     * @return object
+     * {@inheritDocs}
      */
     public function createNewObject($className)
     {

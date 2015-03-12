@@ -1,5 +1,19 @@
 <?php
 
+/*
+ * Copyright (C) 2015  Mayflower GmbH
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 use Bepado\SDK\Struct as Struct;
 
 /**
@@ -13,8 +27,19 @@ use Bepado\SDK\Struct as Struct;
  */
 class mf_sdk_address_converter extends mf_abstract_converter implements mf_converter_interface
 {
+    /**
+     * Default value for the prefix.
+     *
+     * Will assign values a in an oxAddress model.
+     */
     const DEFAULT_ADDRESS_FIELD_PREFIX = 'oxaddress__ox';
 
+    /**
+     * Mapping between a OXID values of a objects's address data to
+     * the properties of the SDK's Address model.
+     *
+     * @var array
+     */
     private $sdkAddressMapper = array(
         '%typecompany'   => 'company',
         '%typefname'     => 'firstName',
@@ -67,7 +92,14 @@ class mf_sdk_address_converter extends mf_abstract_converter implements mf_conve
     }
 
     /**
+     * {@inheritDocs}
+     *
+     * In difference to the other converter this one will set the values on
+     * different object like oxBasket, oxOrder or oxArticle as default. So the prefix
+     * for the field values is needed or defaults to the oxArticle version.
+     *
      * @param Struct\Address $object
+     * @param string $type
      *
      * @return array|oxAddress
      */
@@ -86,6 +118,8 @@ class mf_sdk_address_converter extends mf_abstract_converter implements mf_conve
     }
 
     /**
+     * Does the real mapping work.
+     *
      * @param Struct\Address $address
      * @param string         $type
      * @return array
@@ -127,6 +161,12 @@ class mf_sdk_address_converter extends mf_abstract_converter implements mf_conve
         return $fieldData;
     }
 
+    /**
+     * Will create the value of a oxState model by its id.
+     *
+     * @param $stateId
+     * @return mixed|null
+     */
     private function createState($stateId)
     {
         /** @var oxState $oxState */
@@ -139,6 +179,12 @@ class mf_sdk_address_converter extends mf_abstract_converter implements mf_conve
         return null;
     }
 
+    /**
+     * Will create the country shortcut by a given country id.
+     *
+     * @param $countryId
+     * @return mixed|null
+     */
     private function createCountry($countryId)
     {
         /** @var oxState $oxState */

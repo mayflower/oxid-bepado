@@ -1,8 +1,25 @@
 <?php
+
+/*
+ * Copyright (C) 2015  Mayflower GmbH
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 use Bepado\SDK\SDK;
 use Bepado\SDK\Struct\Product;
 
 /**
+ * This is an extension of the oxArticle model.
+ *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
 class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
@@ -43,6 +60,8 @@ class mf_bepado_oxarticle extends mf_bepado_oxarticle_parent
     }
 
     /**
+     * When a oxArticle is delete, we need to take care on exported/imported articles.
+     *
      * @param null $oxId
      *
      * @return mixed
