@@ -12,10 +12,10 @@ Clone this module to the folder `/modules/bepado` in your shop directory. Do thi
 in your terminal and execute the following command:
 
 ```
-    $ git clone https://github.com/Mayflower/oxid-bepado.git bepado
+    $ git clone -b 1.0 https://github.com/Mayflower/oxid-bepado.git bepado
 ```
 
-This creates the `bepado` directory for you. If you want to name the module otherwise please note that the name of the 
+This creates the `bepado` directory for you and directly clones the current stable branch. If you want to name the module otherwise please note that the name of the 
 directory has to be exactly the same as the `id` in the modules `metadata.php` (so change that as well).
 
 
