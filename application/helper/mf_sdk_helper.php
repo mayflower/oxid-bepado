@@ -27,12 +27,12 @@ class mf_sdk_helper extends mf_abstract_helper
     /**
      * Creates the config the SDK does need to be instantiated.
      *
-     * @return SDKConfig
+     * @return mfBepadoConfiguration
      */
     public function createSdkConfigFromOxid()
     {
-        /** @var SDKConfig $config */
-        $config = $this->getVersionLayer()->createNewObject('SDKConfig');
+        /** @var mfBepadoConfiguration $config */
+        $config = $this->getVersionLayer()->createNewObject('mfBepadoConfiguration');
         // load global oxid config
         $oShopConfig = $this->getVersionLayer()->getConfig();
         // module config
@@ -45,9 +45,9 @@ class mf_sdk_helper extends mf_abstract_helper
         $config->setSandboxMode($sandboxMode);
 
         if ($sandboxMode) {
-            $config->setSocialnetworkHost(SDKConfig::SOCIALNETWORK_HOST_DEMO);
-            $config->setTransactionHost(SDKConfig::TRANSACTION_HOST_DEMO);
-            $config->setSearchHost(SDKConfig::SEARCH_HOST_DEMO);
+            $config->setSocialnetworkHost(mfBepadoConfiguration::SOCIALNETWORK_HOST_DEMO);
+            $config->setTransactionHost(mfBepadoConfiguration::TRANSACTION_HOST_DEMO);
+            $config->setSearchHost(mfBepadoConfiguration::SEARCH_HOST_DEMO);
         }
 
         return $config;
@@ -59,11 +59,11 @@ class mf_sdk_helper extends mf_abstract_helper
      * API-Key and Endpoint are fetched from the settings and are
      * editable in the module settings.
      *
-     * @param SDKConfig $sdkConfig
+     * @param mfBepadoConfiguration $sdkConfig
      *
      * @return SDK
      */
-    public function instantiateSdk(SDKConfig $sdkConfig)
+    public function instantiateSdk(mfBepadoConfiguration $sdkConfig)
     {
         $this->prepareHosts($sdkConfig);
 
@@ -157,9 +157,9 @@ class mf_sdk_helper extends mf_abstract_helper
      * Depending on the settings set the config the env var entries will be
      * set or not.
      *
-     * @param SDKConfig $sdkConfig
+     * @param mfBepadoConfiguration $sdkConfig
      */
-    private function prepareHosts(SDKConfig $sdkConfig)
+    private function prepareHosts(mfBepadoConfiguration $sdkConfig)
     {
         if (null !== $sdkConfig->getSocialnetworkHost()) {
             putenv('_SOCIALNETWORK_HOST='.$sdkConfig->getSocialnetworkHost());
@@ -284,5 +284,35 @@ class mf_sdk_helper extends mf_abstract_helper
         $oObject2Delivery->oxobject2delivery__oxobjectid = new oxField('bepadoshipping');
         $oObject2Delivery->oxobject2delivery__oxtype = new oxField("oxdelset");
         $oObject2Delivery->save();
+
+        $this->createModuleConfigurationForShops();
+    }
+
+    /**
+     * Each shop will get its own module configuration,
+     * so we will loop through all of them. Existing ones, won't be overwritten.
+     */
+    private function createModuleConfigurationForShops()
+    {
+        /** @var oxConfig $oConfig */
+        $oConfig = $this->getVersionLayer()->getConfig();
+        foreach ($oConfig->getShopIds() as $iShopId) {
+            /** @var mfBepadoConfiguration $oBepadoConfig */
+            $oBepadoConfig = $this->getVersionLayer()->createNewObject('mfBepadoConfiguration');
+            $oBepadoConfig->load($iShopId);
+            if ($oBepadoConfig->isLoaded()) {
+                // existing configuration won't be overwritten
+                continue;
+            }
+
+            $oBepadoConfig->setId($iShopId);
+            $oBepadoConfig
+                ->setSandboxMode(true)
+                ->setShopHintInBasket(false)
+                ->setShopHintOnArticleDetails(false)
+                ;
+            $oBepadoConfig->save();
+        }
+
     }
 }

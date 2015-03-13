@@ -173,7 +173,7 @@ class oxidProductToShop implements ProductToShop
         $oBepadoProductState->assign(array(
                 'p_source_id' => $product->sourceId,
                 'shop_id'     => $product->shopId,
-                'state'       => SDKConfig::ARTICLE_STATE_IMPORTED,
+                'state'       => mfBepadoConfiguration::ARTICLE_STATE_IMPORTED,
                 'OXID'        => $oxArticle->getId(),
             )
         );

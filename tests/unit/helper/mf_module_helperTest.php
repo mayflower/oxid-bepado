@@ -21,7 +21,7 @@ class mf_module_helperTest extends BaseTestCase
 
         $this->helper = new mf_module_helper();
         $this->helper->setVersionLayer($this->versionLayer);
-        $sdkConfig = new SDKConfig();
+        $sdkConfig = new mfBepadoConfiguration();
         $sdkConfig
             ->setApiEndpointUrl('some-url')
             ->setApiKey('some-key')
@@ -36,7 +36,7 @@ class mf_module_helperTest extends BaseTestCase
 
     public function testSaveOnConfVarsVerified()
     {
-        $this->createSDKConfig();
+        $this->createmfBepadoConfiguration();
         $this->sdk->expects($this->once())->method('verifyKey');
 
         $result = $this->helper->onSaveConfigVars($this->configVars);
@@ -46,7 +46,7 @@ class mf_module_helperTest extends BaseTestCase
 
     public function testOnSaveConfVarsNotVerified()
     {
-        $this->createSDKConfig();
+        $this->createmfBepadoConfiguration();
 
         $exception = new \RuntimeException();
         $this->sdk->expects($this->once())->method('verifyKey')->will($this->throwException($exception));
@@ -63,7 +63,7 @@ class mf_module_helperTest extends BaseTestCase
         );
     }
 
-    private function createSDKConfig()
+    private function createmfBepadoConfiguration()
     {
         $this->oxidConfig
             ->expects($this->at(0))

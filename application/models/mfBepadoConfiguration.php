@@ -13,14 +13,13 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-use Bepado\SDK\Struct\Order;
 
 /**
  * A model for sdk configuration values to instantiate the sdk.
  *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
-class SDKConfig
+class mfBepadoConfiguration extends oxBase
 {
     const ARTICLE_STATE_NONE = 0;
     const ARTICLE_STATE_EXPORTED = 1;
@@ -30,21 +29,7 @@ class SDKConfig
     const TRANSACTION_HOST_DEMO = 'transaction.server1230-han.de-nserver.de';
     const SOCIALNETWORK_HOST_DEMO = 'sn.server1230-han.de-nserver.de';
     const DEFAULT_PAYMENT_TYPE = 'bepadopaymenttype';
-
-    /**
-     * @var
-     */
-    private $apiKey;
-
-    /**
-     * @var string
-     */
-    private $apiEndpointUrl;
-
-    /**
-     * @var string
-     */
-    private $sandboxMode;
+    const DATABASE_BASE_STRING = 'mfbepadoconfiguration__';
 
     /**
      * @var string
@@ -61,62 +46,131 @@ class SDKConfig
      */
     private $searchHost;
 
+    public function __construct()
+    {
+        parent::init('mfbepadoconfiguration');
+    }
+
     /**
+     * Will return the current api endpoint url.
+     *
      * @return mixed
      */
     public function getApiEndpointUrl()
     {
-        return $this->apiEndpointUrl;
+        return $this->getFieldData(self::DATABASE_BASE_STRING.'apiendpoint');
     }
 
     /**
+     * Will set the endpoint url to the configuration.
+     *
      * @param mixed $apiEndpointUrl
      *
-     * @return SDKConfig
+     * @return mfBepadoConfiguration
      */
     public function setApiEndpointUrl($apiEndpointUrl)
     {
-        $this->apiEndpointUrl = $apiEndpointUrl;
+        $this->_setFieldData(self::DATABASE_BASE_STRING.'apiendpoint', $apiEndpointUrl);
 
         return $this;
     }
 
     /**
+     * Will return the current api key.
+     *
      * @return mixed
      */
     public function getApiKey()
     {
-        return $this->apiKey;
+        return $this->getFieldData(self::DATABASE_BASE_STRING.'apikey');
     }
 
     /**
+     * Will set the api key to the configuration.
+     *
      * @param mixed $apiKey
      *
-     * @return SDKConfig
+     * @return mfBepadoConfiguration
      */
     public function setApiKey($apiKey)
     {
-        $this->apiKey = $apiKey;
+        $this->_setFieldData(self::DATABASE_BASE_STRING.'apikey', $apiKey);
 
         return $this;
     }
 
     /**
+     * Will return the current sandbox mode.
+     *
      * @return string
      */
     public function getSandboxMode()
     {
-        return $this->sandboxMode;
+        return $this->getFieldData(self::DATABASE_BASE_STRING.'sandboxmode');
     }
 
     /**
+     * Will set the sandbox mode to the configuration.
+     *
      * @param string $sandboxMode
      *
-     * @return SDKConfig
+     * @return mfBepadoConfiguration
      */
     public function setSandboxMode($sandboxMode)
     {
-        $this->sandboxMode = $sandboxMode;
+        $this->_setFieldData(self::DATABASE_BASE_STRING.'sandboxmode', $sandboxMode);
+
+        return $this;
+    }
+
+    /**
+     * Gets the flag whether is Remote shop should be visible on
+     * the article details page or not.
+     *
+     * @return mixed
+     */
+    public function getShopHintOnArticleDetails()
+    {
+        return $this->getFieldData(self::DATABASE_BASE_STRING.'shophintarticledetails');
+    }
+
+    /**
+     * Set the flag whether is Remote shop should be visible on
+     * the article details page or not.
+     *
+     * @param bool $shopHint
+     *
+     * @return $this
+     */
+    public function setShopHintOnArticleDetails($shopHint)
+    {
+        $this->_setFieldData(self::DATABASE_BASE_STRING.'shophintarticledetails', $shopHint);
+
+        return $this;
+    }
+
+    /**
+     * Gets the flag whether is Remote shop should be visible in
+     * the basket page or not.
+     *
+     * @return mixed
+     */
+    public function getShopHintInBasket()
+    {
+        return $this->getFieldData(self::DATABASE_BASE_STRING.'shophintbasket');
+    }
+
+    /**
+     * Set the flag whether is Remote shop should be visible in
+     * the basket page or not.
+     *
+     * @param bool $shopHint
+     *
+     * @return $this
+     */
+    public function setShopHintInBasket($shopHint)
+    {
+        $this->_setFieldData(self::DATABASE_BASE_STRING.'shophintbasket', $shopHint);
 
         return $this;
     }
@@ -132,7 +186,7 @@ class SDKConfig
     /**
      * @param string $searchHost
      *
-     * @return SDKConfig
+     * @return mfBepadoConfiguration
      */
     public function setSearchHost($searchHost)
     {
@@ -152,7 +206,7 @@ class SDKConfig
     /**
      * @param string $socialnetworkHost
      *
-     * @return SDKConfig
+     * @return mfBepadoConfiguration
      */
     public function setSocialnetworkHost($socialnetworkHost)
     {
@@ -172,7 +226,7 @@ class SDKConfig
     /**
      * @param string $transactionHost
      *
-     * @return SDKConfig
+     * @return mfBepadoConfiguration
      */
     public function setTransactionHost($transactionHost)
     {

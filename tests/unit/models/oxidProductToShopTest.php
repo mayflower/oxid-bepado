@@ -96,7 +96,7 @@ class oxidProductToShopTest extends BaseTestCase
             ->with($this->equalTo(array(
                 'p_source_id' => 'some-id',
                 'shop_id'     => 'shop-id',
-                'state'       => SDKConfig::ARTICLE_STATE_IMPORTED,
+                'state'       => mfBepadoConfiguration::ARTICLE_STATE_IMPORTED,
                 'OXID'        => 'test-id',
             )));
         $this->bepadoProductState->expects($this->once())->method('save');

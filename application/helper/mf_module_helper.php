@@ -66,11 +66,11 @@ class mf_module_helper extends mf_abstract_helper
     }
 
     /**
-     * @param SDKConfig $config
+     * @param mfBepadoConfiguration $config
      *
      * @return bool
      */
-    public function verifyAtSdk(SDKConfig $config)
+    public function verifyAtSdk(mfBepadoConfiguration $config)
     {
         /** @var SDK $sdk */
         $sdk = $this->getVersionLayer()->createNewObject('mf_sdk_helper')->instantiateSdk($config);

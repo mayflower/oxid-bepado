@@ -37,7 +37,7 @@ class mf_sdk_order_helperTest extends BaseTestCase
         $this->mfArticleHelper = $this->getMockBuilder('mf_sdk_article_helper')->disableOriginalConstructor()->getMock();
         $this->mfLoggerHelper  = $this->getMockBuilder('mf_sdk_logger_helper')->disableOriginalConstructor()->getMock();
 
-        $sdkConfig = new SDKConfig();
+        $sdkConfig = new mfBepadoConfiguration();
         $this->mfSdkHelper
             ->expects($this->any())
             ->method('createSdkConfigFromOxid')
@@ -330,7 +330,7 @@ class mf_sdk_order_helperTest extends BaseTestCase
     protected function getObjectMapping()
     {
         return array(
-            'SDKConfig'              => new SDKConfig(),
+            'mfBepadoConfiguration'              => new mfBepadoConfiguration(),
             'oxorder'                => $this->oxOrder,
             'mf_sdk_helper'          => $this->mfSdkHelper,
             'mf_sdk_article_helper'  => $this->mfArticleHelper,

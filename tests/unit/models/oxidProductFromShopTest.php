@@ -55,7 +55,7 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
 
         // preparing sdk and its config
-        $this->sdkConfig = new SDKConfig();
+        $this->sdkConfig = new mfBepadoConfiguration();
         $this->sdkConfig->setApiEndpointUrl('test-endpoint');
         $this->sdkConfig->setApiKey('test-api-key');
         $this->sdkConfig->setSandboxMode(true);

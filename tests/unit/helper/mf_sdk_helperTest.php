@@ -13,6 +13,7 @@ class mf_sdk_helperTest extends BaseTestCase
     protected $oxBase;
     protected $oxDb;
     protected $logger;
+    protected $sdkConfig;
     /**
      * @var mf_sdk_helper
      */
@@ -32,6 +33,7 @@ class mf_sdk_helperTest extends BaseTestCase
         $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
         $this->logger = $this->getMockBuilder('mf_sdk_logger_helper')->disableOriginalConstructor()->getMock();
+        $this->sdkConfig = $this->getMockBuilder('mfBepadoConfiguration')->disableOriginalConstructor()->getMock();
     }
 
     /**
@@ -43,7 +45,7 @@ class mf_sdk_helperTest extends BaseTestCase
         $oxConfig = $this->getMock('oxConfig');
         $versionLayer = $this->getMock('VersionLayerInterface');
         $versionLayer->expects($this->once())->method('getConfig')->will($this->returnValue($oxConfig));
-        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new SDKConfig()));
+        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new mfBepadoConfiguration()));
         $this->helper->setVersionLayer($versionLayer);
         $oxConfig->expects($this->at(0))
             ->method('getConfigParam')
@@ -73,7 +75,7 @@ class mf_sdk_helperTest extends BaseTestCase
         $oxConfig = $this->getMock('oxConfig');
         $versionLayer = $this->getMock('VersionLayerInterface');
         $versionLayer->expects($this->once())->method('getConfig')->will($this->returnValue($oxConfig));
-        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new SDKConfig()));
+        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new mfBepadoConfiguration()));
         $this->helper->setVersionLayer($versionLayer);
         $oxConfig->expects($this->at(0))
             ->method('getConfigParam')
@@ -191,18 +193,24 @@ class mf_sdk_helperTest extends BaseTestCase
         $this->oxBase->expects($this->at(0))->method('oxobject2delivery');
         $this->oxBase->expects($this->at(1))->method('oxobject2delivery');
 
+        $this->oxidConfig
+            ->expects($this->once())
+            ->method('getShopIds')
+            ->will($this->returnValue(array()))
+            ;
+
         $this->helper->onModuleActivation();
     }
 
     protected function getObjectMapping()
     {
         return array(
-            'SDKConfig'             => new SDKConfig(),
             'oxgroups'              => $this->oxGroups,
             'oxdelivery'            => $this->oxDelivery,
             'oxdeliveryset'         => $this->oxDeliverySet,
             'oxbase'                => $this->oxBase,
             'mf_sdk_logger_helper'  => $this->logger,
+            'mfBepadoConfiguration'             => $this->sdkConfig,
         );
     }
 }

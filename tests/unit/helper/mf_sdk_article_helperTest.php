@@ -51,7 +51,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->productConverter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
         $this->sdk = $this->getMockBuilder('sdkMock')->disableOriginalConstructor()->getMock();
-        $sdkConfig = new SDKConfig();
+        $sdkConfig = new mfBepadoConfiguration();
         $this->sdkHelper
             ->expects($this->any())
             ->method('createSdkConfigFromOxid')
@@ -96,7 +96,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->oxBase
             ->expects($this->once())
             ->method('getFieldData')
-            ->will($this->returnValue((string) SDKConfig::ARTICLE_STATE_EXPORTED));
+            ->will($this->returnValue((string) mfBepadoConfiguration::ARTICLE_STATE_EXPORTED));
 
         $result = $this->helper->isArticleExported($this->oxArticle);
 
@@ -131,7 +131,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->oxBase
             ->expects($this->once())
             ->method('getFieldData')
-            ->will($this->returnValue((string) SDKConfig::ARTICLE_STATE_IMPORTED));
+            ->will($this->returnValue((string) mfBepadoConfiguration::ARTICLE_STATE_IMPORTED));
 
         $result = $this->helper->isArticleImported($this->oxArticle);
 
@@ -166,7 +166,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->oxBase
             ->expects($this->once())
             ->method('getFieldData')
-            ->will($this->returnValue((string) SDKConfig::ARTICLE_STATE_IMPORTED));
+            ->will($this->returnValue((string) mfBepadoConfiguration::ARTICLE_STATE_IMPORTED));
 
         $result = $this->helper->isOrderArticleImported($this->oxOrderArticle);
 
@@ -190,7 +190,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->oxBase
             ->expects($this->once())
             ->method('getFieldData')
-            ->will($this->returnValue((string) SDKConfig::ARTICLE_STATE_NONE));
+            ->will($this->returnValue((string) mfBepadoConfiguration::ARTICLE_STATE_NONE));
 
         $result = $this->helper->getArticleBepadoState($this->oxArticle);
 
@@ -204,7 +204,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->oxBase
             ->expects($this->once())
             ->method('getFieldData')
-            ->will($this->returnValue((string) SDKConfig::ARTICLE_STATE_EXPORTED));
+            ->will($this->returnValue((string) mfBepadoConfiguration::ARTICLE_STATE_EXPORTED));
 
         $result = $this->helper->getArticleBepadoState($this->oxArticle);
 
@@ -218,7 +218,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->oxBase
             ->expects($this->once())
             ->method('getFieldData')
-            ->will($this->returnValue((string) SDKConfig::ARTICLE_STATE_IMPORTED));
+            ->will($this->returnValue((string) mfBepadoConfiguration::ARTICLE_STATE_IMPORTED));
 
         $result = $this->helper->getArticleBepadoState($this->oxArticle);
 
@@ -381,7 +381,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
                 ->expects($this->once())
                 ->method('getFieldData')
                 ->with($this->equalTo('state'))
-                ->will($this->returnValue(SDKConfig::ARTICLE_STATE_EXPORTED));
+                ->will($this->returnValue(mfBepadoConfiguration::ARTICLE_STATE_EXPORTED));
         }
     }
 

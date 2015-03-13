@@ -55,7 +55,6 @@ $aLang = array(
     'mf_bepado_products'                        => 'Produkte verwalten',
     'mf_configuration_module'                  => 'Modul',
     'mf_configuration_module_main'             => 'Main',
-    'mf_configuration_module_extend'           => 'Erweitert',
     'mf_configuration_category'                => 'Kategorien',
     'mf_configuration_category_main'           => 'Main',
     'mf_configuration_unit'                    => 'Maßeinheiten',

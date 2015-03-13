@@ -25,7 +25,7 @@ class mf_category_mainTest extends BaseTestCase
         $this->_oCategory = $oCategory;
 
         $this->sdk = $this->getMockBuilder('sdkMock')->disableOriginalConstructor()->getMock();
-        $this->sdkConfig = new SDKConfig();
+        $this->sdkConfig = new mfBepadoConfiguration();
         $this->sdkConfig->setApiEndpointUrl('test-endpoint');
         $this->sdkConfig->setApiKey('test-api-key');
         $this->sdkConfig->setSandboxMode(true);

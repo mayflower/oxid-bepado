@@ -48,7 +48,6 @@ $aModule = array(
         'mfbepado'                       => $aPaths['controllers'] . '/mfBepado.php',
         'mf_configuration_module'        => $aPaths['controllers'] . '/admin/mf_configuration_module.php',
         'mf_configuration_module_main'   => $aPaths['controllers'] . '/admin/mf_configuration_module_main.php',
-        'mf_configuration_module_extend' => $aPaths['controllers'] . '/admin/mf_configuration_module_extend.php',
         'mf_configuration_module_list'   => $aPaths['controllers'] . '/admin/mf_configuration_module_list.php',
         'mf_configuration_category'      => $aPaths['controllers'] . '/admin/mf_configuration_category.php',
         'mf_configuration_category_main' => $aPaths['controllers'] . '/admin/mf_configuration_category_main.php',
@@ -65,7 +64,7 @@ $aModule = array(
 
         'oxidproductfromshop'   => $aPaths['models'] . '/productFromShop.php',
         'oxidProductToShop'     => $aPaths['models'] . '/productToShop.php',
-        'SDKConfig'             => $aPaths['models'] . '/SDKConfig.php',
+        'mfBepadoConfiguration'             => $aPaths['models'] . '/mfBepadoConfiguration.php',
 
         'mf_converter_interface'   => $aPaths['converter'] . '/mf_converter_interface.php',
         'mf_abstract_converter'    => $aPaths['converter'] . '/mf_abstract_converter.php',
@@ -130,7 +129,6 @@ $aModule = array(
         'mf_sdk_result.tpl'                  => $aPaths['views'] . '/tpl/mf_sdk_result.tpl',
         'mf_configuration_module.tpl'        => $aPaths['views'] . '/admin/tpl/mf_configuration_module.tpl',
         'mf_configuration_module_main.tpl'   => $aPaths['views'] . '/admin/tpl/mf_configuration_module_main.tpl',
-        'mf_configuration_module_extend.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_module_extend.tpl',
         'mf_configuration_module_list.tpl'   => $aPaths['views'] . '/admin/tpl/mf_configuration_module_list.tpl',
         'mf_configuration_category.tpl'      => $aPaths['views'] . '/admin/tpl/mf_configuration_category.tpl',
         'mf_configuration_category_main.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_category_main.tpl',
