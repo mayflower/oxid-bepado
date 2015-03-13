@@ -69,4 +69,15 @@ $aLang = array(
     'MF_CONFIGURATION_UNIT_LIST_MENUSUBITEM'   => 'Maßeinheit (Zuordnung)',
     'MF_PRODUCT_IMPORT_LIST_MENUSUBITEM'   => 'Import',
     'MF_PRODUCT_EXPORT_LIST_MENUSUBITEM'   => 'Export',
+    'MF_BEPDO_SANDBOXMODE'                      => 'S',
+    'MF_BEPDO_SHOP_ID'                          => 'ShopId',
+    'MF_BEPADO_CONFIGURATION_MODULE_SANDBOXMODE'=> 'Sandbox-Modus activ',
+    'MF_BEPADO_CONFIGURATION_MODULE_APIKEY'     => 'Api-Key',
+    'MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINTS' => 'Marktplatzhinweise',
+    'MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINT_ARTICLE_DETAILS' => 'In den Artikeldetails',
+    'MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINT_BASKET' => 'Im Warenkorb',
+    'HELP_MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINTS' => 'Geben Sie einen Marktplatzhinweis
+                                                        für einen bestimmten Bereich frei. Damit sieht der Nutzer wenn
+                                                         er bspw. einen importierten Artikel in seinem Warenkorb hat anhand
+                                                         eines Hinweises über den Lieferanten-Shop.',
 );

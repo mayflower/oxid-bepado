@@ -21,10 +21,63 @@
  */
 class mf_configuration_module_main extends oxAdminDetails
 {
+    /**
+     * @var VersionLayerInterface
+     */
+    protected $_oVersionLayer;
+
+    /**
+     * Prepares rendering of the main tab with the values for the template.
+     *
+     * In this case the model is fetched from database only based on the id.
+     *
+     * @return string
+     */
     public function render()
     {
         parent::render();
 
+        $oBepadoConfiguration = $this->getVersionLayer()->createNewObject('mfBepadoConfiguration');
+        $this->_aViewData['edit'] = $oBepadoConfiguration;
+
+        $oxId = $this->getEditObjectId();
+        if ($oxId && '-1' !== $oxId) {
+            $oBepadoConfiguration->load($oxId);
+        }
+
         return 'mf_configuration_module_main.tpl';
+    }
+
+    /**
+     * Persists the given values on the main tab.
+     */
+    public function save()
+    {
+        parent::save();
+
+        $aParams = $this->getVersionLayer()->getConfig()->getRequestParameter("editval");
+
+        $oBepadoConfiguration = $this->getVersionLayer()->createNewObject('mfBepadoConfiguration');
+        $oBepadoConfiguration->assign($aParams);
+        $oBepadoConfiguration->save();
+
+        // set oxid if inserted
+        $this->setEditObjectId( $oBepadoConfiguration->getId() );
+    }
+
+    /**
+     * Create and/or returns the VersionLayer.
+     *
+     * @return VersionLayerInterface
+     */
+    private function getVersionLayer()
+    {
+        if (null == $this->_oVersionLayer) {
+            /** @var VersionLayerFactory $factory */
+            $factory = oxNew('VersionLayerFactory');
+            $this->_oVersionLayer = $factory->create();
+        }
+
+        return $this->_oVersionLayer;
     }
 }

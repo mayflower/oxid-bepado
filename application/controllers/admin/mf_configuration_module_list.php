@@ -19,5 +19,17 @@
  */
 class mf_configuration_module_list extends oxAdminList
 {
+    /**
+     * Which is the base model to use for this list.
+     *
+     * @var string
+     */
+    protected $_sListClass = 'mfBepadoConfiguration';
+
+    /**
+     * Decides which template is chose for this list.
+     *
+     * @var string
+     */
     protected $_sThisTemplate = 'mf_configuration_module_list.tpl';
 }
