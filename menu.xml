@@ -14,5 +14,13 @@
                 <TAB id="mf_configuration_unit_main" cl="mf_configuration_unit_main" />
             </SUBMENU>
         </MAINMENU>
+        <MAINMENU id="mf_bepado_products">
+            <SUBMENU id="mf_product_import" cl="mf_product_import" list="mf_product_import_list">
+                <TAB id="mf_product_import_main" cl="mf_product_import_main" />
+            </SUBMENU>
+            <SUBMENU id="mf_product_export" cl="mf_product_export" list="mf_product_export_list">
+                <TAB id="mf_product_export_main" cl="mf_product_export_main" />
+            </SUBMENU>
+        </MAINMENU>
     </OXMENU>
 </OX>
