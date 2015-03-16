@@ -175,6 +175,21 @@ class mfBepadoConfiguration extends oxBase
         return $this;
     }
 
+    public function hastShopHintInBasket()
+    {
+        return '1' === $this->getShopHintInBasket();
+    }
+
+    public function hastShopHintOnArticleDetails()
+    {
+        return '1' === $this->getShopHintOnArticleDetails();
+    }
+
+    public function isInSandboxMode()
+    {
+        return '1' === $this->getSandboxMode();
+    }
+
     /**
      * @return string
      */
