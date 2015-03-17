@@ -38,6 +38,7 @@ $aModule = array(
 
         'basket'                         => $aPaths['controllers'] . '/mf_basket',
         'order'                          => $aPaths['controllers'] . '/mf_order',
+        'details'                        => $aPaths['controllers'] . '/mf_details',
 
         'oxarticle'             => $aPaths['models'] . '/mf_bepado_oxarticle',
         'oxorder'               => $aPaths['models'] . '/mf_oxOrder',
@@ -124,6 +125,11 @@ $aModule = array(
             'template' => 'page/checkout/inc/basketcontents.tpl',
             'block'    => 'checkout_basketcontents_basketitem_titlenumber',
             'file'     => $aPaths['blocks'] . '/checkout_basketcontents_basketitem_titlenumber.tpl'
+        ),
+        array(
+            'template' => 'page/details/inc/productmain.tpl',
+            'block'    => 'details_productmain_artnumber',
+            'file'     => $aPaths['blocks'] . '/details_productmain_artnumber.tpl'
         ),
     ),
     'templates' => array(

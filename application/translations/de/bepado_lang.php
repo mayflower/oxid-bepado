@@ -20,5 +20,6 @@
 
 $aLang = array(
     'charset'                          => 'UTF-8',
-    'MESSAGE_BEPADO_RESPONSE_ORDER_PROBLEM_STATE' => 'Fehler beim Bestellen. Bitte kontaktieren Sie den Support.'
+    'MESSAGE_BEPADO_RESPONSE_ORDER_PROBLEM_STATE' => 'Fehler beim Bestellen. Bitte kontaktieren Sie den Support.',
+    'HELP_MF_BEPADO_MARKETPLACE_HINT'             => 'Dieser Artikel wurde über das Bepado Netzwerk importiert.',
 );

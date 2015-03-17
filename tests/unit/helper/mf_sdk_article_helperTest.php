@@ -2,6 +2,7 @@
 
 
 use Bepado\SDK\Struct\Product;
+use Bepado\SDK\Struct as Struct;
 
 require_once __DIR__ . '/../BaseTestCase.php';
 
@@ -31,6 +32,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
     protected $sdk;
     protected $productConverter;
     protected $mfBepadoConfiguration;
+    protected $loggerHelper;
 
     public function setUp()
     {
@@ -56,6 +58,8 @@ class mf_sdk_article_helperTest extends BaseTestCase
             ->expects($this->any())
             ->method('instantiateSdk')
             ->will($this->returnValue($this->sdk));
+        $this->mfBepadoConfiguration = $this->getMockBuilder('mfBepadoConfiguration')->disableOriginalConstructor()->getMock();
+        $this->loggerHelper = $this->getMockBuilder('mf_sdk_logger_helper')->disableOriginalConstructor()->getMock();
     }
 
     public function tearDown()
@@ -456,6 +460,100 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->assertEquals('shop-id', $product->shopId);
     }
 
+    public function testMarketHintCreation()
+    {
+        $this->oxBase->expects($this->any())->method('load')->with($this->equalTo('test-id'));
+        $this->oxBase->expects($this->any())->method('isLoaded')->will($this->returnValue(true));
+        $this->oxBase
+            ->expects($this->any())
+            ->method('getFieldData')
+            ->will($this->returnCallback(function () {
+                $args = func_get_args();
+                if ("state" === $args[0]) {
+                    return (string) mfBepadoConfiguration::ARTICLE_STATE_IMPORTED;
+                } elseif ("shop_id" === $args[0]) {
+                    return 'shop-id';
+                }
+             })
+            );
+        $this->mfBepadoConfiguration->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
+        // prepare the markteplace shop
+        $marketPlaceShop = new Struct\Shop();
+        $marketPlaceShop->id = 'shop-id';
+        $marketPlaceShop->url = 'some-url';
+        $marketPlaceShop->name = 'some-name';
+        $this->mfBepadoConfiguration
+            ->expects($this->once())
+            ->method('hastShopHintOnArticleDetails')
+            ->will($this->returnValue(true));
+        $this->sdkHelper
+            ->expects($this->once())
+            ->method('computeMarketplaceHintForProduct')
+            ->with($this->equalTo($this->mfBepadoConfiguration))
+            ->will($this->returnValue($marketPlaceShop))
+            ;
+        $this->productConverter
+            ->expects($this->once())
+            ->method('fromShopToBepado')
+            ->with($this->equalTo($this->oxArticle))
+            ->will($this->returnValue(new Product()));
+
+        $this->helper->computeMarketplaceHintOnArticle($this->oxArticle);
+
+        $this->assertEquals($marketPlaceShop, $this->oxArticle->marketplace_shop);
+    }
+
+    public function testMarketHintCreationInvalidModuleConfigurationShouldBeLogged()
+    {
+        $this->oxBase->expects($this->any())->method('load')->with($this->equalTo('test-id'));
+        $this->oxBase->expects($this->any())->method('isLoaded')->will($this->returnValue(true));
+        $this->oxBase
+            ->expects($this->any())
+            ->method('getFieldData')
+            ->will($this->returnCallback(function () {
+                $args = func_get_args();
+                if ("state" === $args[0]) {
+                    return (string) mfBepadoConfiguration::ARTICLE_STATE_IMPORTED;
+                } elseif ("shop_id" === $args[0]) {
+                    return 'shop-id';
+                }
+            })
+            );
+        $this->mfBepadoConfiguration
+            ->expects($this->once())
+            ->method('isLoaded')->will($this->returnValue(false));
+        $this->loggerHelper
+            ->expects($this->once())
+            ->method('writeBepadoLog')
+            ->with($this->equalTo('No bepado configuration found for shopId shop-id'));
+
+        $result = $this->helper->computeMarketplaceHintOnArticle($this->oxArticle);
+
+        $this->assertNull($result);
+    }
+
+    public function testMarketHintCreationForNonImportedArticlesShouldDoNothing()
+    {
+        $this->oxBase->expects($this->any())->method('load')->with($this->equalTo('test-id'));
+        $this->oxBase->expects($this->any())->method('isLoaded')->will($this->returnValue(true));
+        $this->oxBase
+            ->expects($this->any())
+            ->method('getFieldData')
+            ->will($this->returnCallback(function () {
+                $args = func_get_args();
+                if ("state" === $args[0]) {
+                    return (string) mfBepadoConfiguration::ARTICLE_STATE_NONE;
+                }
+            })
+            );
+        $this->mfBepadoConfiguration
+            ->expects($this->never())
+            ->method('load');
+        $result = $this->helper->computeMarketplaceHintOnArticle($this->oxArticle);
+
+        $this->assertNull($result);
+    }
+
     protected function getObjectMapping()
     {
         return array(
@@ -463,6 +561,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
             'mf_sdk_helper'         => $this->sdkHelper,
             'mf_sdk_converter'      => $this->productConverter,
             'mfBepadoConfiguration' => $this->mfBepadoConfiguration,
+            'mf_sdk_logger_helper'  => $this->loggerHelper,
         );
     }
 }
