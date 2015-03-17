@@ -122,7 +122,7 @@ class mfBepadoConfiguration extends oxBase
      */
     public function getShopHintOnArticleDetails()
     {
-        return $this->getFieldData(self::DATABASE_BASE_STRING.'shophintarticledetails');
+        return $this->getFieldData(self::DATABASE_BASE_STRING.'marketplacehintarticle');
     }
 
     /**
@@ -135,7 +135,7 @@ class mfBepadoConfiguration extends oxBase
      */
     public function setShopHintOnArticleDetails($shopHint)
     {
-        $this->_setFieldData(self::DATABASE_BASE_STRING.'shophintarticledetails', $shopHint);
+        $this->_setFieldData(self::DATABASE_BASE_STRING.'marketplacehintarticle', $shopHint);
 
         return $this;
     }
@@ -148,7 +148,7 @@ class mfBepadoConfiguration extends oxBase
      */
     public function getShopHintInBasket()
     {
-        return $this->getFieldData(self::DATABASE_BASE_STRING.'shophintbasket');
+        return $this->getFieldData(self::DATABASE_BASE_STRING.'marketplacehintbasket');
     }
 
     /**
@@ -161,7 +161,7 @@ class mfBepadoConfiguration extends oxBase
      */
     public function setShopHintInBasket($shopHint)
     {
-        $this->_setFieldData(self::DATABASE_BASE_STRING.'shophintbasket', $shopHint);
+        $this->_setFieldData(self::DATABASE_BASE_STRING.'marketplacehintbasket', $shopHint);
 
         return $this;
     }

@@ -55,7 +55,7 @@
                             [{ oxmultilang ident="MF_BEPADO_PURCHASE_GROUP_CHAR" }]
                         </td>
                         <td class="edittext" colspan="2">
-                            <select name="mf_editval[mfbepadoconfiguration__purchasegroup]" class="editinput" style="max-width: 300px;"[{$readonly}]>
+                            <select name="editval[mfbepadoconfiguration__purchasegroup]" class="editinput" style="max-width: 300px;"[{$readonly}]>
                                 [{foreach from=$available_purchaseGroups item=char}]
                                 <option
                                         value="[{$char}]"
@@ -95,8 +95,8 @@
                                 [{oxmultilang ident="MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINT_BASKET"}]
                             </td>
                             <td class="edittext">
-                                <input type="hidden" name="editval[mfbepadoconfiguration__shophintbasket]" value="0">
-                                <input class="edittext" type="checkbox" name="editval[mfbepadoconfiguration__shophintbasket]" value='1' [{if $edit->mfbepadoconfiguration__shophintbasket->value == 1}]checked[{/if}] [{$readonly}]>
+                                <input type="hidden" name="editval[mfbepadoconfiguration__marketplacehintbasket]" value="0">
+                                <input class="edittext" type="checkbox" name="editval[mfbepadoconfiguration__marketplacehintbasket]" value='1' [{if $edit->mfbepadoconfiguration__marketplacehintbasket->value == 1}]checked[{/if}] [{$readonly}]>
                             </td>
                         </tr>
                         <tr>
@@ -104,8 +104,8 @@
                                 [{oxmultilang ident="MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINT_ARTICLE_DETAILS"}]
                             </td>
                             <td class="edittext">
-                                <input type="hidden" name="editval[mfbepadoconfiguration__shophintarticledetails]" value="0">
-                                <input class="edittext" type="checkbox" name="editval[mfbepadoconfiguration__shophintarticledetails]" value='1' [{if $edit->mfbepadoconfiguration__shophintarticledetails->value == 1}]checked[{/if}] [{$readonly}]>
+                                <input type="hidden" name="editval[mfbepadoconfiguration__marketplacehintarticle]" value="0">
+                                <input class="edittext" type="checkbox" name="editval[mfbepadoconfiguration__marketplacehintarticle]" value='1' [{if $edit->mfbepadoconfiguration__marketplacehintarticle->value == 1}]checked[{/if}] [{$readonly}]>
                             </td>
                         </tr>
                     </table>

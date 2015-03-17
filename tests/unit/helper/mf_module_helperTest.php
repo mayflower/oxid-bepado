@@ -32,7 +32,7 @@ class mf_module_helperTest extends BaseTestCase
             'mfbepadoconfiguration__oxid' => 'shop-id',
             'mfbepadoconfiguration__sandboxmode' => '1',
             'mfbepadoconfiguration__shophintonarticledetails' => '0',
-            'mfbepadoconfiguration__shophintbasket' => '0',
+            'mfbepadoconfiguration__marketplacehintbasket' => '0',
             'mfbepadoconfiguration__apikey' => 'some-key',
         ));
     }

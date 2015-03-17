@@ -269,4 +269,36 @@ class mf_sdk_article_helper extends mf_abstract_helper
 
         return $this->sdk;
     }
+
+    /**
+     * With the given configuration an for imported articles this
+     * method will add information to display the marketplace shop.
+     *
+     * @param oxArticle $oxArticle
+     *
+     * @throws Exception
+     */
+    public function computeMarketplaceHintOnArticle(oxArticle $oxArticle)
+    {
+        $oxArticle->marketplace_shop = null;
+        if (!$this->isArticleImported($oxArticle)) {
+            return;
+        }
+
+        /** @var mfBepadoConfiguration $oBepadoConfiguration Needed for the marketplace hint in the basket. */
+        $oBepadoConfiguration = $this->getVersionLayer()->createNewObject('mfBepadoConfiguration');
+        $shopId = $this->getVersionLayer()->getConfig()->getShopId();
+        $oBepadoConfiguration->load($shopId);
+        if (!$oBepadoConfiguration->isLoaded()) {
+            $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper')->writeBepadoLog('No bepado configuration found for shopId '.$shopId);
+            return;
+        }
+
+        if ($oBepadoConfiguration->hastShopHintOnArticleDetails()) {
+            $oxArticle->marketplace_shop = $this->getVersionLayer()
+                ->createNewObject('mf_sdk_helper')
+                ->computeMarketplaceHintForProduct($oBepadoConfiguration, $this->computeSdkProduct($oxArticle))
+            ;
+        }
+    }
 }
