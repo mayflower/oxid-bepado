@@ -353,7 +353,11 @@ class mf_sdk_converter implements mf_converter_interface
      */
     private function computePurchasePriceField()
     {
-        $purchaseGroupChar = $this->getVersionLayer()->getConfig()->getConfigParam('sPurchaseGroupChar');
+        /** @var mfBepadoConfiguration $bepadoConfiguration */
+        $bepadoConfiguration = $this->getVersionLayer()->createNewObject('mfBepadoConfiguration');
+        $shopId = $this->getVersionLayer()->getConfig()->getShopId();
+        $bepadoConfiguration->load($shopId);
+        $purchaseGroupChar = $bepadoConfiguration->getPurchaseGroup();
         if (!in_array($purchaseGroupChar, array('A', 'B', 'C'))) {
             $purchaseGroupChar = self::DEFAULT_PURCHASE_PRICE_CHAR;
         }

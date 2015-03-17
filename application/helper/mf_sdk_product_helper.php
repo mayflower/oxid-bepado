@@ -31,13 +31,36 @@ class mf_sdk_product_helper extends mf_abstract_helper
     protected $sdk;
 
     /**
+     * The bepado own logging.
+     *
+     * @var mf_sdk_logger_helper
+     */
+    protected $logger;
+
+    /**
+     * @var mf_sdk_helper
+     */
+    protected $sdkHelper;
+
+    /**
      * @param oxBasket $oxBasket
      */
     public function checkProductsInBasket(oxBasket $oxBasket)
     {
+        $this->logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
+        $this->sdkHelper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
+
         /** @var  oxBasketItem[] $aBasket */
         $aBasket = $oxBasket->getContents();
         $countChanges = 0;
+
+        /** @var mfBepadoConfiguration $oBepadoConfiguration Needed for the marketplace hint in the basket. */
+        $oBepadoConfiguration = $this->getVersionLayer()->createNewObject('mfBepadoConfiguration');
+        $shopId = $this->getVersionLayer()->getConfig()->getShopId();
+        $oBepadoConfiguration->load($shopId);
+        if (!$oBepadoConfiguration->isLoaded()) {
+            $this->logger->writeBepadoLog('No bepado configuration found for shopId '.$shopId);
+        }
 
         foreach ($aBasket as $basketItem) {
             /** @var mf_bepado_oxarticle $oxBasketArticle */
@@ -56,6 +79,8 @@ class mf_sdk_product_helper extends mf_abstract_helper
             }
 
             $product = $helper->computeSdkProduct($oxBasketArticle);
+
+            // do the checkProduct at the sdk
             foreach ($this->doCheckProduct($product) as $message) {
                 if (isset($message->values['availability'])) {
                     $changedAvailability = $message->values['availability'];
@@ -80,6 +105,7 @@ class mf_sdk_product_helper extends mf_abstract_helper
                 $errorMsg[] = 'The price has changed.';
             }
 
+            // set possible error messages
             if ($errorMsg) {
                 $countChanges++;
                 $basketItem->bepado_check = new oxField(
@@ -88,6 +114,10 @@ class mf_sdk_product_helper extends mf_abstract_helper
                 );
             }
 
+            $basketItem->marketplace_shop = null;
+            if ($oBepadoConfiguration->hastShopHintInBasket()) {
+                $basketItem->marketplace_shop = $this->sdkHelper->computeMarketplaceHintForProduct($oBepadoConfiguration, $product);
+            }
         }
 
         // do calculate when there where changes only
@@ -132,12 +162,12 @@ class mf_sdk_product_helper extends mf_abstract_helper
      * order checks while finalizing a order.
      *
      * @param oxOrder $oxOrder
-     *
      * @param oxUser $oxUser
+     *
      * @return Reservation|bool
-     * @throws oxArticleInputException
+     *
+     * @throws Exception
      * @throws oxNoArticleException
-     * @throws oxOutOfStockException
      */
     public function reserveProductsInOrder(oxOrder $oxOrder, oxUser $oxUser)
     {
@@ -205,8 +235,7 @@ class mf_sdk_product_helper extends mf_abstract_helper
     {
         if (null === $this->sdk) {
             $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
-            $config = $helper->createSdkConfigFromOxid();
-            $this->sdk = $helper->instantiateSdk($config);
+            $this->sdk = $helper->instantiateSdk();
         }
 
         return $this->sdk;

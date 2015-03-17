@@ -16,27 +16,22 @@ abstract class BaseTestCase extends OxidTestCase
      */
     protected $oxidConfig;
 
-    /**
-     * @var array
-     */
-    protected $configVars = array(
-        'bool' => 'confbools',
-        'str'  => 'confstr',
-        'arr'  => 'confarrs',
-        'aarr' => 'confaarrs',
-        'select' => 'confselects',
-        'num'    => 'confnum',
-    );
-
     protected function prepareVersionLayerWithConfig()
     {
         $this->versionLayer = $this->getMock('VersionLayerInterface');
         $this->oxidConfig = $this->getMock('oxConfig');
         $this->versionLayer->expects($this->any())->method('getConfig')->will($this->returnValue($this->oxidConfig));
         $this->versionLayer->expects($this->any())->method('createNewObject')->will($this->returnCallback(array($this, 'createNewObject')));
-        $this->oxidConfig->expects($this->any())
+        $this->oxidConfig
+            ->expects($this->any())
             ->method('getConfigParam')
-            ->will($this->returnCallback(array($this, 'createConfigReturnValue')));
+            ->will($this->returnCallback(array($this, 'createConfigReturnValue')))
+        ;
+        $this->oxidConfig
+            ->expects($this->any())
+            ->method('getShopId')
+            ->will($this->returnValue('shop-id'))
+        ;
     }
 
     /**
@@ -62,7 +57,8 @@ abstract class BaseTestCase extends OxidTestCase
     }
 
     /**
-     * When you want to
+     * When you want to.
+     *
      * @return array
      */
     protected function getConfigMapping()

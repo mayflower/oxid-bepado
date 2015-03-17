@@ -28,7 +28,6 @@ $aModule = array(
     'url'     => 'http://www.mayflower.de/OXID-Bepado-Modul',
     'thumbnail' => 'thumbnail.jpg',
     'extend'  => array(
-        'module_config'                  => $aPaths['controllers'] . '/admin/mf_Module_Config',
         'article_extend'                 => $aPaths['controllers'] . '/admin/mf_article_extend',
         'article_list'                   => $aPaths['controllers'] . '/admin/mf_article_list',
         'category_main'                  => $aPaths['controllers'] . '/admin/mf_category_main',
@@ -48,7 +47,6 @@ $aModule = array(
         'mfbepado'                       => $aPaths['controllers'] . '/mfBepado.php',
         'mf_configuration_module'        => $aPaths['controllers'] . '/admin/mf_configuration_module.php',
         'mf_configuration_module_main'   => $aPaths['controllers'] . '/admin/mf_configuration_module_main.php',
-        'mf_configuration_module_extend' => $aPaths['controllers'] . '/admin/mf_configuration_module_extend.php',
         'mf_configuration_module_list'   => $aPaths['controllers'] . '/admin/mf_configuration_module_list.php',
         'mf_configuration_category'      => $aPaths['controllers'] . '/admin/mf_configuration_category.php',
         'mf_configuration_category_main' => $aPaths['controllers'] . '/admin/mf_configuration_category_main.php',
@@ -65,7 +63,7 @@ $aModule = array(
 
         'oxidproductfromshop'   => $aPaths['models'] . '/productFromShop.php',
         'oxidProductToShop'     => $aPaths['models'] . '/productToShop.php',
-        'SDKConfig'             => $aPaths['models'] . '/SDKConfig.php',
+        'mfBepadoConfiguration'             => $aPaths['models'] . '/mfBepadoConfiguration.php',
 
         'mf_converter_interface'   => $aPaths['converter'] . '/mf_converter_interface.php',
         'mf_abstract_converter'    => $aPaths['converter'] . '/mf_abstract_converter.php',
@@ -122,15 +120,18 @@ $aModule = array(
             'block'    => 'checkout_payment_errors',
             'file'     => $aPaths['blocks'] . '/mf_checkout_payment_errors.tpl'
         ),
+        array(
+            'template' => 'page/checkout/inc/basketcontents.tpl',
+            'block'    => 'checkout_basketcontents_basketitem_titlenumber',
+            'file'     => $aPaths['blocks'] . '/checkout_basketcontents_basketitem_titlenumber.tpl'
+        ),
     ),
     'templates' => array(
-        'mf_module_config.tpl'               => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl',
         'mf_category_list.tpl'               => $aPaths['views'] . '/admin/tpl/mf_category_list.tpl',
         'mf_order_package.tpl'               => $aPaths['views'] . '/admin/tpl/mf_order_package.tpl',
         'mf_sdk_result.tpl'                  => $aPaths['views'] . '/tpl/mf_sdk_result.tpl',
         'mf_configuration_module.tpl'        => $aPaths['views'] . '/admin/tpl/mf_configuration_module.tpl',
         'mf_configuration_module_main.tpl'   => $aPaths['views'] . '/admin/tpl/mf_configuration_module_main.tpl',
-        'mf_configuration_module_extend.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_module_extend.tpl',
         'mf_configuration_module_list.tpl'   => $aPaths['views'] . '/admin/tpl/mf_configuration_module_list.tpl',
         'mf_configuration_category.tpl'      => $aPaths['views'] . '/admin/tpl/mf_configuration_category.tpl',
         'mf_configuration_category_main.tpl' => $aPaths['views'] . '/admin/tpl/mf_configuration_category_main.tpl',
@@ -144,34 +145,6 @@ $aModule = array(
         'mf_product_export.tpl'              => $aPaths['views'] . '/admin/tpl/mf_product_export.tpl',
         'mf_product_export_main.tpl'         => $aPaths['views'] . '/admin/tpl/mf_product_export_main.tpl',
         'mf_product_export_list.tpl'         => $aPaths['views'] . '/admin/tpl/mf_product_export_list.tpl',
-    ),
-    'settings' => array(
-        array(
-            'group' => 'main',
-            'name'  => 'sBepadoLocalEndpoint',
-            'type'  => 'str',
-            'value' => 'http://xxx.de/index.php?cl=mfbepado'
-        ),
-        array(
-            'group' => 'main',
-            'name'  => 'sBepadoApiKey',
-            'type'  => 'str',
-            'value' => 'xxx'
-        ),
-        array(
-            'group' => 'main',
-            'name'  => 'sandboxMode',
-            'type'  => 'bool',
-            'value' => true,
-        ),
-        array(
-            'group'       => 'main',
-            'name'        => 'sPurchaseGroupChar',
-            'type'        => 'select',
-            'value'       => 'B',
-            'constraints' => 'A|B|C',
-            'position'    => 1
-        ),
     ),
     'events' => array(
         'onActivate'   => 'EventListener::onActivate',

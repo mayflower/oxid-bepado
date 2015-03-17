@@ -21,30 +21,20 @@
 use Bepado\SDK\Struct\Order;
 
 $aLang = array(
-    'charset'                          => 'UTF-8',
-    'SHOP_MODULE_sBepadoLocalEndpoint' => 'Bepado apiEndpointUrl',
-    'SHOP_MODULE_sBepadoApiKey'        => 'Bepado apiKey',
-    'SHOP_MODULE_GROUP_main'           => 'Allgemeine Parameter',
-    'SHOP_MODULE_sandboxMode'          => 'Modul im Sandbox-Modus',
-    'SHOP_MODULE_sPurchaseGroupChar'   => 'Händlerpreis',
-    'SHOP_MODULE_sPurchaseGroupChar_A' => 'Preis A',
-    'SHOP_MODULE_sPurchaseGroupChar_B' => 'Preis B',
-    'SHOP_MODULE_sPurchaseGroupChar_C' => 'Preis C',
-    'api_key_not_verified'             => 'API-Key konnte nicht verifiziert werden und wurde nicht gespeichert.',
-    'ARTICLE_MAIN_BEPADO'              => 'Artikel zum Export freigeben',
-    'BEPADO_SETTINGS'                  => 'Einstellungen für Bepado',
-    'HELP_ARTICLE_BEPADO_SETTINGS'     => 'Hier können Sie dieses Produkt zum Export nach Bepado freigeben.',
-
-    'BEPADO_PAYMENT_TYPE'              => 'Bepado Zahlungsart',
-    'HELP_BEPADO_PAYMENT_TYPE'         => 'Bitte wählen Sie eine Zahlungsart derer diese in Bepado entspricht',
-
-    'BEPADO_PAYMENT_TYPE_'.Order::PAYMENT_ADVANCE      => 'Advanced',
-    'BEPADO_PAYMENT_TYPE_'.Order::PAYMENT_INVOICE      => 'Rechnung',
-    'BEPADO_PAYMENT_TYPE_'.Order::PAYMENT_DEBIT        => 'Lastschriftverfahren',
-    'BEPADO_PAYMENT_TYPE_'.Order::PAYMENT_CREDITCARD   => 'Kreditkarte',
-    'BEPADO_PAYMENT_TYPE_'.Order::PAYMENT_PROVIDER     => 'Provider',
-    'BEPADO_PAYMENT_TYPE_'.Order::PAYMENT_OTHER        => 'Sonstiges',
-    'BEPADO_PAYMENT_TYPE_'.Order::PAYMENT_UNKNOWN      => 'Unbekannt',
+    'charset'                            => 'UTF-8',
+    'SHOP_MODULE_sBepadoLocalEndpoint'   => 'Bepado apiEndpointUrl',
+    'SHOP_MODULE_sBepadoApiKey'          => 'Bepado apiKey',
+    'SHOP_MODULE_GROUP_main'             => 'Allgemeine Parameter',
+    'SHOP_MODULE_sandboxMode'            => 'Modul im Sandbox-Modus',
+    'MF_BEPADO_PURCHASE_GROUP_CHAR'      => 'Händlerpreisgruppe',
+    'HELP_MF_BEPADO_PURCHASE_GROUP_CHAR' => 'Wählen Sie das Preisfeld aus. Dieses wird verwendet umd dem Händler einen besonderen Preis zu gewähren.',
+    'MF_BEPADO_PURCHASE_GROUP_CHAR_A'    => 'Preis A',
+    'MF_BEPADO_PURCHASE_GROUP_CHAR_B'    => 'Preis B',
+    'MF_BEPADO_PURCHASE_GROUP_CHAR_C'    => 'Preis C',
+    'api_key_not_verified'               => 'API-Key konnte nicht verifiziert werden und wurde nicht gespeichert.',
+    'ARTICLE_MAIN_BEPADO'                => 'Artikel zum Export freigeben',
+    'BEPADO_SETTINGS'                    => 'Einstellungen für Bepado',
+    'HELP_ARTICLE_BEPADO_SETTINGS'       => 'Hier können Sie dieses Produkt zum Export nach Bepado freigeben.',
 
     'BEPADO_CATEGORY'                  => 'Bepado-Kategorie',
     'HELP_BEPADO_CATEGORY'             => 'Hier stellen Sie ein, welche Bepado-Kategorie Ihrer Shop-Kategorie entspricht.',
@@ -55,7 +45,6 @@ $aLang = array(
     'mf_bepado_products'                        => 'Produkte verwalten',
     'mf_configuration_module'                  => 'Modul',
     'mf_configuration_module_main'             => 'Main',
-    'mf_configuration_module_extend'           => 'Erweitert',
     'mf_configuration_category'                => 'Kategorien',
     'mf_configuration_category_main'           => 'Main',
     'mf_configuration_unit'                    => 'Maßeinheiten',
@@ -70,4 +59,15 @@ $aLang = array(
     'MF_CONFIGURATION_UNIT_LIST_MENUSUBITEM'   => 'Maßeinheit (Zuordnung)',
     'MF_PRODUCT_IMPORT_LIST_MENUSUBITEM'   => 'Import',
     'MF_PRODUCT_EXPORT_LIST_MENUSUBITEM'   => 'Export',
+    'MF_BEPDO_SANDBOXMODE'                      => 'S',
+    'MF_BEPDO_SHOP_ID'                          => 'ShopId',
+    'MF_BEPADO_CONFIGURATION_MODULE_SANDBOXMODE'=> 'Sandbox-Modus activ',
+    'MF_BEPADO_CONFIGURATION_MODULE_APIKEY'     => 'Api-Key',
+    'MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINTS' => 'Marktplatzhinweise',
+    'MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINT_ARTICLE_DETAILS' => 'In den Artikeldetails',
+    'MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINT_BASKET' => 'Im Warenkorb',
+    'HELP_MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINTS' => 'Geben Sie einen Marktplatzhinweis
+                                                        für einen bestimmten Bereich frei. Damit sieht der Nutzer wenn
+                                                         er bspw. einen importierten Artikel in seinem Warenkorb hat anhand
+                                                         eines Hinweises über den Lieferanten-Shop.',
 );

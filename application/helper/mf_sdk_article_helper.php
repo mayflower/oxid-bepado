@@ -39,7 +39,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
      */
     public function isArticleImported(oxArticle $article)
     {
-        return $this->getBepadoState($article->getId()) === SDKConfig::ARTICLE_STATE_IMPORTED;
+        return $this->getBepadoState($article->getId()) === mfBepadoConfiguration::ARTICLE_STATE_IMPORTED;
     }
 
     /**
@@ -51,7 +51,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
      */
     public function isOrderArticleImported(oxOrderArticle $orderArticle)
     {
-        return $this->getBepadoState($orderArticle->getArticle()->getId()) === SDKConfig::ARTICLE_STATE_IMPORTED;
+        return $this->getBepadoState($orderArticle->getArticle()->getId()) === mfBepadoConfiguration::ARTICLE_STATE_IMPORTED;
     }
 
     /**
@@ -63,7 +63,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
      */
     public function isArticleExported(oxArticle $article)
     {
-        return $this->getBepadoState($article->getId()) === SDKConfig::ARTICLE_STATE_EXPORTED;
+        return $this->getBepadoState($article->getId()) === mfBepadoConfiguration::ARTICLE_STATE_EXPORTED;
     }
 
     /**
@@ -91,11 +91,11 @@ class mf_sdk_article_helper extends mf_abstract_helper
         $oBepadoProductState->load($articleId);
 
         if (!$oBepadoProductState->isLoaded()) {
-            return SDKConfig::ARTICLE_STATE_NONE;
+            return mfBepadoConfiguration::ARTICLE_STATE_NONE;
         }
         $state = (int) $oBepadoProductState->getFieldData('state');
 
-        return !$state ? SDKConfig::ARTICLE_STATE_NONE : $state;
+        return !$state ? mfBepadoConfiguration::ARTICLE_STATE_NONE : $state;
     }
 
     /**
@@ -116,7 +116,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
                     'p_source_id' => $articleId,
                     'OXID'        => $articleId,
                     'shop_id'     => '_self_',
-                    'state'       => SDKConfig::ARTICLE_STATE_EXPORTED,
+                    'state'       => mfBepadoConfiguration::ARTICLE_STATE_EXPORTED,
                 )
             );
             $oBepadoProductState->save();
@@ -134,7 +134,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
         /** @var oxBase $oBepadoProductState */
         $oBepadoProductState = $this->getVersionLayer()->createNewObject('oxbase');
         $oBepadoProductState->init('bepado_product_state');
-        $select = $oBepadoProductState->buildSelectString(array('p_source_id' => $oxArticleId, 'shop_id' => SDKConfig::SHOP_ID_LOCAL));
+        $select = $oBepadoProductState->buildSelectString(array('p_source_id' => $oxArticleId, 'shop_id' => mfBepadoConfiguration::SHOP_ID_LOCAL));
         $id = $this->getVersionLayer()->getDb(true)->getOne($select);
         $oBepadoProductState->load($id);
 
@@ -221,7 +221,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
         $oState->load($oxArticle->getId());
         $state = (int) $oState->getFieldData('state');
 
-        if ($state !== SDKConfig::ARTICLE_STATE_EXPORTED && $state !== SDKConfig::ARTICLE_STATE_IMPORTED) {
+        if ($state !== mfBepadoConfiguration::ARTICLE_STATE_EXPORTED && $state !== mfBepadoConfiguration::ARTICLE_STATE_IMPORTED) {
             throw new Exception("Article is not managed for bepado. Neither exported to a remote shop nor imported.");
         }
 
@@ -264,8 +264,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
     {
         if (null === $this->sdk) {
             $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
-            $config  = $helper->createSdkConfigFromOxid();
-            $this->sdk = $helper->instantiateSdk($config);
+            $this->sdk = $helper->instantiateSdk();
         }
 
         return $this->sdk;

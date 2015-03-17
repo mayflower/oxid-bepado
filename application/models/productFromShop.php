@@ -77,7 +77,7 @@ class oxidProductFromShop implements ProductFromShop
     public function getExportedProductIDs()
     {
         $ids = array();
-        $sql = "SELECT p_source_id FROM bepado_product_state WHERE state = ".SDKConfig::ARTICLE_STATE_EXPORTED;
+        $sql = "SELECT p_source_id FROM bepado_product_state WHERE state = ".mfBepadoConfiguration::ARTICLE_STATE_EXPORTED;
         $list = $this->getVersionLayer()->getDb(true)->execute($sql);
 
         while (!$list->EOF) {
@@ -117,8 +117,7 @@ class oxidProductFromShop implements ProductFromShop
     {
         if (null === $this->sdk) {
             $sdkHelper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
-            $sdkConfig = $sdkHelper->createSdkConfigFromOxid();
-            $this->sdk = $sdkHelper->instantiateSdk($sdkConfig);
+            $this->sdk = $sdkHelper->instantiateSdk();
         }
 
         return $this->sdk;
@@ -148,7 +147,7 @@ class oxidProductFromShop implements ProductFromShop
             throw new Exception('No valid products in basket');
         }
 
-        $oxBasket->setPayment(SDKConfig::DEFAULT_PAYMENT_TYPE);
+        $oxBasket->setPayment(mfBepadoConfiguration::DEFAULT_PAYMENT_TYPE);
         $shippingOrder = clone $order;
         $shippingCosts = $this->getOrCreateSDK()->calculateShippingCosts($shippingOrder);
 

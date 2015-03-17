@@ -4,7 +4,6 @@ require_once __DIR__.'/../BaseTestCase.php';
 require_once __DIR__.'/../wrapper/ResultSet.php';
 
 use Bepado\SDK\Struct as Struct;
-use Bepado\SDK\Struct\Product;
 
 /**
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
@@ -55,11 +54,11 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
 
         // preparing sdk and its config
-        $this->sdkConfig = new SDKConfig();
+        $this->sdkConfig = new mfBepadoConfiguration();
         $this->sdkConfig->setApiEndpointUrl('test-endpoint');
         $this->sdkConfig->setApiKey('test-api-key');
         $this->sdkConfig->setSandboxMode(true);
-        $this->sdkHelper->expects($this->any())->method('createSdkConfigFromOxid')->will($this->returnValue($this->sdkConfig));
+        $this->sdkHelper->expects($this->any())->method('computeConfiguration')->will($this->returnValue($this->sdkConfig));
         $this->sdkHelper->expects($this->any())->method('instantiateSdk')->will($this->returnValue($this->sdk));
         $this->oxArticle->expects($this->any())->method('getId')->will($this->returnValue('some-id'));
     }
