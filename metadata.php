@@ -120,6 +120,11 @@ $aModule = array(
             'block'    => 'checkout_payment_errors',
             'file'     => $aPaths['blocks'] . '/mf_checkout_payment_errors.tpl'
         ),
+        array(
+            'template' => 'page/checkout/inc/basketcontents.tpl',
+            'block'    => 'checkout_basketcontents_basketitem_titlenumber',
+            'file'     => $aPaths['blocks'] . '/checkout_basketcontents_basketitem_titlenumber.tpl'
+        ),
     ),
     'templates' => array(
         'mf_category_list.tpl'               => $aPaths['views'] . '/admin/tpl/mf_category_list.tpl',

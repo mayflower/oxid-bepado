@@ -28,6 +28,8 @@ class mf_sdk_product_helperTest extends BaseTestCase
      */
     protected $helper;
 
+    protected $bepadoConfiguration;
+
     public function setUp()
     {
         $this->prepareVersionLayerWithConfig();
@@ -47,6 +49,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->loggerHelper = $this->getMockBuilder('mf_sdk_logger_helper')->disableOriginalConstructor()->getMock();
         $this->oxUser = $this->getMockBuilder('oxUser')->disableOriginalConstructor()->getMock();
         $this->addressConverter = $this->getMockBuilder('mf_sdk_address_converter')->disableOriginalConstructor()->getMock();
+        $this->bepadoConfiguration = $this->getMockBuilder('mfBepadoConfiguration')->disableOriginalConstructor()->getMock();
 
         $this->sdkHelper
             ->expects($this->any())
@@ -323,6 +326,89 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->helper->checkProductsInBasket($this->oxBasket);
     }
 
+    public function testCheckProductsInBasketWithMarketplaceHint()
+    {
+        // expectations
+        $this->oxBasketItem
+            ->expects($this->once())
+            ->method('getAmount')
+            ->will($this->returnValue(6));
+        $this->articleHelper
+            ->expects($this->any())
+            ->method('isArticleImported')
+            ->will($this->returnValue(true));
+        $this->sdk
+            ->expects($this->any())
+            ->method('checkProducts')
+            ->will($this->returnValue(array()));
+
+        $product = new Struct\Product();
+        $product->shopId = 'shop-id';
+        $product->availability = 3;
+        $this->articleHelper
+            ->expects($this->once())
+            ->method('computeSdkProduct')
+            ->with($this->equalTo($this->oxArticle))
+            ->will($this->returnValue($product));
+        $this->oxBasket
+            ->expects($this->never())
+            ->method('calculateBasket');
+
+        // prepare the markteplace shop
+        $marketPlaceShop = new Struct\Shop();
+        $marketPlaceShop->id = 'shop-id';
+        $marketPlaceShop->url = 'some-url';
+        $marketPlaceShop->name = 'some-name';
+        $this->bepadoConfiguration
+            ->expects($this->once())
+            ->method('hastShopHintInBasket')
+            ->will($this->returnValue(true));
+
+        $this->sdkHelper
+            ->expects($this->once())
+            ->method('computeMarketplaceHintForProduct')
+            ->with($this->equalTo($this->bepadoConfiguration), $this->equalTo($product))
+            ->will($this->returnValue($marketPlaceShop))
+        ;
+
+        $this->helper->checkProductsInBasket($this->oxBasket);
+
+        // asserts
+        $this->assertEquals(
+            $marketPlaceShop,
+            $this->oxBasketItem->marketplace_shop
+        );
+    }
+
+    public function testCheckProductsInBasketLogConfigurationError()
+    {
+        // expectations
+        $this->oxBasketItem
+            ->expects($this->once())
+            ->method('getAmount')
+            ->will($this->returnValue(0));
+        $this->articleHelper
+            ->expects($this->any())
+            ->method('isArticleImported')
+            ->will($this->returnValue(false));
+
+        $this->oxBasket
+            ->expects($this->never())
+            ->method('calculateBasket');
+
+        $this->bepadoConfiguration
+            ->expects($this->once())
+            ->method('isLoaded')
+            ->will($this->returnValue(false));
+
+        $this->loggerHelper
+            ->expects($this->once())
+            ->method('writeBepadoLog')
+            ->with($this->equalTo('No bepado configuration found for shopId shop-id'));
+
+        $this->helper->checkProductsInBasket($this->oxBasket);
+    }
+
     public function testReservation()
     {
         $sdkOrder = new Struct\Order();
@@ -389,7 +475,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
     protected function getObjectMapping()
     {
         return array(
-            'mfBepadoConfiguration'                => new mfBepadoConfiguration(),
+            'mfBepadoConfiguration'    => $this->bepadoConfiguration,
             'mf_sdk_helper'            => $this->sdkHelper,
             'mf_sdk_order_converter'   => $this->orderConverter,
             'oxorder'                  => $this->oxOrder,

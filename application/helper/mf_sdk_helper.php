@@ -42,9 +42,7 @@ class mf_sdk_helper extends mf_abstract_helper
             throw new \RuntimeException('No bebado configuration found for shop with id '.$sShopId);
         }
 
-        // set the api endpoint url by the use of the shop url and a suffix for the controller class
-        $apiEndpointUrl = $oShopConfig->getShopUrl().mfBepadoConfiguration::API_ENDPOINT_URL_SUFFIX;
-        $oBepadoConfiguration->setApiEndpointUrl($apiEndpointUrl);
+        $this->createApiEndPointUrl($oBepadoConfiguration);
 
         return $oBepadoConfiguration;
     }
@@ -65,6 +63,10 @@ class mf_sdk_helper extends mf_abstract_helper
             $mfBepadoConfiguration = $this->computeConfiguration();
         }
         $this->prepareHosts($mfBepadoConfiguration);
+
+        if (null === $mfBepadoConfiguration->getApiEndpointUrl()) {
+            $this->createApiEndPointUrl($mfBepadoConfiguration);
+        }
 
         // load global oxid config
         $oShopConfig = $this->getVersionLayer()->getConfig();
@@ -316,5 +318,32 @@ class mf_sdk_helper extends mf_abstract_helper
             $oBepadoConfig->save();
         }
 
+    }
+
+    /**
+     * Method creates information that can be used as a marked place hint in different situations.
+     *
+     * @param mfBepadoConfiguration $bepadoConfiguration
+     *
+     * @param Struct\Product $product
+     * @return array
+     */
+    public function computeMarketplaceHintForProduct(mfBepadoConfiguration $bepadoConfiguration, Struct\Product $product)
+    {
+        $sdk = $this->instantiateSdk($bepadoConfiguration);
+
+        return $sdk->getShop($product->shopId);
+    }
+
+    /**
+     * Will create the api endpoint url based on the current shop url.
+     *
+     * @param $mfBepadoConfiguration
+     */
+    public function createApiEndPointUrl($mfBepadoConfiguration)
+    {
+        $oShopConfig = $this->getVersionLayer()->getConfig();
+        $apiEndpointUrl = $oShopConfig->getShopUrl().mfBepadoConfiguration::API_ENDPOINT_URL_SUFFIX;
+        $mfBepadoConfiguration->setApiEndpointUrl($apiEndpointUrl);
     }
 }
