@@ -52,7 +52,7 @@ class mf_sdk_converterTest extends BaseTestCase
         'oxarticles__oxtitle'        => 'test-title',
         'oxarticles__oxshortdesc'    => 'test short description',
         'oxarticles__oxprice'        => 92.44,
-        'oxarticles__oxpriceb'       => 90,
+        'oxarticles__oxpricea'       => 90,
         'oxarticles__oxstock'        => 10,
         'oxarticles__oxweight'       => 11,
         'oxarticles__oxwidth'        => 12,
@@ -68,6 +68,7 @@ class mf_sdk_converterTest extends BaseTestCase
 
     protected $sdkHelper;
     protected $oxList;
+    protected $bepadoConfiguration;
 
     public function setUp()
     {
@@ -89,6 +90,15 @@ class mf_sdk_converterTest extends BaseTestCase
             ->expects($this->once())
             ->method('getCurrencyArray')
             ->will($this->returnValue(array($currencyItem)));
+
+        $this->bepadoConfiguration = $this->getMockBuilder('mfBepadoConfiguration')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->bepadoConfiguration->expects($this->any())->method('load')->with($this->equalTo('shop-id'));
+        $this->bepadoConfiguration
+            ->expects($this->any())
+            ->method('getPurchaseGroup')
+            ->will($this->returnValue('A'));
     }
 
     /**
@@ -188,7 +198,7 @@ class mf_sdk_converterTest extends BaseTestCase
             if (!oxRegistry::getConfig()->getConfigParam('blEnterNetPrice')) {
                 if ('oxarticles__oxprice' === $field) {
                     $value = 110.00359999999999;
-                } elseif ('oxarticles__oxpriceb' === $field) {
+                } elseif ('oxarticles__oxpricea' === $field) {
                     $value = 107.10;
                 } elseif ('oxarticles__oxdeltimeunit' === $field) {
                     $value = 'DAY';
@@ -207,7 +217,7 @@ class mf_sdk_converterTest extends BaseTestCase
         $shopUrl = oxRegistry::getConfig()->getShopUrl();
         $this->productValues['url'] = $shopUrl . 'index.php?cl=details&amp;anid=some-id';
 
-        $this->articleValues['oxarticles__oxpriceb'] = null;
+        $this->articleValues['oxarticles__oxpricea'] = null;
 
         /** @var oxArticle $oxArticle */
         $oxArticle = oxNew('oxarticle');
@@ -223,7 +233,7 @@ class mf_sdk_converterTest extends BaseTestCase
         $shopUrl = oxRegistry::getConfig()->getShopUrl();
         $this->productValues['url'] = $shopUrl . 'index.php?cl=details&amp;anid=some-id';
 
-        $this->articleValues['oxarticles__oxpriceb'] = 0.0;
+        $this->articleValues['oxarticles__oxpricea'] = 0.0;
 
         /** @var oxArticle $oxArticle */
         $oxArticle = oxNew('oxarticle');
@@ -237,10 +247,11 @@ class mf_sdk_converterTest extends BaseTestCase
     protected function getObjectMapping()
     {
         return array(
-            'oxshop'           => $this->oxShop,
-            'mf_sdk_helper'    => $this->sdkHelper,
-            'oxlist'           => $this->oxList,
-            'mf_module_helper' => oxNew('mf_module_helper'),
+            'oxshop'                => $this->oxShop,
+            'mf_sdk_helper'         => $this->sdkHelper,
+            'oxlist'                => $this->oxList,
+            'mf_module_helper'      => oxNew('mf_module_helper'),
+            'mfBepadoConfiguration' => $this->bepadoConfiguration
         );
     }
 }

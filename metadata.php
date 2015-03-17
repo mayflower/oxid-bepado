@@ -28,7 +28,6 @@ $aModule = array(
     'url'     => 'http://www.mayflower.de/OXID-Bepado-Modul',
     'thumbnail' => 'thumbnail.jpg',
     'extend'  => array(
-        'module_config'                  => $aPaths['controllers'] . '/admin/mf_Module_Config',
         'article_extend'                 => $aPaths['controllers'] . '/admin/mf_article_extend',
         'article_list'                   => $aPaths['controllers'] . '/admin/mf_article_list',
         'category_main'                  => $aPaths['controllers'] . '/admin/mf_category_main',
@@ -123,7 +122,6 @@ $aModule = array(
         ),
     ),
     'templates' => array(
-        'mf_module_config.tpl'               => $aPaths['views'] . '/admin/tpl/mf_module_config.tpl',
         'mf_category_list.tpl'               => $aPaths['views'] . '/admin/tpl/mf_category_list.tpl',
         'mf_order_package.tpl'               => $aPaths['views'] . '/admin/tpl/mf_order_package.tpl',
         'mf_sdk_result.tpl'                  => $aPaths['views'] . '/tpl/mf_sdk_result.tpl',
@@ -142,34 +140,6 @@ $aModule = array(
         'mf_product_export.tpl'              => $aPaths['views'] . '/admin/tpl/mf_product_export.tpl',
         'mf_product_export_main.tpl'         => $aPaths['views'] . '/admin/tpl/mf_product_export_main.tpl',
         'mf_product_export_list.tpl'         => $aPaths['views'] . '/admin/tpl/mf_product_export_list.tpl',
-    ),
-    'settings' => array(
-        array(
-            'group' => 'main',
-            'name'  => 'sBepadoLocalEndpoint',
-            'type'  => 'str',
-            'value' => 'http://xxx.de/index.php?cl=mfbepado'
-        ),
-        array(
-            'group' => 'main',
-            'name'  => 'sBepadoApiKey',
-            'type'  => 'str',
-            'value' => 'xxx'
-        ),
-        array(
-            'group' => 'main',
-            'name'  => 'sandboxMode',
-            'type'  => 'bool',
-            'value' => true,
-        ),
-        array(
-            'group'       => 'main',
-            'name'        => 'sPurchaseGroupChar',
-            'type'        => 'select',
-            'value'       => 'B',
-            'constraints' => 'A|B|C',
-            'position'    => 1
-        ),
     ),
     'events' => array(
         'onActivate'   => 'EventListener::onActivate',

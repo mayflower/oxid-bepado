@@ -18,6 +18,8 @@ class mfBepadoConfigurationTest extends OxidTestCase
             ->setSandboxMode(false)
             ->setShopHintOnArticleDetails(true)
             ->setShopHintInBasket(true)
+            ->setShopHintInBasket(true)
+            ->setPurchaseGroup('A')
         ;
 
         $configuration->save();
@@ -25,12 +27,13 @@ class mfBepadoConfigurationTest extends OxidTestCase
         $myDB = $this->getDb();
         /** @var Object_ResultSet $result */
         $result = $myDB->execute("SELECT * FROM mfbepadoconfiguration  WHERE OXID = 'some-shop'");
-        $expectedResult = ['some-shop', null, null, 0, 1, 1];
+        $expectedResult = ['some-shop', null, '0', '1', '1', 'A'];
 
         $this->assertEquals($expectedResult, $result->fields);
 
         // check the getter
         $configuration = new mfBepadoConfiguration();
+        $configuration->setApiEndpointUrl('some-url');
         $configuration->load('some-shop');
 
         $this->assertEquals('some-shop', $configuration->getId());
@@ -40,5 +43,7 @@ class mfBepadoConfigurationTest extends OxidTestCase
         $this->assertFalse($configuration->isInSandboxMode());
         $this->assertTrue($configuration->hastShopHintInBasket());
         $this->assertTrue($configuration->hastShopHintOnArticleDetails());
+        $this->assertEquals('some-url', $configuration->getApiEndpointUrl());
+        $this->assertEquals('A', $configuration->getPurchaseGroup());
     }
 }

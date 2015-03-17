@@ -13,7 +13,7 @@ class mf_sdk_helperTest extends BaseTestCase
     protected $oxBase;
     protected $oxDb;
     protected $logger;
-    protected $sdkConfig;
+    protected $bepadoConfiguration;
     /**
      * @var mf_sdk_helper
      */
@@ -33,71 +33,45 @@ class mf_sdk_helperTest extends BaseTestCase
         $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
         $this->logger = $this->getMockBuilder('mf_sdk_logger_helper')->disableOriginalConstructor()->getMock();
-        $this->sdkConfig = $this->getMockBuilder('mfBepadoConfiguration')->disableOriginalConstructor()->getMock();
+        $this->bepadoConfiguration = $this->getMockBuilder('mfBepadoConfiguration')->disableOriginalConstructor()->getMock();
+    }
+
+    public function testConfigCreationNon()
+    {
+        $this->bepadoConfiguration
+            ->expects($this->once())
+            ->method('load')
+            ->with($this->equalTo('shop-id'))
+            ;
+        $this->bepadoConfiguration
+            ->expects($this->once())
+            ->method('isLoaded')
+            ->will($this->returnValue(true));
+        $this->bepadoConfiguration
+            ->expects($this->any())
+            ->method('isInSandboxMode')
+            ;
+
+        $this->helper->computeConfiguration();
     }
 
     /**
-     * As i wanna check the real values delivered by the config, we need to do an extra action
-     * instead of the the default value of the base test case.
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage No bebado configuration found for shop with id shop-id
      */
-    public function testConfigCreationNonSandboxMode()
+    public function testConfigCreationNonWithUnknownShopId()
     {
-        $oxConfig = $this->getMock('oxConfig');
-        $versionLayer = $this->getMock('VersionLayerInterface');
-        $versionLayer->expects($this->once())->method('getConfig')->will($this->returnValue($oxConfig));
-        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new mfBepadoConfiguration()));
-        $this->helper->setVersionLayer($versionLayer);
-        $oxConfig->expects($this->at(0))
-            ->method('getConfigParam')
-            ->with($this->equalTo('sBepadoLocalEndpoint'))
-            ->will($this->returnValue('test-endpoint'));
-        $oxConfig->expects($this->at(1))
-            ->method('getConfigParam')
-            ->with($this->equalTo('sBepadoApiKey'))
-            ->will($this->returnValue('test-key'));
-
-        $oxConfig->expects($this->at(2))
-            ->method('getConfigParam')
-            ->with($this->equalTo('sandboxMode'))
+        $this->bepadoConfiguration
+            ->expects($this->once())
+            ->method('load')
+            ->with($this->equalTo('shop-id'))
+        ;
+        $this->bepadoConfiguration
+            ->expects($this->once())
+            ->method('isLoaded')
             ->will($this->returnValue(false));
-        $sdConfig = $this->helper->createSdkConfigFromOxid();
 
-        $this->assertEquals('test-endpoint', $sdConfig->getApiEndpointUrl());
-        $this->assertEquals('test-key', $sdConfig->getApiKey());
-        $this->assertFalse($sdConfig->getSandboxMode());
-        $this->assertNull($sdConfig->getSocialnetworkHost());
-        $this->assertNull($sdConfig->getTransactionHost());
-        $this->assertNull($sdConfig->getSearchHost());
-    }
-
-    public function testConfigCreationInSandboxMode()
-    {
-        $oxConfig = $this->getMock('oxConfig');
-        $versionLayer = $this->getMock('VersionLayerInterface');
-        $versionLayer->expects($this->once())->method('getConfig')->will($this->returnValue($oxConfig));
-        $versionLayer->expects($this->once())->method('createNewObject')->will($this->returnValue(new mfBepadoConfiguration()));
-        $this->helper->setVersionLayer($versionLayer);
-        $oxConfig->expects($this->at(0))
-            ->method('getConfigParam')
-            ->with($this->equalTo('sBepadoLocalEndpoint'))
-            ->will($this->returnValue('test-endpoint'));
-        $oxConfig->expects($this->at(1))
-            ->method('getConfigParam')
-            ->with($this->equalTo('sBepadoApiKey'))
-            ->will($this->returnValue('test-key'));
-
-        $oxConfig->expects($this->at(2))
-            ->method('getConfigParam')
-            ->with($this->equalTo('sandboxMode'))
-            ->will($this->returnValue(true));
-        $sdConfig = $this->helper->createSdkConfigFromOxid();
-
-        $this->assertEquals('test-endpoint', $sdConfig->getApiEndpointUrl());
-        $this->assertEquals('test-key', $sdConfig->getApiKey());
-        $this->assertTrue($sdConfig->getSandboxMode());
-        $this->assertEquals('search.server1230-han.de-nserver.de', $sdConfig->getSearchHost());
-        $this->assertEquals('transaction.server1230-han.de-nserver.de', $sdConfig->getTransactionHost());
-        $this->assertEquals('sn.server1230-han.de-nserver.de', $sdConfig->getSocialnetworkHost());
+        $this->helper->computeConfiguration();
     }
 
     public function testImageCreation()
@@ -210,7 +184,7 @@ class mf_sdk_helperTest extends BaseTestCase
             'oxdeliveryset'         => $this->oxDeliverySet,
             'oxbase'                => $this->oxBase,
             'mf_sdk_logger_helper'  => $this->logger,
-            'mfBepadoConfiguration'             => $this->sdkConfig,
+            'mfBepadoConfiguration' => $this->bepadoConfiguration,
         );
     }
 }

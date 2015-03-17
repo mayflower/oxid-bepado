@@ -110,8 +110,7 @@ class mf_category_main extends mf_category_main_parent
     {
         /** @var mf_sdk_helper $sdkHelper */
         $sdkHelper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
-        $sdkConfig = $sdkHelper->createSdkConfigFromOxid();
-        $sdk = $sdkHelper->instantiateSdk($sdkConfig);
+        $sdk = $sdkHelper->instantiateSdk();
 
         return $sdk->getCategories();
     }

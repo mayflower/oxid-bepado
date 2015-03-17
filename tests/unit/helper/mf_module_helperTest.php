@@ -5,15 +5,14 @@
  */
 class mf_module_helperTest extends BaseTestCase
 {
-
-    protected $sdkHelper;
-
     /**
      * @var mf_module_helper
      */
     protected $helper;
 
+    protected $sdkHelper;
     protected $sdk;
+    protected $bepadoConfiguration;
 
     public function setUp()
     {
@@ -21,70 +20,56 @@ class mf_module_helperTest extends BaseTestCase
 
         $this->helper = new mf_module_helper();
         $this->helper->setVersionLayer($this->versionLayer);
-        $sdkConfig = new mfBepadoConfiguration();
-        $sdkConfig
-            ->setApiEndpointUrl('some-url')
-            ->setApiKey('some-key')
-            ->setSocialnetworkHost('some-host')
-            ->setSandboxMode(true)
-        ;
         $this->sdkHelper = $this->getMockBuilder('mf_sdk_helper')->disableOriginalConstructor()->getMock();
         $this->sdk = $this->getMockBuilder('sdkMock')->disableOriginalConstructor()->getMock();
-        $this->sdkHelper->expects($this->any())->method('createSdkConfigFromOxid')->will($this->returnValue($sdkConfig));
         $this->sdkHelper->expects($this->any())->method('instantiateSdk')->will($this->returnValue($this->sdk));
-    }
-
-    public function testSaveOnConfVarsVerified()
-    {
-        $this->createmfBepadoConfiguration();
-        $this->sdk->expects($this->once())->method('verifyKey');
-
-        $result = $this->helper->onSaveConfigVars($this->configVars);
-
-        $this->assertTrue($result);
-    }
-
-    public function testOnSaveConfVarsNotVerified()
-    {
-        $this->createmfBepadoConfiguration();
-
-        $exception = new \RuntimeException();
-        $this->sdk->expects($this->once())->method('verifyKey')->will($this->throwException($exception));
-
-        $result = $this->helper->onSaveConfigVars($this->configVars);
-
-        $this->assertFalse($result);
+        $this->bepadoConfiguration = new mfBepadoConfiguration();
+        $this->sdkHelper
+            ->expects($this->any())
+            ->method('computeConfiguration')
+            ->will($this->returnValue($this->bepadoConfiguration));
+        $this->bepadoConfiguration->assign(array(
+            'mfbepadoconfiguration__oxid' => 'shop-id',
+            'mfbepadoconfiguration__sandboxmode' => '1',
+            'mfbepadoconfiguration__shophintonarticledetails' => '0',
+            'mfbepadoconfiguration__shophintbasket' => '0',
+            'mfbepadoconfiguration__apikey' => 'some-key',
+        ));
     }
 
     protected function getObjectMapping()
     {
         return array(
-            'mf_sdk_helper' => $this->sdkHelper,
+            'mf_sdk_helper'         => $this->sdkHelper,
+            'mfBepadoConfiguration' => $this->bepadoConfiguration,
         );
     }
 
-    private function createmfBepadoConfiguration()
+    public function testThruthyVerifyKey()
     {
-        $this->oxidConfig
-            ->expects($this->at(0))
-            ->method('getRequestParameter')
-            ->with($this->equalTo('confbools'))
-            ->will($this->returnValue(array('prodMode' => 'false')));
-        $this->oxidConfig
-            ->expects($this->at(1))
-            ->method('getRequestParameter')
-            ->with($this->equalTo('confstr'))
-            ->will($this->returnValue(array(
-                'sBepadoLocalEndpoint' => 'test-url',
-                'sBepadoApiKey'        => 'test-key'
-            )));
-        $this->oxidConfig
-            ->expects($this->at(4))
-            ->method('getRequestParameter')
-            ->with($this->equalTo('confselects'))
-            ->will($this->returnValue(array(
-                'sPurchaseGroupChar' => 'A',
-            )));
+        $this->sdk
+            ->expects($this->once())
+            ->method('verifyKey')
+            ->with($this->equalTo('some-key'));
+
+        $result = $this->helper->verifyAtSdk($this->bepadoConfiguration);
+
+        $this->assertTrue($result);
+    }
+
+    public function testFalsyVerifyKey()
+    {
+        $this->sdk
+            ->expects($this->once())
+            ->method('verifyKey')
+            ->with($this->equalTo('some-key'))
+            ->will($this->returnCallback(function() {
+                throw new \RuntimeException('some text');
+            }));
+        ;
+        $result = $this->helper->verifyAtSdk($this->bepadoConfiguration);
+
+        $this->assertFalse($result);
     }
 
     public function testNetPriceCalculationShopIsNetNetGoesIn()

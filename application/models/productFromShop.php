@@ -117,8 +117,7 @@ class oxidProductFromShop implements ProductFromShop
     {
         if (null === $this->sdk) {
             $sdkHelper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
-            $sdkConfig = $sdkHelper->createSdkConfigFromOxid();
-            $this->sdk = $sdkHelper->instantiateSdk($sdkConfig);
+            $this->sdk = $sdkHelper->instantiateSdk();
         }
 
         return $this->sdk;

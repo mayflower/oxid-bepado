@@ -1,9 +1,7 @@
 <?php
 
 use Bepado\SDK\Struct as Struct;
-use Bepado\SDK\Struct\Message;
 use Bepado\SDK\Struct\Reservation;
-use Bepado\SDK\Struct\SearchResult\Product;
 
 require_once __DIR__ . '/../BaseTestCase.php';
 require_once __DIR__ . '/../wrapper/sdkMock.php';
@@ -50,10 +48,9 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->oxUser = $this->getMockBuilder('oxUser')->disableOriginalConstructor()->getMock();
         $this->addressConverter = $this->getMockBuilder('mf_sdk_address_converter')->disableOriginalConstructor()->getMock();
 
-        $sdkConfig = new mfBepadoConfiguration();
         $this->sdkHelper
             ->expects($this->any())
-            ->method('createSdkConfigFromOxid')
+            ->method('computeConfiguration')
             ->will($this->returnValue($sdkConfig));
         $this->oxBasket
             ->expects($this->any())
@@ -66,7 +63,6 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->sdkHelper
             ->expects($this->any())
             ->method('instantiateSdk')
-            ->with($this->equalTo($sdkConfig))
             ->will($this->returnValue($this->sdk));
         $this->loggerHelper
             ->expects($this->any())
@@ -103,7 +99,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->method('checkProducts')
             ->will($this->returnValue(true));
 
-        $product = new Product();
+        $product = new Struct\Product();
         $product->availability = 3;
         $this->articleHelper
             ->expects($this->once())
@@ -142,7 +138,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
                     ))
             ));
 
-        $product = new Product();
+        $product = new Struct\Product();
         $product->availability = 3;
         $this->articleHelper
             ->expects($this->once())
@@ -186,7 +182,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
                 )
             ));
 
-        $product = new Product();
+        $product = new Struct\Product();
         $product->availability = 3;
         $this->articleHelper
             ->expects($this->once())
@@ -225,7 +221,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
                 ))
             ));
 
-        $product = new Product();
+        $product = new Struct\Product();
         $product->availability = 3;
         $this->articleHelper
             ->expects($this->once())
@@ -275,7 +271,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
                 ))
             ));
 
-        $product = new Product();
+        $product = new Struct\Product();
         $product->availability = 3;
         $this->articleHelper
             ->expects($this->once())
@@ -316,7 +312,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->method('checkProducts')
             ->will($this->throwException($exception));
 
-        $product = new Product();
+        $product = new Struct\Product();
         $product->availability = 3;
         $this->articleHelper
             ->expects($this->once())

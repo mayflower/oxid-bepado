@@ -118,8 +118,7 @@ class mf_sdk_order_helper extends mf_abstract_helper
     {
         if (null === $this->sdk) {
             $helper = $this->getVersionLayer()->createNewObject('mf_sdk_helper');
-            $config  = $helper->createSdkConfigFromOxid();
-            $this->sdk = $helper->instantiateSdk($config);
+            $this->sdk = $helper->instantiateSdk();
         }
 
         return $this->sdk;

@@ -30,21 +30,12 @@ class mfBepadoConfiguration extends oxBase
     const SOCIALNETWORK_HOST_DEMO = 'sn.server1230-han.de-nserver.de';
     const DEFAULT_PAYMENT_TYPE = 'bepadopaymenttype';
     const DATABASE_BASE_STRING = 'mfbepadoconfiguration__';
+    const API_ENDPOINT_URL_SUFFIX = 'index.php?cl=mfbepado';
 
     /**
-     * @var string
+     * @var string The current endpoint url based on the shop and its url.
      */
-    private $socialnetworkHost;
-
-    /**
-     * @var string
-     */
-    private $transactionHost;
-
-    /**
-     * @var string
-     */
-    private $searchHost;
+    protected $apiEndpointUrl;
 
     public function __construct()
     {
@@ -58,7 +49,7 @@ class mfBepadoConfiguration extends oxBase
      */
     public function getApiEndpointUrl()
     {
-        return $this->getFieldData(self::DATABASE_BASE_STRING.'apiendpoint');
+        return $this->apiEndpointUrl;
     }
 
     /**
@@ -70,7 +61,7 @@ class mfBepadoConfiguration extends oxBase
      */
     public function setApiEndpointUrl($apiEndpointUrl)
     {
-        $this->_setFieldData(self::DATABASE_BASE_STRING.'apiendpoint', $apiEndpointUrl);
+        $this->apiEndpointUrl = $apiEndpointUrl;
 
         return $this;
     }
@@ -175,78 +166,70 @@ class mfBepadoConfiguration extends oxBase
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function hastShopHintInBasket()
     {
         return '1' === $this->getShopHintInBasket();
     }
 
+    /**
+     * @return bool
+     */
     public function hastShopHintOnArticleDetails()
     {
         return '1' === $this->getShopHintOnArticleDetails();
     }
 
+    /**
+     * @return bool
+     */
     public function isInSandboxMode()
     {
         return '1' === $this->getSandboxMode();
     }
 
+
+    public function setPurchaseGroup($purchaseGroupCharakter)
+    {
+        $this->_setFieldData(self::DATABASE_BASE_STRING.'purchasegroup', $purchaseGroupCharakter);
+
+        return $this;
+    }
+
+    public function getPurchaseGroup()
+    {
+        return $this->getFieldData(self::DATABASE_BASE_STRING.'purchasegroup');
+    }
+
     /**
-     * @return string
+     * Returns the demo search host, when in sandbox mode.
+     *
+     * @return string|null
      */
     public function getSearchHost()
     {
-        return $this->searchHost;
+        return $this->isInSandboxMode() ? self::SEARCH_HOST_DEMO : null;
     }
 
     /**
-     * @param string $searchHost
+     * Returns the demo socialnetwork host, when in sandbox mode.
      *
-     * @return mfBepadoConfiguration
-     */
-    public function setSearchHost($searchHost)
-    {
-        $this->searchHost = $searchHost;
-
-        return $this;
-    }
-
-    /**
-     * @return string
+     * @return string|null
      */
     public function getSocialnetworkHost()
     {
-        return $this->socialnetworkHost;
+        return $this->isInSandboxMode() ? self::SOCIALNETWORK_HOST_DEMO : null;
     }
 
     /**
-     * @param string $socialnetworkHost
+     * Returns the demo transaction host, when in sandbox mode.
      *
-     * @return mfBepadoConfiguration
-     */
-    public function setSocialnetworkHost($socialnetworkHost)
-    {
-        $this->socialnetworkHost = $socialnetworkHost;
-
-        return $this;
-    }
-
-    /**
-     * @return string
+     * @return string|null
      */
     public function getTransactionHost()
     {
-        return $this->transactionHost;
-    }
-
-    /**
-     * @param string $transactionHost
-     *
-     * @return mfBepadoConfiguration
-     */
-    public function setTransactionHost($transactionHost)
-    {
-        $this->transactionHost = $transactionHost;
-
-        return $this;
+        return $this->isInSandboxMode() ? self::TRANSACTION_HOST_DEMO : null;
     }
 }

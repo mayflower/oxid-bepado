@@ -51,6 +51,30 @@
                         </td>
                     </tr>
                     <tr>
+                        <td class="edittext">
+                            [{ oxmultilang ident="MF_BEPADO_PURCHASE_GROUP_CHAR" }]
+                        </td>
+                        <td class="edittext" colspan="2">
+                            <select name="mf_editval[mfbepadoconfiguration__purchasegroup]" class="editinput" style="max-width: 300px;"[{$readonly}]>
+                                [{foreach from=$available_purchaseGroups item=char}]
+                                <option
+                                        value="[{$char}]"
+                                        [{if $char == $edit->mfbepadoconfiguration__purchasegroup->value}]SELECTED[{/if}]>
+                                    [{ oxmultilang ident="MF_BEPADO_PURCHASE_GROUP_CHAR_$char" }]
+                                </option>
+                                [{/foreach}]
+                            </select>
+                            [{ oxinputhelp ident="HELP_MF_BEPADO_PURCHASE_GROUP_CHAR" }]
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="edittext" colspan="2">
+                            [{if isset($verified) && !$verified}]
+                            [{ oxmultilang ident="api_key_not_verified" }]
+                            [{/if}]
+                        </td>
+                    </tr>
+                    <tr>
                         <td class="edittext" colspan="2"><br><br>
                             <input type="submit" class="edittext" name="save" value="[{oxmultilang ident="GENERAL_SAVE"}]" onClick="Javascript:document.myedit.fnc.value='save'" [{$readonly}]>
                         </td>

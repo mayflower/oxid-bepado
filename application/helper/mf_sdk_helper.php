@@ -25,32 +25,28 @@ use Bepado\SDK\Struct as Struct;
 class mf_sdk_helper extends mf_abstract_helper
 {
     /**
-     * Creates the config the SDK does need to be instantiated.
+     * Creates the bepado configuration depending on the current shop id.
      *
      * @return mfBepadoConfiguration
      */
-    public function createSdkConfigFromOxid()
+    public function computeConfiguration()
     {
-        /** @var mfBepadoConfiguration $config */
-        $config = $this->getVersionLayer()->createNewObject('mfBepadoConfiguration');
-        // load global oxid config
+        /** @var mfBepadoConfiguration $oBepadoConfiguration */
+        $oBepadoConfiguration = $this->getVersionLayer()->createNewObject('mfBepadoConfiguration');
         $oShopConfig = $this->getVersionLayer()->getConfig();
-        // module config
-        $sLocalEndpoint = $oShopConfig->getConfigParam('sBepadoLocalEndpoint');
-        $sApiKey = $oShopConfig->getConfigParam('sBepadoApiKey');
-        $sandboxMode = $oShopConfig->getConfigParam('sandboxMode');
 
-        $config->setApiEndpointUrl($sLocalEndpoint);
-        $config->setApiKey($sApiKey);
-        $config->setSandboxMode($sandboxMode);
+        $sShopId = $oShopConfig->getShopId();
+        $oBepadoConfiguration->load($sShopId);
 
-        if ($sandboxMode) {
-            $config->setSocialnetworkHost(mfBepadoConfiguration::SOCIALNETWORK_HOST_DEMO);
-            $config->setTransactionHost(mfBepadoConfiguration::TRANSACTION_HOST_DEMO);
-            $config->setSearchHost(mfBepadoConfiguration::SEARCH_HOST_DEMO);
+        if (!$oBepadoConfiguration->isLoaded()) {
+            throw new \RuntimeException('No bebado configuration found for shop with id '.$sShopId);
         }
 
-        return $config;
+        // set the api endpoint url by the use of the shop url and a suffix for the controller class
+        $apiEndpointUrl = $oShopConfig->getShopUrl().mfBepadoConfiguration::API_ENDPOINT_URL_SUFFIX;
+        $oBepadoConfiguration->setApiEndpointUrl($apiEndpointUrl);
+
+        return $oBepadoConfiguration;
     }
 
     /**
@@ -59,13 +55,16 @@ class mf_sdk_helper extends mf_abstract_helper
      * API-Key and Endpoint are fetched from the settings and are
      * editable in the module settings.
      *
-     * @param mfBepadoConfiguration $sdkConfig
+     * @param mfBepadoConfiguration $mfBepadoConfiguration
      *
      * @return SDK
      */
-    public function instantiateSdk(mfBepadoConfiguration $sdkConfig)
+    public function instantiateSdk(mfBepadoConfiguration $mfBepadoConfiguration = null)
     {
-        $this->prepareHosts($sdkConfig);
+        if (null === $mfBepadoConfiguration) {
+            $mfBepadoConfiguration = $this->computeConfiguration();
+        }
+        $this->prepareHosts($mfBepadoConfiguration);
 
         // load global oxid config
         $oShopConfig = $this->getVersionLayer()->getConfig();
@@ -85,8 +84,8 @@ class mf_sdk_helper extends mf_abstract_helper
 
         $builder = new \Bepado\SDK\SDKBuilder();
         $builder
-            ->setApiKey($sdkConfig->getApiKey())
-            ->setApiEndpointUrl($sdkConfig->getApiEndpointUrl())
+            ->setApiKey($mfBepadoConfiguration->getApiKey())
+            ->setApiEndpointUrl($mfBepadoConfiguration->getApiEndpointUrl())
             ->configurePDOGateway($pdoConnection)
             ->setProductToShop($to)
             ->setProductFromShop($from)
@@ -183,7 +182,7 @@ class mf_sdk_helper extends mf_abstract_helper
         /** @var mf_sdk_logger_helper $logger */
         $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
 
-        $sdkConfig = $this->createSdkConfigFromOxid();
+        $sdkConfig = $this->computeConfiguration();
         $sdk = $this->instantiateSdk($sdkConfig);
         try {
             return $sdk->handle(file_get_contents('php://input'), $_SERVER);
@@ -296,6 +295,7 @@ class mf_sdk_helper extends mf_abstract_helper
     {
         /** @var oxConfig $oConfig */
         $oConfig = $this->getVersionLayer()->getConfig();
+
         foreach ($oConfig->getShopIds() as $iShopId) {
             /** @var mfBepadoConfiguration $oBepadoConfig */
             $oBepadoConfig = $this->getVersionLayer()->createNewObject('mfBepadoConfiguration');
@@ -310,6 +310,8 @@ class mf_sdk_helper extends mf_abstract_helper
                 ->setSandboxMode(true)
                 ->setShopHintInBasket(false)
                 ->setShopHintOnArticleDetails(false)
+                ->setPurchaseGroup('A')
+                ->setApiKey('some-key')
                 ;
             $oBepadoConfig->save();
         }

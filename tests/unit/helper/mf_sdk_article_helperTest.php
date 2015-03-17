@@ -30,6 +30,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
     protected $sdkHelper;
     protected $sdk;
     protected $productConverter;
+    protected $mfBepadoConfiguration;
 
     public function setUp()
     {
@@ -51,15 +52,9 @@ class mf_sdk_article_helperTest extends BaseTestCase
         $this->productConverter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
         $this->sdk = $this->getMockBuilder('sdkMock')->disableOriginalConstructor()->getMock();
-        $sdkConfig = new mfBepadoConfiguration();
-        $this->sdkHelper
-            ->expects($this->any())
-            ->method('createSdkConfigFromOxid')
-            ->will($this->returnValue($sdkConfig));
         $this->sdkHelper
             ->expects($this->any())
             ->method('instantiateSdk')
-            ->with($this->equalTo($sdkConfig))
             ->will($this->returnValue($this->sdk));
     }
 
@@ -464,9 +459,10 @@ class mf_sdk_article_helperTest extends BaseTestCase
     protected function getObjectMapping()
     {
         return array(
-            'oxbase'           => $this->oxBase,
-            'mf_sdk_helper'    => $this->sdkHelper,
-            'mf_sdk_converter' => $this->productConverter,
+            'oxbase'                => $this->oxBase,
+            'mf_sdk_helper'         => $this->sdkHelper,
+            'mf_sdk_converter'      => $this->productConverter,
+            'mfBepadoConfiguration' => $this->mfBepadoConfiguration,
         );
     }
 }
