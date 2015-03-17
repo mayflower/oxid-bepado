@@ -39,7 +39,7 @@ class mf_configuration_module_mainTest extends BaseTestCase
             'mfbepadoconfiguration__oxid' => 'shop-id',
             'mfbepadoconfiguration__sandboxmode' => '1',
             'mfbepadoconfiguration__shophintonarticledetails' => '0',
-            'mfbepadoconfiguration__shophintbasket' => '0',
+            'mfbepadoconfiguration__marketplacehintbasket' => '0',
             'mfbepadoconfiguration__apikey' => 'some-key',
             'mfbepadoconfiguration__purchasegroup' => 'A',
         );
@@ -71,7 +71,7 @@ class mf_configuration_module_mainTest extends BaseTestCase
             'mfbepadoconfiguration__oxid' => 'shop-id',
             'mfbepadoconfiguration__sandboxmode' => '1',
             'mfbepadoconfiguration__shophintonarticledetails' => '0',
-            'mfbepadoconfiguration__shophintbasket' => '0',
+            'mfbepadoconfiguration__marketplacehintbasket' => '0',
             'mfbepadoconfiguration__apikey' => 'some-key',
             'mfbepadoconfiguration__purchasegroup' => 'A',
         );

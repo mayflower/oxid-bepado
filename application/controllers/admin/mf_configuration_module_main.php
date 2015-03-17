@@ -77,6 +77,7 @@ class mf_configuration_module_main extends oxAdminDetails
         $aParams = $this->getVersionLayer()->getConfig()->getRequestParameter("editval");
 
         $oBepadoConfiguration = $this->getVersionLayer()->createNewObject('mfBepadoConfiguration');
+        $oBepadoConfiguration->load($this->getEditObjectId());
         $oBepadoConfiguration->assign($aParams);
         $oBepadoConfiguration->save();
 
