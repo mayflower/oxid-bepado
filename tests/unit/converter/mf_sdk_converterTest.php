@@ -69,6 +69,7 @@ class mf_sdk_converterTest extends BaseTestCase
     protected $sdkHelper;
     protected $oxList;
     protected $bepadoConfiguration;
+    protected $oxDb;
 
     public function setUp()
     {
@@ -99,6 +100,15 @@ class mf_sdk_converterTest extends BaseTestCase
             ->expects($this->any())
             ->method('getPurchaseGroup')
             ->will($this->returnValue('A'));
+        $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
+        $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
+        $this->oxDb
+            ->expects($this->any())
+            ->method('getAll')
+            ->with($this->equalTo('SELECT * FROM mfbepadounits'))
+            ->will($this->returnValue(array(
+                array('_UNIT_G' => 'g')
+            )));
     }
 
     /**

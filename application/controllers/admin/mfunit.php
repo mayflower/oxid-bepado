@@ -15,11 +15,9 @@
  */
 
 /**
- * This controller will render the list view of the unit mapping admin.
- *
  * @author Maximilian Berghoff <Maximilian.Berghoff@mayflower.de>
  */
-class mf_configuration_unit_list extends oxAdminList
+class mfunit extends oxAdminView
 {
-    protected $_sThisTemplate = 'mf_configuration_unit_list.tpl';
+    protected $_sThisTemplate = 'mfunit.tpl';
 }

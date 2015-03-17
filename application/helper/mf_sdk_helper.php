@@ -287,6 +287,7 @@ class mf_sdk_helper extends mf_abstract_helper
         $oObject2Delivery->save();
 
         $this->createModuleConfigurationForShops();
+        $this->createBaseUnitMapping();
     }
 
     /**
@@ -318,6 +319,29 @@ class mf_sdk_helper extends mf_abstract_helper
             $oBepadoConfig->save();
         }
 
+    }
+
+    /**
+     * To have a better start after activating the shop, we will add some common
+     * unit mappings.
+     */
+    private function createBaseUnitMapping()
+    {
+        $aUnits = oxRegistry::getLang()->getSimilarByKey("_UNIT_", null, false);
+
+        foreach ($aUnits as $key => $unit) {
+            /** @var mfBepadoUnit $oBepadoUnit */
+            $oBepadoUnit = $this->getVersionLayer()->createNewObject('mfBepadoUnit');
+            $oBepadoUnit->load($key);
+            if ($oBepadoUnit->isLoaded()) {
+                // won't insert twice after deactivation
+                continue;
+            }
+
+            $oBepadoUnit->setId($key);
+            $oBepadoUnit->setBepadoKey($oBepadoUnit->guessBepadoKey($key));
+            $oBepadoUnit->save();
+        }
     }
 
     /**

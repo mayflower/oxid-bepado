@@ -14,6 +14,7 @@ class mf_sdk_helperTest extends BaseTestCase
     protected $oxDb;
     protected $logger;
     protected $bepadoConfiguration;
+    protected $mfBepadoUnit;
     /**
      * @var mf_sdk_helper
      */
@@ -34,6 +35,7 @@ class mf_sdk_helperTest extends BaseTestCase
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
         $this->logger = $this->getMockBuilder('mf_sdk_logger_helper')->disableOriginalConstructor()->getMock();
         $this->bepadoConfiguration = $this->getMockBuilder('mfBepadoConfiguration')->disableOriginalConstructor()->getMock();
+        $this->mfBepadoUnit = $this->getMockBuilder('mfBepadoUnit')->disableOriginalConstructor()->getMock();
     }
 
     public function testConfigCreationNon()
@@ -185,6 +187,7 @@ class mf_sdk_helperTest extends BaseTestCase
             'oxbase'                => $this->oxBase,
             'mf_sdk_logger_helper'  => $this->logger,
             'mfBepadoConfiguration' => $this->bepadoConfiguration,
+            'mfBepadoUnit'          => $this->mfBepadoUnit,
         );
     }
 }
