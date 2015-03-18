@@ -37,6 +37,13 @@ CREATE TABLE  IF NOT EXISTS `mfbepadoconfiguration` (
   PRIMARY KEY (`OXID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+/**Table to persist a unit mapping, the oxid will be the oxid unit key, which should be translated */
+CREATE TABLE  IF NOT EXISTS `mfbepadounits` (
+  `OXID` VARCHAR(255) NOT NULL,
+  `BEPADOUNITKEY` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`OXID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 ALTER TABLE bepado_categories ADD path VARCHAR(255) NOT NULL;
 ALTER TABLE bepado_categories ADD catnid VARCHAR(255) NOT NULL;
 

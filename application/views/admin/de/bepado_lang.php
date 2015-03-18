@@ -47,8 +47,8 @@ $aLang = array(
     'mf_configuration_module_main'             => 'Main',
     'mf_configuration_category'                => 'Kategorien',
     'mf_configuration_category_main'           => 'Main',
-    'mf_configuration_unit'                    => 'Maßeinheiten',
-    'mf_configuration_unit_main'               => 'Main',
+    'mfunit'                    => 'Maßeinheiten',
+    'mfunit_main'               => 'Main',
     'mf_product_export'                        => 'Export',
     'mf_product_export_main'                   => 'Main',
     'mf_product_import'                        => 'Import',
@@ -56,7 +56,7 @@ $aLang = array(
     'MF_CONFIGURATION'                         => 'Bepado Konfiguration',
     'MF_CONFIGURATION_MODULE_LIST_MENUSUBITEM' => 'Modul',
     'MF_CONFIGURATION_CATEGORY_LIST_MENUSUBITEM'=> 'Kategorie (Zuordnung)',
-    'MF_CONFIGURATION_UNIT_LIST_MENUSUBITEM'   => 'Maßeinheit (Zuordnung)',
+    'mfunit_LIST_MENUSUBITEM'   => 'Maßeinheit (Zuordnung)',
     'MF_PRODUCT_IMPORT_LIST_MENUSUBITEM'   => 'Import',
     'MF_PRODUCT_EXPORT_LIST_MENUSUBITEM'   => 'Export',
     'MF_BEPDO_SANDBOXMODE'                      => 'S',
@@ -68,8 +68,21 @@ $aLang = array(
     'MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINTS' => 'Marktplatzhinweise',
     'MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINT_ARTICLE_DETAILS' => 'In den Artikeldetails',
     'MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINT_BASKET' => 'Im Warenkorb',
-    'HELP_MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINTS' => 'Geben Sie einen Marktplatzhinweis
-                                                        für einen bestimmten Bereich frei. Damit sieht der Nutzer wenn
-                                                         er bspw. einen importierten Artikel in seinem Warenkorb hat anhand
-                                                         eines Hinweises über den Lieferanten-Shop.',
+    'HELP_MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINTS'  => 'Geben Sie einen Marktplatzhinweis
+                                                          für einen bestimmten Bereich frei. Damit sieht der Nutzer wenn
+                                                          er bspw. einen importierten Artikel in seinem Warenkorb hat anhand
+                                                          eines Hinweises über den Lieferanten-Shop.',
+    'MF_BEPDO_UNIT_KEY'                               => 'Bepado Key',
+    'MF_BEPDO_OXID_UNIT_KEY'                          => 'OXID Key',
+    'MF_BEPDO_OXID_UNIT_LABEL'                        => 'OXID Label',
+    'MF_BEPADO_OXID_UNIT_KEY'                         => 'OXID Maßeinheit',
+    'MF_BEPADO_BEPADO_UNIT_KEY'                       => 'Bepado Maßeinheit',
+    'HELP_MF_BEPADO_OXID_UNIT_KEY'                    => 'OXID Maßeinheit haben Sie über ihre Übersetzungen definiert. Es werden bereits verwendete heraus gefiltert.',
+    'HELP_MF_BEPADO_BEPADO_UNIT_KEY'                  => 'Die Maßeinheit im Bepado Netzwerk',
+    'MF_BEPADO_CONFIGURATION_UNIT_HINT_LEGEND'        => 'Hinweise zum Maßeinheiten-Mapping',
+    'MF_BEPADO_CONFIGURATION_UNIT_HINT'               => '
+        <p>In beiden Auswahlfeldern werden Ihnen immer nur die Einheiten angezeigt, die noch zu vergeben sind.</p>
+        <p>Das heißt haben Sie all Ihren OXID-Einheiten eine Bepado-Einheit zugewisen, können Sie keine weitere Zuweisung vornehmen.<br />
+        Außerdem ist es nur möglich folgende Bepado-Einheiten auszuwählen:</p>',
+    'MF_BEPADO_UNIT_NO_SELECT'                         => 'Wählen Sie eine Einheit ...'
 );

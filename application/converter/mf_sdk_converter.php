@@ -49,24 +49,20 @@ class mf_sdk_converter implements mf_converter_interface
      *
      * @var array
      */
-    private $oxidUnitMapper = array(
-        '_UNIT_KG' => 'kg',
-        '_UNIT_G' => 'g',
-        '_UNIT_L' => 'l',
-        '_UNIT_ML' => 'ml',
-        '_UNIT_CM' => 'cm',
-        '_UNIT_MM' => 'mm',
-        '_UNIT_M' => 'm',
-        '_UNIT_M2' => 'm^2',
-        '_UNIT_M3' => 'm^3',
-        '_UNIT_PIECE' => 'piece',
-        '_UNIT_ITEM' => 'piece',
-    );
+    private $oxidUnitMapper = array();
 
     /**
      * @var mf_module_helper
      */
     private $moduleHelper;
+
+    public function __construct()
+    {
+        $result = $this->getVersionLayer()->getDb(true)->getAll('SELECT * FROM mfbepadounits');
+        foreach ($result as $row) {
+            $this->oxidUnitMapper[$row['OXID']] = $row['BEPADOUNITKEY'];
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -193,10 +189,13 @@ class mf_sdk_converter implements mf_converter_interface
         $aParams['oxarticles__oxstock'] = $object->availability;
 
         //attributes
-        $aUnitMapping = array_flip($this->oxidUnitMapper);
-        if (isset($aUnitMapping[$object->attributes[Product::ATTRIBUTE_UNIT]])) {
-            $aParams['oxarticles__oxunitname'] = $aUnitMapping[$object->attributes[Product::ATTRIBUTE_UNIT]];
+        if (isset($object->attributes[Product::ATTRIBUTE_UNIT])) {
+            $aUnitMapping = array_flip($this->oxidUnitMapper);
+            if (isset($aUnitMapping[$object->attributes[Product::ATTRIBUTE_UNIT]])) {
+                $aParams['oxarticles__oxunitname'] = $aUnitMapping[$object->attributes[Product::ATTRIBUTE_UNIT]];
+            }
         }
+
         $aParams['oxarticles__oxunitquantity'] = $object->attributes[Product::ATTRIBUTE_QUANTITY];
         $aParams['oxarticles__oxweight'] = $object->attributes[Product::ATTRIBUTE_WEIGHT];
 

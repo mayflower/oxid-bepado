@@ -9,8 +9,8 @@
             <SUBMENU id="mf_configuration_category" cl="mf_configuration_category" list="mf_configuration_category_list">
                 <TAB id="mf_configuration_category_main" cl="mf_configuration_category_main" />
             </SUBMENU>
-            <SUBMENU id="mf_configuration_unit" cl="mf_configuration_unit" list="mf_configuration_unit_list">
-                <TAB id="mf_configuration_unit_main" cl="mf_configuration_unit_main" />
+            <SUBMENU id="mfunit" cl="mfunit" list="mfunit_list">
+                <TAB id="mfunit_main" cl="mfunit_main" />
             </SUBMENU>
         </MAINMENU>
         <MAINMENU id="mf_bepado_products">

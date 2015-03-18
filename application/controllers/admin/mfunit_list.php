@@ -15,16 +15,23 @@
  */
 
 /**
- * This controller will render the main view of the unit configuration/mapping admin.
+ * This controller will render the list view of the unit mapping admin.
  *
  * @author Maximilian Berghoff <Maximilian.Berghoff@mayflower.de>
  */
-class mf_configuration_unit_main extends oxAdminDetails
+class mfunit_list extends oxAdminList
 {
-    public function render()
-    {
-        parent::render();
+    /**
+     * Which is the base model to use for this list.
+     *
+     * @var string
+     */
+    protected $_sListClass = 'mfBepadoUnit';
 
-        return 'mf_configuration_unit_main.tpl';
-    }
+    /**
+     * Decides which template is chose for this list.
+     *
+     * @var string
+     */
+    protected $_sThisTemplate = 'mfunit_list.tpl';
 }
