@@ -80,9 +80,59 @@ $aLang = array(
     'HELP_MF_BEPADO_OXID_UNIT_KEY'                    => 'OXID Maßeinheit haben Sie über ihre Übersetzungen definiert. Es werden bereits verwendete heraus gefiltert.',
     'HELP_MF_BEPADO_BEPADO_UNIT_KEY'                  => 'Die Maßeinheit im Bepado Netzwerk',
     'MF_BEPADO_CONFIGURATION_UNIT_HINT_LEGEND'        => 'Hinweise zum Maßeinheiten-Mapping',
-    'MF_BEPADO_CONFIGURATION_UNIT_HINT'               => '
-        <p>In beiden Auswahlfeldern werden Ihnen immer nur die Einheiten angezeigt, die noch zu vergeben sind.</p>
+    'MF_BEPADO_CONFIGURATION_UNIT_HINT'               => '<p>In beiden Auswahlfeldern werden Ihnen immer nur die Einheiten angezeigt, die noch zu vergeben sind.</p>
         <p>Das heißt haben Sie all Ihren OXID-Einheiten eine Bepado-Einheit zugewisen, können Sie keine weitere Zuweisung vornehmen.<br />
         Außerdem ist es nur möglich folgende Bepado-Einheiten auszuwählen:</p>',
-    'MF_BEPADO_UNIT_NO_SELECT'                         => 'Wählen Sie eine Einheit ...'
+    'MF_BEPADO_UNIT_NO_SELECT'                        => 'Wählen Sie eine Einheit ...',
+    'MF_BEPADO_SHOP_ID'                               => 'Shop-ID',
+    'MF_BEPADO_PRODUCT_SOURCE_ID'                     => 'Product-ID',
+    'MF_BEPADO_ARTICLE_TITLE'                         => 'Produktname',
+    'MF_PRODUCT_IMPORT_TITLE'                         => 'Titel',
+    'HELP_MF_PRODUCT_IMPORT_TITLE'                    => '<p>Titel des importierten Produkts.</p>
+        <p>Wird bei jeder Syncronisation mit den Originaldaten überschrieben.</p>',
+    'HELP_MF_BEPADO_PRODUCT_IMPORT_SHORTDESCRIPTION'  => '<p>Kurzbeschreibung des importierten Produkts.</p>
+        <p>Wird bei jeder Syncronisation mit den Originaldaten überschrieben.</p>',
+    'HELP_MF_PRODUCT_IMPORT_EAN'                      => '
+        <p> Die Artikelnummer (EAN) des importierten Produkts</p>
+        <p>Wird bei jeder Syncronisation mit den Originaldaten überschrieben.</p>
+    ',
+    'HELP_MF_BEPADO_PRODUCT_IMPORT_VENDORID'          => '
+        <p>Der Hersteller bei importierten Artikeln ist immer der Shop bei dem diese aboniert wurden.</p>
+    ',
+    'MF_PRODUCT_IMPORT_PURCHASE_PRICE'                => 'Händlerpreis',
+    'HELP_MF_PRODUCT_IMPORT_PURCHASE_PRICE'           => 'Stelle die Preisgruppe in der Modul-Konfiguration ein.',
+    'MF_BEPADO_PRODUCT_IMPORT_ATTRIBUTES'             => 'Attribute',
+    'MF_PRODUCT_IMPORT_LONG_DESCRIPTION'              => 'Beschreibungstext',
+    'MF_BEPAPO_PRODUCT_IMPORT_CREATE_NEW'             => '<p>Neue Artikel können hier nicht erstellt werden.
+                                                          Sie werden automatisch synchronisiert.<br />Wähle einfach einen aus
+                                                          der Liste oder aboniere Artikel im Bepado Socialnetwork.</p>
+                                                          <p>Artikel können hier auch nicht einfach gelöscht werden, da
+                                                          die Abonierung ebenfalls über das Backend von Bepado erfolgt.</p>',
+    'MF_PRODUCT_EXPORT_TITLE'                         => 'Titel',
+    'HELP_MF_PRODUCT_EXPORT_TITLE'                    => '<p>Titel des exportierten Produkts.</p>
+        <p>Entspricht dem Titel in der Artikelverwaltung des OXID eShop.</p>',
+    'HELP_MF_BEPADO_PRODUCT_EXPORT_SHORTDESCRIPTION'  => '<p>Kurzbeschreibung des exportieren Produkts.</p>
+        <p>Entspricht der Kurzberschreibung in der Artikelverwaltung des OXID eShop.</p>',
+    'HELP_MF_PRODUCT_EXPORT_EAN'                      => '
+        <p> Wird als EAN im Bepado Social network ausgegeben.</p>
+    ',
+    'HELP_MF_BEPADO_PRODUCT_EXPORT_VENDORID'          => '
+        <p>Wähle einen Herrsteller aus oder lasse das Feld frei wenn der eigene Shop als Hersteler im
+        Bepado Socialnetwork angezeigt werden soll.</p>
+    ',
+    'MF_PRODUCT_EXPORT_PURCHASE_PRICE'                => 'Händlerpreis',
+    'HELP_MF_PRODUCT_EXPORT_PURCHASE_PRICE'           => 'Stelle die Preisgruppe in der Modul-Konfiguration ein.',
+    'MF_BEPADO_PRODUCT_EXPORT_ATTRIBUTES'             => 'Attribute',
+    'MF_PRODUCT_EXPORT_LONG_DESCRIPTION'              => 'Beschreibungstext',
+    'HELP_MF_BEPAPO_PRODUCT_EXPORT_CREATE_NEW'        => 'In der Lister erscheinen alle Artikel, die noch nicht für
+        Bepado freigegeben wurden. Vor der Freigabe werden diese konvertiert und validiert um zu überprüfen ob alle
+        nötigen Werte gesetzt sind.',
+    'MF_BEPAPO_PRODUCT_EXPORT_CHOSE_ARTICLE'          => 'Wähle einen Artikel aus',
+    'MF_BEPADO_PRODUCT_TO_EXPORT'                     => 'Artikel',
+    'MF_BEPADO_PRODUCT_EXPORT_SAVE'                   => 'Freigeben',
+    'MF_BEPADO_PRODUCT_EXPORT_DELETE'                 => 'Das Löschen des Eintrages löscht nicht den Artikel sondern
+        hebt dessen Eigenschaft auf ein exportierter Artikel zu sein.',
+    'MF_BEPADE_PRODUCT_VERIFY_ARTICLE'                => 'Bitte passen Sie Ihren Artikel an.',
+
+    'The purchasePrice is not allowed to be 0 or smaller.' => 'Der Artikel enthält keinen Eintrag im Feld Händlerpreis.',
 );

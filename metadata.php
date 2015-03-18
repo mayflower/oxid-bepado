@@ -55,6 +55,7 @@ $aModule = array(
         'mfunit'          => $aPaths['controllers'] . '/admin/mfunit.php',
         'mfunit_main'     => $aPaths['controllers'] . '/admin/mfunit_main.php',
         'mfunit_list'     => $aPaths['controllers'] . '/admin/mfunit_list.php',
+        'mf_product_admin_list'          => $aPaths['controllers'] . '/admin/mf_product_admin_list.php',
         'mf_product_import'              => $aPaths['controllers'] . '/admin/mf_product_import.php',
         'mf_product_import_main'         => $aPaths['controllers'] . '/admin/mf_product_import_main.php',
         'mf_product_import_list'         => $aPaths['controllers'] . '/admin/mf_product_import_list.php',
@@ -66,6 +67,7 @@ $aModule = array(
         'oxidProductToShop'     => $aPaths['models'] . '/productToShop.php',
         'mfBepadoConfiguration' => $aPaths['models'] . '/mfBepadoConfiguration.php',
         'mfBepadoUnit'          => $aPaths['models'] . '/mfBepadoUnit.php',
+        'mfBepadoProduct'       => $aPaths['models'] . '/mfBepadoProduct.php',
 
         'mf_converter_interface'   => $aPaths['converter'] . '/mf_converter_interface.php',
         'mf_abstract_converter'    => $aPaths['converter'] . '/mf_abstract_converter.php',
@@ -157,5 +159,3 @@ $aModule = array(
         'onActivate'   => 'EventListener::onActivate',
     ),
 );
-
-

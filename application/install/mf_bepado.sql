@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-CREATE TABLE IF NOT EXISTS `bepado_product_state` (
+CREATE TABLE IF NOT EXISTS `mfbepadoproducts` (
   `OXID` VARCHAR(32),
   `p_source_id` VARCHAR(64) NOT NULL,
   `shop_id` VARCHAR(64) NOT NULL,

@@ -19,7 +19,35 @@
  *
  * @author Maximilian Berghoff <Maximilian.Berghoff@mayflower.de>
  */
-class mf_product_import_list extends oxAdminList
+class mf_product_import_list extends mf_product_admin_list
 {
+    /**
+     * Which is the base model to use for this list.
+     *
+     * @var string
+     */
+    protected $_sListClass = 'mfBepadoProduct';
+
+    /**
+     * Decides which template is chose for this list.
+     *
+     * @var string
+     */
     protected $_sThisTemplate = 'mf_product_import_list.tpl';
+
+    /**
+     * We need to enrich the data of the mfBepadoProduct model by its
+     * oxid article representation.
+     */
+    public function render()
+    {
+        $sParent = parent::render();
+
+        $this->_aViewData['mylist'] = $this->filterArticlesByState(
+            $this->_aViewData['mylist'],
+            mfBepadoProduct::PRODUCT_STATE_IMPORTED
+        );
+
+        return $sParent;
+    }
 }

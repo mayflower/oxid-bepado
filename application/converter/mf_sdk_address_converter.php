@@ -62,7 +62,7 @@ class mf_sdk_address_converter extends mf_abstract_converter implements mf_conve
      * prefix for the oxAddress field names. So we will create an array for assigning the
      * values first.
      *
-     * @param oxBase $object
+     * @param mfBepadoProduct $object
      *
      * @return Struct\Address|array
      */

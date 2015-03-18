@@ -77,7 +77,7 @@ class oxidProductFromShop implements ProductFromShop
     public function getExportedProductIDs()
     {
         $ids = array();
-        $sql = "SELECT p_source_id FROM bepado_product_state WHERE state = ".mfBepadoConfiguration::ARTICLE_STATE_EXPORTED;
+        $sql = "SELECT p_source_id FROM mfbepadoproducts WHERE state = ".mfBepadoConfiguration::ARTICLE_STATE_EXPORTED;
         $list = $this->getVersionLayer()->getDb(true)->execute($sql);
 
         while (!$list->EOF) {

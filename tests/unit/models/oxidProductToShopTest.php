@@ -17,12 +17,12 @@ class oxidProductToShopTest extends BaseTestCase
     protected $sdkHelper;
 
     protected $converter;
-    protected $bepadoProductState;
+    protected $bepadoProduct;
     protected $oxDb;
     protected $convertedOxArticle;
     protected $oxArticle;
-    protected $oxBase;
     protected $articleNumberGenerator;
+    protected $logger;
 
     public function setUp()
     {
@@ -42,10 +42,8 @@ class oxidProductToShopTest extends BaseTestCase
         $this->sdkHelper = $this->getMock('mf_sdk_helper', array('computeConfiguration'));
         $this->converter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
         $this->converter->expects($this->any())->method('fromBepadoToShop')->will($this->returnValue($this->convertedOxArticle));
-
-        // create the bepadoProductState from that
-        $this->bepadoProductState = $this->getMockBuilder('oxBase')->disableOriginalConstructor()->getMock();
-        $this->bepadoProductState->expects($this->any())->method('init')->with($this->equalTo('bepado_product_state'));
+        $this->logger = $this->getMockBuilder('mf_sdk_logger_helper')->disableOriginalConstructor()->getMock();
+        $this->bepadoProduct = $this->getMockBuilder('mfBepadoProduct')->disableOriginalConstructor()->getMock();
 
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
     }
@@ -57,21 +55,15 @@ class oxidProductToShopTest extends BaseTestCase
         $product->shopId = 'shop-id';
 
         // expected method calls
-        $this->bepadoProductState
+        $this->bepadoProduct
             ->expects($this->once())
             ->method('buildSelectString')
             ->with($this->equalTo(array('p_source_id' => 'some-id', 'shop_id' => 'shop-id')))
             ->will($this->returnValue('sql-query'))
             ;
-        $this->oxDb
-            ->expects($this->once())
-            ->method('getOne')
-            ->with($this->equalTo('sql-query'))
-            ->will($this->returnValue(false));
-        $this->bepadoProductState
-            ->expects($this->once())
-            ->method('isLoaded')
-            ->will($this->returnValue(false));
+        $this->oxDb->expects($this->once())->method('getOne')->with($this->equalTo('sql-query'))->will($this->returnValue(false));
+        $this->bepadoProduct->expects($this->never())->method('load');
+        $this->bepadoProduct->expects($this->any())->method('getState')->will($this->returnValue(mfBepadoProduct::PRODUCT_STATE_NONE));
 
         // assign data and save the article
         $this->articleNumberGenerator
@@ -90,7 +82,7 @@ class oxidProductToShopTest extends BaseTestCase
 
         // create an entry for the state
         $this->convertedOxArticle->expects($this->any())->method('getId')->will($this->returnValue('test-id'));
-        $this->bepadoProductState
+        $this->bepadoProduct
             ->expects($this->once())
             ->method('assign')
             ->with($this->equalTo(array(
@@ -99,7 +91,7 @@ class oxidProductToShopTest extends BaseTestCase
                 'state'       => mfBepadoConfiguration::ARTICLE_STATE_IMPORTED,
                 'OXID'        => 'test-id',
             )));
-        $this->bepadoProductState->expects($this->once())->method('save');
+        $this->bepadoProduct->expects($this->once())->method('save');
 
         // trigger the insert action
         $this->productToShop->insertOrUpdate($product);
@@ -112,7 +104,7 @@ class oxidProductToShopTest extends BaseTestCase
         $product->shopId = 'shop-id';
 
         // expected method calls
-        $this->bepadoProductState
+        $this->bepadoProduct
             ->expects($this->once())
             ->method('buildSelectString')
             ->with($this->equalTo(array('p_source_id' => 'some-id', 'shop_id' => 'shop-id')))
@@ -125,27 +117,18 @@ class oxidProductToShopTest extends BaseTestCase
             ->with($this->equalTo('sql-query'))
             ->will($this->returnValue('test-id'));
         // so the state need to be loaded and should return true for the load state
-        $this->bepadoProductState
-            ->expects($this->once())
-            ->method('load')
-            ->with($this->equalTo('test-id'));
-        $this->bepadoProductState
-            ->expects($this->once())
-            ->method('isLoaded')
-            ->will($this->returnValue(true));
-        $this->bepadoProductState->expects($this->once())->method('getId')->will($this->returnValue('test-id'));
+        $this->bepadoProduct->expects($this->once())->method('load')->with($this->equalTo('test-id'));
+        $this->bepadoProduct->expects($this->any())->method('getState')->will($this->returnValue(mfBepadoProduct::PRODUCT_STATE_IMPORTED));
+        $this->bepadoProduct->expects($this->once())->method('getId')->will($this->returnValue('test-id'));
+
         // the product state entry won't be changed on update
-        $this->bepadoProductState->expects($this->never())->method('save');
+        $this->bepadoProduct->expects($this->never())->method('save');
+
         // the article number should be created on insert only
-        $this->articleNumberGenerator
-            ->expects($this->never())
-            ->method('generate');
+        $this->articleNumberGenerator->expects($this->never())->method('generate');
 
         // expected methods on the existing oxArticle
-        $this->oxArticle
-            ->expects($this->once())
-            ->method('load')
-            ->with($this->equalTo('test-id'));
+        $this->oxArticle->expects($this->once())->method('load')->with($this->equalTo('test-id'));
         $this->oxArticle->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
         $this->convertedOxArticle
             ->expects($this->once())
@@ -163,6 +146,7 @@ class oxidProductToShopTest extends BaseTestCase
                 'oxarticles__oxtitle' => 'some-value',
             )));
         $this->oxArticle->expects($this->once())->method('save');
+
         // trigger the insert action
         $this->productToShop->insertOrUpdate($product);
     }
@@ -174,34 +158,64 @@ class oxidProductToShopTest extends BaseTestCase
         $product->shopId = 'shop-id';
 
         // expected method calls
-        $this->bepadoProductState
+
+        // so the state need to be loaded and should return true for the load state
+        $this->bepadoProduct
             ->expects($this->once())
             ->method('buildSelectString')
             ->with($this->equalTo(array('p_source_id' => 'some-id', 'shop_id' => 'shop-id')))
-            ->will($this->returnValue('sql-query'))
-        ;
+            ->will($this->returnValue('sql-query'));
+        $this->bepadoProduct->expects($this->once())->method('load')->with($this->equalTo('test-id'));
+        $this->bepadoProduct->expects($this->any())->method('getState')->will($this->returnValue(mfBepadoProduct::PRODUCT_STATE_IMPORTED));
+        $this->bepadoProduct->expects($this->once())->method('getId')->will($this->returnValue('test-id'));
 
         $this->oxDb
             ->expects($this->once())
             ->method('getOne')
             ->with($this->equalTo('sql-query'))
             ->will($this->returnValue('test-id'));
-        // so the state need to be loaded and should return true for the load state
-        $this->bepadoProductState
-            ->expects($this->once())
-            ->method('load')
-            ->with($this->equalTo('test-id'));
-        $this->bepadoProductState
-            ->expects($this->once())
-            ->method('isLoaded')
-            ->will($this->returnValue(true));
-        $this->bepadoProductState->expects($this->once())->method('getId')->will($this->returnValue('test-id'));
         // expected methods on the existing oxArticle
-        $this->oxArticle
-            ->expects($this->once())
-            ->method('load')
-            ->with($this->equalTo('test-id'));
+        $this->oxArticle->expects($this->once())->method('load')->with($this->equalTo('test-id'));
         $this->oxArticle->expects($this->once())->method('isLoaded')->will($this->returnValue(false));
+
+        // trigger the insert action
+        $this->productToShop->insertOrUpdate($product);
+    }
+
+    public function testInsertOrUpdateWithExportedArticleInjectedLogs()
+    {
+        $product = new Struct\Product();
+        $product->sourceId = 'some-id';
+        $product->shopId = 'shop-id';
+        $product->title = 'some-name';
+
+        // expected method calls
+
+        // so the state need to be loaded and should return true for the load state
+        $this->bepadoProduct
+            ->expects($this->once())
+            ->method('buildSelectString')
+            ->with($this->equalTo(array('p_source_id' => 'some-id', 'shop_id' => 'shop-id')))
+            ->will($this->returnValue('sql-query'));
+        $this->bepadoProduct->expects($this->once())->method('load')->with($this->equalTo('test-id'));
+        $this->bepadoProduct->expects($this->any())->method('getState')->will($this->returnValue(mfBepadoProduct::PRODUCT_STATE_EXPORTED));
+        $this->bepadoProduct->expects($this->never())->method('save');
+
+        $this->oxDb
+            ->expects($this->once())
+            ->method('getOne')
+            ->with($this->equalTo('sql-query'))
+            ->will($this->returnValue('test-id'));
+
+        $this->logger
+            ->expects($this->once())
+            ->method('writeBepadoLog')
+            ->with(
+                $this->equalTo(
+                    'Somebody tried to insert or update a bepado product, which is marked as an exported oxArticle.'
+                ),
+                $this->equalTo(array('product' => array('id' => 'some-id', 'name' => 'some-name')))
+            );
 
         // trigger the insert action
         $this->productToShop->insertOrUpdate($product);
@@ -227,7 +241,7 @@ class oxidProductToShopTest extends BaseTestCase
 
     public function testDelete()
     {
-        $this->bepadoProductState
+        $this->bepadoProduct
             ->expects($this->once())
             ->method('buildSelectString')
             ->with(array('p_source_id' => 'source-id', 'shop_id' => 'shop-id'))
@@ -238,12 +252,12 @@ class oxidProductToShopTest extends BaseTestCase
             ->with($this->equalTo('some-sql'))
             ->will($this->returnValue('test-id'))
         ;
-        $this->bepadoProductState
+        $this->bepadoProduct
             ->expects($this->once())
             ->method('load')
             ->with($this->equalTo('test-id'))
             ->will($this->returnValue(true));
-        $this->bepadoProductState->expects($this->once())->method('delete');
+        $this->bepadoProduct->expects($this->once())->method('delete');
         $this->oxArticle->expects($this->once())->method('load')->with('test-id');
         $this->oxArticle->expects($this->once())->method('delete');
 
@@ -252,7 +266,7 @@ class oxidProductToShopTest extends BaseTestCase
 
     public function testDeleteWithNonMarkedArticle()
     {
-        $this->bepadoProductState
+        $this->bepadoProduct
             ->expects($this->once())
             ->method('buildSelectString')
             ->with(array('p_source_id' => 'source-id', 'shop_id' => 'shop-id'))
@@ -263,12 +277,12 @@ class oxidProductToShopTest extends BaseTestCase
             ->with($this->equalTo('some-sql'))
             ->will($this->returnValue(false))
         ;
-        $this->bepadoProductState
+        $this->bepadoProduct
             ->expects($this->never())
             ->method('load')
             ->with($this->equalTo('test-id'))
             ->will($this->returnValue(true));
-        $this->bepadoProductState->expects($this->never())->method('delete');
+        $this->bepadoProduct->expects($this->never())->method('delete');
 
         $this->productToShop->delete('shop-id', 'source-id');
     }
@@ -276,11 +290,12 @@ class oxidProductToShopTest extends BaseTestCase
     protected function getObjectMapping()
     {
         return array(
-            'oxbase'                      => $this->bepadoProductState,
-            'oxarticle'                   => $this->oxArticle,
+            'mfBepadoProduct'                      => $this->bepadoProduct,
+            'oxArticle'                   => $this->oxArticle,
             'mf_sdk_converter'            => $this->converter,
             'mf_sdk_helper'               => $this->sdkHelper,
             'mf_article_number_generator' => $this->articleNumberGenerator,
+            'mf_sdk_logger_helper'        => $this->logger,
         );
     }
 }

@@ -59,25 +59,32 @@ class oxidProductToShop implements ProductToShop
     {
         /** @var mf_sdk_converter $productConverter */
         $productConverter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
-
+        /** @var mf_sdk_logger_helper $logger */
+        $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
         $oxArticle = $productConverter->fromBepadoToShop($product);
-
-        /** @var oxBase $oBepadoProductState */
-        $oBepadoProductState = $this->getVersionLayer()->createNewObject('oxbase');
-        $oBepadoProductState->init('bepado_product_state');
-        $select = $oBepadoProductState->buildSelectString(array(
+        /** @var mfBepadoProduct $oBepadoProduct */
+        $oBepadoProduct = $this->getVersionLayer()->createNewObject('mfBepadoProduct');
+        $select = $oBepadoProduct->buildSelectString(array(
             'p_source_id' => $product->sourceId,
             'shop_id' => $product->shopId
         ));
 
         if ($id = $this->getVersionLayer()->getDb(true)->getOne($select)) {
-            $oBepadoProductState->load($id);
+            $oBepadoProduct->load($id);
+        }
+        if (mfBepadoProduct::PRODUCT_STATE_EXPORTED === $oBepadoProduct->getState()) {
+            $logger->writeBepadoLog(
+                'Somebody tried to insert or update a bepado product, which is marked as an exported oxArticle.',
+                array('product' => array('id' => $product->sourceId, 'name' => $product->title))
+            );
+
+            return;
         }
 
-        if ($oBepadoProductState->isLoaded()) {
-            $this->updateArticle($oxArticle, $oBepadoProductState->getId());
+        if (mfBepadoProduct::PRODUCT_STATE_IMPORTED === $oBepadoProduct->getState()) {
+            $this->updateArticle($oxArticle, $oBepadoProduct->getId());
         } else {
-            $this->insertArticleWithBepadoState($oxArticle, $oBepadoProductState, $product);
+            $this->insertArticle($oxArticle, $oBepadoProduct, $product);
         }
 
         $this->computeCategoryChanges($oxArticle, $product);
@@ -98,19 +105,18 @@ class oxidProductToShop implements ProductToShop
      */
     public function delete($shopId, $sourceId)
     {
-        /** @var oxBase $oBepadoProductState */
-        $oBepadoProductState = $this->getVersionLayer()->createNewObject('oxbase');
-        $oBepadoProductState->init('bepado_product_state');
-        $select = $oBepadoProductState->buildSelectString(array(
+        /** @var mfBepadoProduct $oBepadoProduct */
+        $oBepadoProduct = $this->getVersionLayer()->createNewObject('mfBepadoProduct');
+        $select = $oBepadoProduct->buildSelectString(array(
             'p_source_id' => $sourceId,
             'shop_id' => $shopId
         ));
         $id = $this->getVersionLayer()->getDb(true)->getOne($select);
         if ($id) {
-            $oBepadoProductState->load($id);
-            $oBepadoProductState->delete();
+            $oBepadoProduct->load($id);
+            $oBepadoProduct->delete();
 
-            $oxArticle = $this->getVersionLayer()->createNewObject('oxarticle');
+            $oxArticle = $this->getVersionLayer()->createNewObject('oxArticle');
             $oxArticle->load($id);
             $oxArticle->delete();
         }
@@ -153,11 +159,11 @@ class oxidProductToShop implements ProductToShop
      * Creating a new article means setting it inactive and create a
      * state entry.
      *
-     * @param oxArticle      $oxArticle
-     * @param oxBase         $oBepadoProductState
-     * @param Struct\Product $product
+     * @param oxArticle       $oxArticle
+     * @param mfBepadoProduct $oBepadoProduct
+     * @param Struct\Product  $product
      */
-    private function insertArticleWithBepadoState(oxArticle $oxArticle, oxBase $oBepadoProductState, Struct\Product $product)
+    private function insertArticle(oxArticle $oxArticle, mfBepadoProduct $oBepadoProduct, Struct\Product $product)
     {
         /** @var mf_article_number_generator $articleNumberGenerator */
         $articleNumberGenerator = $this->getVersionLayer()->createNewObject('mf_article_number_generator');
@@ -170,14 +176,14 @@ class oxidProductToShop implements ProductToShop
         $oxArticle->save();
 
         // insert into mapping/state table
-        $oBepadoProductState->assign(array(
+        $oBepadoProduct->assign(array(
                 'p_source_id' => $product->sourceId,
                 'shop_id'     => $product->shopId,
                 'state'       => mfBepadoConfiguration::ARTICLE_STATE_IMPORTED,
                 'OXID'        => $oxArticle->getId(),
             )
         );
-        $oBepadoProductState->save();
+        $oBepadoProduct->save();
     }
 
     /**
@@ -189,7 +195,7 @@ class oxidProductToShop implements ProductToShop
     private function updateArticle(oxArticle $oxArticle, $persistedId)
     {
 
-        $persistedoxArticle = $this->getVersionLayer()->createNewObject('oxarticle');
+        $persistedoxArticle = $this->getVersionLayer()->createNewObject('oxArticle');
         $persistedoxArticle->load($persistedId);
 
         if (!$persistedoxArticle->isLoaded()) {

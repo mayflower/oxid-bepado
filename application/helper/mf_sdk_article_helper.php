@@ -79,23 +79,19 @@ class mf_sdk_article_helper extends mf_abstract_helper
     }
 
     /**
+     * Will compute the state value for a given article id.
+     *
      * @param $articleId
      *
      * @return int
      */
-    private function getBepadoState($articleId)
+    public function getBepadoState($articleId)
     {
-        /** @var oxBase $oBepadoProductState */
-        $oBepadoProductState = $this->getVersionLayer()->createNewObject('oxbase');
-        $oBepadoProductState->init('bepado_product_state');
-        $oBepadoProductState->load($articleId);
+        /** @var mfBepadoProduct $oBepadoProduct */
+        $oBepadoProduct = $this->getVersionLayer()->createNewObject('mfBepadoProduct');
+        $oBepadoProduct->load($articleId);
 
-        if (!$oBepadoProductState->isLoaded()) {
-            return mfBepadoConfiguration::ARTICLE_STATE_NONE;
-        }
-        $state = (int) $oBepadoProductState->getFieldData('state');
-
-        return !$state ? mfBepadoConfiguration::ARTICLE_STATE_NONE : $state;
+        return $oBepadoProduct->getState();
     }
 
     /**
@@ -105,21 +101,21 @@ class mf_sdk_article_helper extends mf_abstract_helper
      */
     public function onSaveArticleExtend($articleId)
     {
-        $oBepadoProductState = $this->createBepadoProductState($articleId);
+        $oBepadoProduct = $this->computeBepadoProductByArticleId($articleId);
         $aParams = $this->getVersionLayer()->getConfig()->getRequestParameter("editval");
         $articleState = isset($aParams['export_to_bepado']) &&  "1" === $aParams['export_to_bepado'] ? true : false;
 
-        if ($oBepadoProductState->isLoaded() && !$articleState) {
-            $oBepadoProductState->delete();
-        } elseif (!$oBepadoProductState->isLoaded() && $articleState) {
-            $oBepadoProductState->assign(array(
+        if ($oBepadoProduct->isLoaded() && !$articleState) {
+            $oBepadoProduct->delete();
+        } elseif (!$oBepadoProduct->isLoaded() && $articleState) {
+            $oBepadoProduct->assign(array(
                     'p_source_id' => $articleId,
                     'OXID'        => $articleId,
                     'shop_id'     => '_self_',
                     'state'       => mfBepadoConfiguration::ARTICLE_STATE_EXPORTED,
                 )
             );
-            $oBepadoProductState->save();
+            $oBepadoProduct->save();
         }
     }
 
@@ -127,18 +123,15 @@ class mf_sdk_article_helper extends mf_abstract_helper
      *
      * @param $oxArticleId
      *
-     * @return oxBase
+     * @return mfBepadoProduct
      */
-    private function createBepadoProductState($oxArticleId)
+    private function computeBepadoProductByArticleId($oxArticleId)
     {
-        /** @var oxBase $oBepadoProductState */
-        $oBepadoProductState = $this->getVersionLayer()->createNewObject('oxbase');
-        $oBepadoProductState->init('bepado_product_state');
-        $select = $oBepadoProductState->buildSelectString(array('p_source_id' => $oxArticleId, 'shop_id' => mfBepadoConfiguration::SHOP_ID_LOCAL));
-        $id = $this->getVersionLayer()->getDb(true)->getOne($select);
-        $oBepadoProductState->load($id);
+        /** @var mfBepadoProduct $oBepadoProduct */
+        $oBepadoProduct = $this->getVersionLayer()->createNewObject('mfBepadoProduct');
+        $oBepadoProduct->load($oxArticleId);
 
-        return $oBepadoProductState;
+        return $oBepadoProduct;
     }
 
     /**
@@ -186,7 +179,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
      */
     private function isArticleKnown($articleId)
     {
-        $sql = "SELECT * FROM bepado_product_state WHERE `OXID` LIKE '" . $articleId."'";
+        $sql = "SELECT * FROM mfbepadoproducts WHERE `OXID` LIKE '" . $articleId."'";
         $result = $this->getVersionLayer()->getDb(true)->execute($sql);
 
         return count($result->getArray()) > 0;
@@ -206,7 +199,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
     }
 
     /**
-     * Computes a SDK Product out of an oxid article.
+     * Computes a SDK Product out of a managed OXID article.
      *
      * @param oxArticle $oxArticle
      *
@@ -216,21 +209,18 @@ class mf_sdk_article_helper extends mf_abstract_helper
      */
     public function computeSdkProduct(oxArticle $oxArticle)
     {
-        $oState = $this->getVersionLayer()->createNewObject('oxbase');
-        $oState->init('bepado_product_state');
-        $oState->load($oxArticle->getId());
-        $state = (int) $oState->getFieldData('state');
+        $oBepadoProduct = $this->computeBepadoProductByArticleId($oxArticle->getId());
+        $state = $oBepadoProduct->getState();
 
-        if ($state !== mfBepadoConfiguration::ARTICLE_STATE_EXPORTED && $state !== mfBepadoConfiguration::ARTICLE_STATE_IMPORTED) {
+        if ($state == mfBepadoProduct::PRODUCT_STATE_NONE) {
             throw new Exception("Article is not managed for bepado. Neither exported to a remote shop nor imported.");
         }
 
         /** @var mf_sdk_converter $converter */
         $converter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
         $sdkProduct = $converter->fromShopToBepado($oxArticle);
-
-        $sdkProduct->shopId = $oState->getFieldData('shop_id');
-        $sdkProduct->sourceId = $oState->getFieldData('p_source_id');
+        $sdkProduct->shopId = $oBepadoProduct->getShopId();
+        $sdkProduct->sourceId = $oBepadoProduct->getProductSourceId();
 
         return $sdkProduct;
     }
@@ -300,5 +290,23 @@ class mf_sdk_article_helper extends mf_abstract_helper
                 ->computeMarketplaceHintForProduct($oBepadoConfiguration, $this->computeSdkProduct($oxArticle))
             ;
         }
+    }
+
+    /**
+     * An admin can decide which of the free fields (A,B or C) to use for the purchase price
+     * mapping. This method will create a string which represents an oxArticle field name like
+     * oxarticles__oxpriceb (a/c).
+     *
+     * @return string
+     */
+    public function getPurchasePriceField()
+    {
+        $sShopId = $this->getVersionLayer()->getConfig()->getShopId();
+        /** @var mfBepadoConfiguration $oBepadoConfiguration */
+        $oBepadoConfiguration = $this->getVersionLayer()->createNewObject('mfBepadoConfiguration');
+        $oBepadoConfiguration->load($sShopId);
+        $sChar = $oBepadoConfiguration->getPurchaseGroup();
+
+        return 'oxarticles__oxprice'.strtolower($sChar);
     }
 }
