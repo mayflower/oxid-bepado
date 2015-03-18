@@ -69,7 +69,7 @@
                 </td>
                 <td valign="top" class="[{ $listclass }]">
                     <div class="listitemfloating">
-                        <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->mfbepadounits__bepadounitkey->value }]');" class="[{ $listclass}]">[{ $listitem->mfbepadounits__bepadounitkey->value }]</a>
+                        <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->mfbepadounits__oxid->value }]');" class="[{ $listclass}]">[{ $listitem->mfbepadounits__bepadounitkey->value }]</a>
                     </div>
                 </td>
                 <td class="[{ $listclass}]">
