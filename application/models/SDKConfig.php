@@ -13,7 +13,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-use Bepado\SDK\Struct\Order;
 
 /**
  * A model for sdk configuration values to instantiate the sdk.

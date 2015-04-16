@@ -115,7 +115,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
             $oBepadoProductState->assign(array(
                     'p_source_id' => $articleId,
                     'OXID'        => $articleId,
-                    'shop_id'     => '_self_',
+                    'shop_id'     => SDKConfig::SHOP_ID_LOCAL,
                     'state'       => SDKConfig::ARTICLE_STATE_EXPORTED,
                 )
             );

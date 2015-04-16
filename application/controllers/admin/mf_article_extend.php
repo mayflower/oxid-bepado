@@ -21,8 +21,6 @@
  */
 class mf_article_extend extends mf_article_extend_parent
 {
-    const SHOP_ID_LOCAL = '_self_';
-
     /**
      * @var VersionLayerInterface
      */
