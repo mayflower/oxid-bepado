@@ -67,6 +67,7 @@ class mf_article_extend extends mf_article_extend_parent
 
         try {
             parent::save();
+            $this->_aViewData['updatelist'] = true;
         } catch (VerificationFailedException $e) {
             $this->_aViewData['errorExportingArticle'] = true;
             $this->_aViewData['errorMessage'] = $e->getMessage();
