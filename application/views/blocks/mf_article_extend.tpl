@@ -11,7 +11,16 @@
 <table cellspacing="0" cellpadding="0" border="0">
 
     <table>
-
+        <tr>
+            <td colspan="2">
+                [{if $errorExportingArticle eq 1}]
+                <div class="errorbox">
+                    <p>[{ oxmultilang ident=$errorMessage }]</p>
+                    <p>[{ oxmultilang ident="MF_BEPADO_PRODUCT_VERIFY_ARTICLE" }]</p>
+                </div>
+                [{/if}]
+            </td>
+        </tr>
         <tr>
             <td class="edittext" width="120">
                 [{ oxmultilang ident="ARTICLE_MAIN_BEPADO" }]
