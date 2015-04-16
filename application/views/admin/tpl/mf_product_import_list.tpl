@@ -24,7 +24,84 @@
     <form name="search" id="search" action="[{ $oViewConf->getSelfLink() }]" method="post">
         [{include file="_formparams.tpl" cl="mf_product_import_list" lstrt=$lstrt actedit=$actedit oxid=$oxid fnc="" language=$actlang editlanguage=$actlang}]
         <table cellspacing="0" cellpadding="0" border="0" width="100%">
+            <colgroup>
+                <col width="3%">
+                <col width="45%">
+                <col width="10%">
+                <col width="10%">
+                <col width="2%">
+            </colgroup>
+            <tr class="listitem">
+                <td class="listheader first" height="15" width="30" align="center">
+                    [{ oxmultilang ident="GENERAL_ACTIVTITLE" }]
+                </td>
+                <td class="listheader first" height="15" width="30" align="center">
+                    [{oxmultilang ident="MF_BEPADO_ARTICLE_TITLE"}]
+                </td>
+                <td class="listheader first" height="15" width="30" align="center">
+                    <a
+                            href="Javascript:top.oxid.admin.setSorting( document.search, 'mfbepadoproducts', 'p_source_id', 'asc');document.search.submit();"
+                            class="listheader">
+                        [{oxmultilang ident="MF_BEPADO_PRODUCT_SOURCE_ID"}]
+                    </a>
+                </td>
+                <td class="listheader first" height="15" width="30" align="center">
+                    <a
+                            href="Javascript:top.oxid.admin.setSorting( document.search, 'mfbepadoproducts', 'shop_id', 'asc');document.search.submit();"
+                            class="listheader">
+                        [{oxmultilang ident="MF_BEPADO_SHOP_ID"}]
+                    </a>
+                </td>
+            </tr>
 
+            [{assign var="blWhite" value=""}]
+            [{assign var="_cnt" value=0}]
+            [{foreach from=$mylist item=listitem}]
+            [{assign var="_cnt" value=$_cnt+1}]
+            <tr id="row.[{$_cnt}]">
+                [{if $listitem->blacklist == 1}]
+                [{assign var="listclass" value=listitem3}]
+                [{else}]
+                [{assign var="listclass" value=listitem$blWhite}]
+                [{/if}]
+                [{if $listitem->mfbepadoproducts__oxid->value == $oxid}]
+                [{assign var="listclass" value=listitem4 }]
+                [{/if}]
+                [{ assign var="oArticle" value=$listitem->getOxArticle() }]
+                <td
+                        valign="top"
+                        class="[{ $listclass}][{ if $oArticle->oxarticles__oxactive->value == 1}] active[{/if}]"
+                        height="15">
+                    <div class="listitemfloating">&nbsp</a></div>
+                </td>
+                <td valign="top" class="[{ $listclass }]">
+                    <div class="listitemfloating">
+                        <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->mfbepadoproducts__oxid->value }]');" class="[{ $listclass}]">[{ $oArticle->oxarticles__oxtitle->value }]</a>
+                    </div>
+                </td>
+                <td valign="top" class="[{ $listclass }]">
+                    <div class="listitemfloating">
+                        <a
+                                href="Javascript:top.oxid.admin.editThis('[{ $listitem->mfbepadoproducts__oxid->value }]');"
+                                class="[{ $listclass}]">
+                            [{assign var="oShop" value=$oView->getShopById($listitem->mfbepadoproducts__shop_id->value)}]
+                            [{ $oShop->name }]
+                        </a>
+                    </div>
+                </td>
+                <td valign="top" class="[{ $listclass }]">
+                    <div class="listitemfloating">
+                        <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->mfbepadoproducts__oxid->value }]');" class="[{ $listclass}]">[{ $listitem->mfbepadoproducts__shop_id->value }]</a>
+                    </div>
+                </td>
+            </tr>
+            [{if $blWhite == "2"}]
+            [{assign var="blWhite" value=""}]
+            [{else}]
+            [{assign var="blWhite" value="2"}]
+            [{/if}]
+            [{/foreach}]
+            [{include file="pagenavisnippet.tpl" colspan="5"}]
         </table>
     </form>
 </div>

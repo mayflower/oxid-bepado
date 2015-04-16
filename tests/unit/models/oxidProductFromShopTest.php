@@ -367,7 +367,7 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->oxDb
             ->expects($this->once())
             ->method('execute')
-            ->with('SELECT p_source_id FROM bepado_product_state WHERE state = 1')
+            ->with('SELECT p_source_id FROM mfbepadoproducts WHERE state = 1')
             ->will($this->returnValue($list));
         $ids = $this->productFromShop->getExportedProductIDs();
 

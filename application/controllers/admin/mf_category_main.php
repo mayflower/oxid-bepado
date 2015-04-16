@@ -70,7 +70,7 @@ class mf_category_main extends mf_category_main_parent
         $myConfig = parent::getConfig();
         $oxidCategoryId = parent::getEditObjectId();
 
-        /** @var oxBase $bepadoCategory */
+        /** @var mfBepadoProduct $bepadoCategory */
         $bepadoCategory = oxNew('oxbase');
         $bepadoCategory->init('bepado_categories');
         $query = $bepadoCategory->buildSelectString(array('catnid' => $oxidCategoryId));
