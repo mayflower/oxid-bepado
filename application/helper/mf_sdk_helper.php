@@ -231,7 +231,7 @@ class mf_sdk_helper extends mf_abstract_helper
 
         foreach ($paths as $sqlFile) {
             $sql = file_get_contents($sqlFile);
-            $sql = str_replace("\n", "", $sql);
+            $sql = str_replace(array("\n","\r"), "", $sql);
             $queries = explode(';', $sql);
 
             foreach ($queries as $query) {

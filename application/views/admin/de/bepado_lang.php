@@ -49,4 +49,8 @@ $aLang = array(
     'BEPADO_CATEGORY'                  => 'Bepado-Kategorie',
     'HELP_BEPADO_CATEGORY'             => 'Hier stellen Sie ein, welche Bepado-Kategorie Ihrer Shop-Kategorie entspricht.',
     'BEPADO_CATEGORY_SELECT'           => '-- keine --',
+
+    'MF_BEPADO_PRODUCT_VERIFY_ARTICLE'                     => 'Bitte passen Sie Ihren Artikel an.',
+
+    'The purchasePrice is not allowed to be 0 or smaller.' => 'Der Artikel enthält keinen Eintrag im Feld Händlerpreis.',
 );

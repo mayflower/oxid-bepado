@@ -124,6 +124,15 @@ class mf_sdk_article_helper extends mf_abstract_helper
     }
 
     /**
+     * @param $articleId
+     */
+    public function rollbackArticleExport($articleId)
+    {
+        $oBepadoProductState = $this->createBepadoProductState($articleId);
+        $oBepadoProductState->delete();
+    }
+
+    /**
      *
      * @param $oxArticleId
      *
