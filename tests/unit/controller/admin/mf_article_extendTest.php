@@ -31,27 +31,27 @@ class mf_article_extendTest extends BaseTestCase
 
     public function testRenderWithStateNone()
     {
-        $this->mfSdkArticleHelper->expects($this->once())->method('getArticleBepadoState')->will($this->returnValue(SDKConfig::ARTICLE_STATE_NONE));
+        $this->mfSdkArticleHelper->expects($this->once())->method('getArticleBepadoState')->will($this->returnValue(mfBepadoProduct::PRODUCT_STATE_NONE));
         $this->oView->render();
         $aViewData = $this->oView->getViewData();
 
-        $this->assertEquals(SDKConfig::ARTICLE_STATE_NONE, $aViewData['export_to_bepado']);
+        $this->assertEquals(mfBepadoProduct::PRODUCT_STATE_NONE, $aViewData['export_to_bepado']);
         $this->assertEquals(1, $aViewData['no_bepado_import']);
     }
 
     public function testRenderWithStateExported()
     {
-        $this->mfSdkArticleHelper->expects($this->once())->method('getArticleBepadoState')->will($this->returnValue(SDKConfig::ARTICLE_STATE_EXPORTED));
+        $this->mfSdkArticleHelper->expects($this->once())->method('getArticleBepadoState')->will($this->returnValue(mfBepadoProduct::PRODUCT_STATE_EXPORTED));
         $this->oView->render();
         $aViewData = $this->oView->getViewData();
 
-        $this->assertEquals(SDKConfig::ARTICLE_STATE_EXPORTED, $aViewData['export_to_bepado']);
+        $this->assertEquals(mfBepadoProduct::PRODUCT_STATE_EXPORTED, $aViewData['export_to_bepado']);
         $this->assertEquals(1, $aViewData['no_bepado_import']);
     }
 
     public function testRenderWithStateImported()
     {
-        $this->mfSdkArticleHelper->expects($this->once())->method('getArticleBepadoState')->will($this->returnValue(SDKConfig::ARTICLE_STATE_IMPORTED));
+        $this->mfSdkArticleHelper->expects($this->once())->method('getArticleBepadoState')->will($this->returnValue(mfBepadoProduct::PRODUCT_STATE_IMPORTED));
         $this->oView->render();
         $aViewData = $this->oView->getViewData();
 
