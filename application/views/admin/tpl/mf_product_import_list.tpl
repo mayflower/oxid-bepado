@@ -49,7 +49,7 @@
                     <a
                             href="Javascript:top.oxid.admin.setSorting( document.search, 'mfbepadoproducts', 'shop_id', 'asc');document.search.submit();"
                             class="listheader">
-                        [{oxmultilang ident="MF_BEPADO_SHOP_ID"}]
+                        [{oxmultilang ident="MF_BEPDO_SHOP_NAME"}]
                     </a>
                 </td>
             </tr>
@@ -81,17 +81,17 @@
                 </td>
                 <td valign="top" class="[{ $listclass }]">
                     <div class="listitemfloating">
+                        <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->mfbepadoproducts__oxid->value }]');" class="[{ $listclass}]">[{ $listitem->mfbepadoproducts__p_source_id->value }]</a>
+                    </div>
+                </td>
+                <td valign="top" class="[{ $listclass }]">
+                    <div class="listitemfloating">
                         <a
                                 href="Javascript:top.oxid.admin.editThis('[{ $listitem->mfbepadoproducts__oxid->value }]');"
                                 class="[{ $listclass}]">
                             [{assign var="oShop" value=$oView->getShopById($listitem->mfbepadoproducts__shop_id->value)}]
                             [{ $oShop->name }]
                         </a>
-                    </div>
-                </td>
-                <td valign="top" class="[{ $listclass }]">
-                    <div class="listitemfloating">
-                        <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->mfbepadoproducts__oxid->value }]');" class="[{ $listclass}]">[{ $listitem->mfbepadoproducts__shop_id->value }]</a>
                     </div>
                 </td>
             </tr>

@@ -26,23 +26,15 @@
         <table cellspacing="0" cellpadding="0" border="0" width="100%">
             <colgroup>
                 <col width="3%">
-                <col width="45%">
-                <col width="10%">
+                <col width="94%">
                 <col width="2%">
             </colgroup>
             <tr class="listitem">
                 <td class="listheader first" height="15" width="30" align="center">
                     [{ oxmultilang ident="GENERAL_ACTIVTITLE" }]
                 </td>
-                <td class="listheader first" height="15" width="30" align="center">
-                    [{oxmultilang ident="MF_BEPADO_ARTICLE_TITLE"}]
-                </td>
                 <td class="listheader first" height="15" width="30" align="center" colspan="2">
-                    <a
-                            href="Javascript:top.oxid.admin.setSorting( document.search, 'mfbepadoproducts', 'shop_id', 'asc');document.search.submit();"
-                            class="listheader">
-                        [{oxmultilang ident="MF_BEPADO_SHOP_ID"}]
-                    </a>
+                    [{oxmultilang ident="MF_BEPADO_ARTICLE_TITLE"}]
                 </td>
             </tr>
 
@@ -69,16 +61,6 @@
                 <td valign="top" class="[{ $listclass }]">
                     <div class="listitemfloating">
                         <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->mfbepadoproducts__oxid->value }]');" class="[{ $listclass}]">[{ $oArticle->oxarticles__oxtitle->value }]</a>
-                    </div>
-                </td>
-                <td valign="top" class="[{ $listclass }]">
-                    <div class="listitemfloating">
-                        <a
-                                href="Javascript:top.oxid.admin.editThis('[{ $listitem->mfbepadoproducts__oxid->value }]');"
-                                class="[{ $listclass}]">
-                            [{assign var="oShop" value=$oView->getShopById($listitem->mfbepadoproducts__shop_id->value)}]
-                            [{ $oShop->name }]
-                        </a>
                     </div>
                 </td>
                 <td class="[{ $listclass}]">

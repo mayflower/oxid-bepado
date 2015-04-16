@@ -63,6 +63,7 @@ $aLang = array(
     'MF_BEPDO_MARKETPLACE_HINT_BASKET'          => 'MP-B',
     'MF_BEPDO_MARKETPLACE_HINT_ARTICLE_DETAILS' => 'MP-A',
     'MF_BEPDO_SHOP_ID'                          => 'ShopId',
+    'MF_BEPDO_SHOP_NAME'                        => 'Lieferant',
     'MF_BEPADO_CONFIGURATION_MODULE_SANDBOXMODE'=> 'Sandbox-Modus activ',
     'MF_BEPADO_CONFIGURATION_MODULE_APIKEY'     => 'Api-Key',
     'MF_BEPADO_CONFIGURATION_MODULE_SHOP_HINTS' => 'Marktplatzhinweise',
