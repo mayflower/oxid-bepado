@@ -101,7 +101,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
      */
     public function onSaveArticleExtend($articleId)
     {
-        $oBepadoProduct = $this->computeBepadoProductByArticleId($articleId);
+        $oBepadoProduct = $this->createBepadoProductState($articleId);
         $aParams = $this->getVersionLayer()->getConfig()->getRequestParameter("editval");
         $articleState = isset($aParams['export_to_bepado']) &&  "1" === $aParams['export_to_bepado'] ? true : false;
 
@@ -120,12 +120,21 @@ class mf_sdk_article_helper extends mf_abstract_helper
     }
 
     /**
+     * @param $articleId
+     */
+    public function rollbackArticleExport($articleId)
+    {
+        $oBepadoProductState = $this->createBepadoProductState($articleId);
+        $oBepadoProductState->delete();
+    }
+
+    /**
      *
      * @param $oxArticleId
      *
      * @return mfBepadoProduct
      */
-    private function computeBepadoProductByArticleId($oxArticleId)
+    private function createBepadoProductState($oxArticleId)
     {
         /** @var mfBepadoProduct $oBepadoProduct */
         $oBepadoProduct = $this->getVersionLayer()->createNewObject('mfBepadoProduct');
@@ -209,7 +218,7 @@ class mf_sdk_article_helper extends mf_abstract_helper
      */
     public function computeSdkProduct(oxArticle $oxArticle)
     {
-        $oBepadoProduct = $this->computeBepadoProductByArticleId($oxArticle->getId());
+        $oBepadoProduct = $this->createBepadoProductState($oxArticle->getId());
         $state = $oBepadoProduct->getState();
 
         if ($state == mfBepadoProduct::PRODUCT_STATE_NONE) {
