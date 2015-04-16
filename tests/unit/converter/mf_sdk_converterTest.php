@@ -254,6 +254,19 @@ class mf_sdk_converterTest extends BaseTestCase
         $this->assertEquals($product->price, $product->purchasePrice);
     }
 
+    public function testNullValuesForDeliveryStuff()
+    {
+        $product = new Struct\Product();
+        $product->deliveryWorkDays = null;
+        $product->deliveryDate  = null;
+
+        $oArticle = $this->converter->fromBepadoToShop($product);
+
+        $this->assertNull($oArticle->getFieldData('oxdelivery'));
+        $this->assertNull($oArticle->getFieldData('oxmaxdeltime'));
+        $this->assertNull($oArticle->getFieldData('oxdeltimeunit'));
+    }
+
     protected function getObjectMapping()
     {
         return array(

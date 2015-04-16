@@ -14,6 +14,8 @@
  * GNU General Public License for more details.
  */
 
+use Bepado\SDK\Exception\VerificationFailedException;
+
 /**
  * This extension adds additional behavior/information to the article admin.
  *
@@ -21,8 +23,6 @@
  */
 class mf_article_extend extends mf_article_extend_parent
 {
-    const SHOP_ID_LOCAL = '_self_';
-
     /**
      * @var VersionLayerInterface
      */
@@ -32,7 +32,6 @@ class mf_article_extend extends mf_article_extend_parent
      * @var mf_sdk_article_helper
      */
     private $articleHelper;
-
 
     /**
      * Add information of the export/import state to the view model.
@@ -44,7 +43,7 @@ class mf_article_extend extends mf_article_extend_parent
         $template = parent::render();
 
         /** @var oxArticle $oxArticle */
-        $oxArticle = oxNew('oxarticle');
+        $oxArticle = $this->getVersionLayer()->createNewObject('oxArticle');
         $oxArticle->load($this->getEditObjectId());
         $state = $this->getArticleHelper()->getArticleBepadoState($oxArticle);
 
@@ -58,12 +57,21 @@ class mf_article_extend extends mf_article_extend_parent
 
     /**
      * Triggers a hook for work on saving articles.
+     *
+     * When an article is exported, it might be not valid when being converted into a sdk product, so we will
+     * rollback and give an error message.
      */
     public function save()
     {
         $this->getArticleHelper()->onSaveArticleExtend($this->getEditObjectId());
 
-        parent::save();
+        try {
+            parent::save();
+        } catch (VerificationFailedException $e) {
+            $this->_aViewData['errorExportingArticle'] = true;
+            $this->_aViewData['errorMessage'] = $e->getMessage();
+            $this->getArticleHelper()->rollbackArticleExport($this->getEditObjectId());
+        }
     }
 
     /**
@@ -92,5 +100,13 @@ class mf_article_extend extends mf_article_extend_parent
         }
 
         return $this->_oVersionLayer;
+    }
+
+    /**
+     * @param VersionLayerInterface $versionLayer
+     */
+    public function setVersionLayer(VersionLayerInterface $versionLayer)
+    {
+        $this->_oVersionLayer = $versionLayer;
     }
 }

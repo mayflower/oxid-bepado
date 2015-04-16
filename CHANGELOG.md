@@ -8,6 +8,12 @@ Changelog
 * **2015-03-17**: Module configuration in own admin area 
 * **2015-03-13**: Admin area for bebado module setting
 
+1.0.1
+-----
+
+* [Bugfix] fix parsing sql dump for module activation
+* [Bugfix] fix default delivery date
+
 1.0.0
 -----
 

@@ -135,4 +135,8 @@ $aLang = array(
     'MF_BEPADE_PRODUCT_VERIFY_ARTICLE'                => 'Bitte passen Sie Ihren Artikel an.',
 
     'The purchasePrice is not allowed to be 0 or smaller.' => 'Der Artikel enthält keinen Eintrag im Feld Händlerpreis.',
+
+    'MF_BEPADO_PRODUCT_VERIFY_ARTICLE'                     => 'Bitte passen Sie Ihren Artikel an.',
+
+    'The purchasePrice is not allowed to be 0 or smaller.' => 'Der Artikel enthält keinen Eintrag im Feld Händlerpreis.',
 );
