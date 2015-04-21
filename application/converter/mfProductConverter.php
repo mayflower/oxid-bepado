@@ -14,24 +14,48 @@
  * GNU General Public License for more details.
  */
 
+use Bepado\SDK\Struct\Product;
+
 /**
- * Abstraction for all converter classes.
+ * Base converter, which converts oxArticles into SDK Products and back.
  *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
-abstract class mf_abstract_converter
+class mfProductConverter implements mfConverterInterface
 {
     /**
      * @var VersionLayerInterface
      */
-    protected $_oVersionLayer;
+    private $_oVersionLayer;
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param oxArticle $shopObject
+     * @param Product   $bepadoObject
+     */
+    public function fromShopToBepado($shopObject, $bepadoObject)
+    {
+
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param Product   $bepadoObject
+     * @param oxArticle $shopObject
+     */
+    public function fromBepadoToShop($bepadoObject, $shopObject)
+    {
+
+    }
 
     /**
      * Create and/or returns the VersionLayer.
      *
      * @return VersionLayerInterface
      */
-    protected function getVersionLayer()
+    private function getVersionLayer()
     {
         if (null == $this->_oVersionLayer) {
             /** @var VersionLayerFactory $factory */

@@ -25,7 +25,7 @@ use Bepado\SDK\Struct as Struct;
  *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
-class mf_sdk_address_converter extends mf_abstract_converter implements mf_converter_interface
+class mfAddressConverter extends mfAbstractConverter implements mfConverterInterface
 {
     /**
      * Default value for the prefix.
@@ -62,33 +62,32 @@ class mf_sdk_address_converter extends mf_abstract_converter implements mf_conve
      * prefix for the oxAddress field names. So we will create an array for assigning the
      * values first.
      *
-     * @param mfBepadoProduct $object
+     * @param oxAddress      $shopObject
+     * @param Struct\Address $bepadoObject
      *
      * @return Struct\Address|array
      */
-    public function fromShopToBepado($object, $type = 'oxaddress__ox')
+    public function fromShopToBepado($shopObject, $bepadoObject, $type = 'oxaddress__ox')
     {
-        $sdkAddress = new Struct\Address();
-
         foreach ($this->sdkAddressMapper as $rawFieldName => $property) {
             $fieldName = str_replace('%type', $type, $rawFieldName);
-            $fieldValue = $object->getFieldData($fieldName);
+            $fieldValue = $shopObject->getFieldData($fieldName);
             if (null !== $fieldValue) {
                 if (strpos($fieldName, 'stateid')) {
                     $fieldValue = $this->createState($fieldValue);
                 } elseif (strpos($fieldName, 'countryid')) {
                     $fieldValue = $this->createCountry($fieldValue);
                 }
-                $sdkAddress->$property = $fieldValue;
+                $bepadoObject->$property = $fieldValue;
             }
         }
 
         // when converting from oxUser the mail isn't in __oxmail
-        if (null === $sdkAddress->email && null != $object->getFieldData('oxuser__oxusername')) {
-            $sdkAddress->email = $object->getFieldData('oxuser__oxusername');
+        if (null === $bepadoObject->email && null != $shopObject->getFieldData('oxuser__oxusername')) {
+            $bepadoObject->email = $shopObject->getFieldData('oxuser__oxusername');
         }
 
-        return $sdkAddress;
+        return $bepadoObject;
     }
 
     /**
@@ -98,20 +97,20 @@ class mf_sdk_address_converter extends mf_abstract_converter implements mf_conve
      * different object like oxBasket, oxOrder or oxArticle as default. So the prefix
      * for the field values is needed or defaults to the oxArticle version.
      *
-     * @param Struct\Address $object
-     * @param string $type
+     * @param Struct\Address $bepadoObject
+     * @param oxAddress      $shopObject
+     * @param string         $type
      *
      * @return array|oxAddress
      */
-    public function fromBepadoToShop($object, $type = 'oxaddress__ox')
+    public function fromBepadoToShop($bepadoObject, $shopObject, $type = 'oxorder__oxbill')
     {
-        $fieldData = $this->createFieldDataFromAddress($object, $type);
+        $fieldData = $this->createFieldDataFromAddress($bepadoObject, $type);
 
         if ($type === self::DEFAULT_ADDRESS_FIELD_PREFIX) {
-            $oxAddress = $this->getVersionLayer()->createNewObject('oxaddress');
-            $oxAddress->assign($fieldData);
+            $shopObject->assign($fieldData);
 
-            return $oxAddress;
+            return $shopObject;
         }
 
         return $fieldData;

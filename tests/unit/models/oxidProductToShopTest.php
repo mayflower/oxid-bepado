@@ -19,7 +19,6 @@ class oxidProductToShopTest extends BaseTestCase
     protected $converter;
     protected $bepadoProduct;
     protected $oxDb;
-    protected $convertedOxArticle;
     protected $oxArticle;
     protected $articleNumberGenerator;
     protected $logger;
@@ -33,15 +32,15 @@ class oxidProductToShopTest extends BaseTestCase
 
         // oxid classes
         $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
-        $this->convertedOxArticle = $this->getMockBuilder('mf_bepado_oxarticle')->disableOriginalConstructor()->getMock();
+        $this->oxArticle = $this->getMockBuilder('mf_bepado_oxarticle')->disableOriginalConstructor()->getMock();
         $this->oxArticle = $this->getMockBuilder('oxArticle')->disableOriginalConstructor()->getMock();
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
 
         // helper/converter for our module
         $this->articleNumberGenerator = $this->getMockBuilder('mf_article_number_generator')->disableOriginalConstructor()->getMock();
         $this->sdkHelper = $this->getMock('mf_sdk_helper', array('computeConfiguration'));
-        $this->converter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
-        $this->converter->expects($this->any())->method('fromBepadoToShop')->will($this->returnValue($this->convertedOxArticle));
+        $this->converter = $this->getMockBuilder('mfProductConverterChain')->disableOriginalConstructor()->getMock();
+        $this->converter->expects($this->any())->method('fromBepadoToShop')->will($this->returnValue($this->oxArticle));
         $this->logger = $this->getMockBuilder('mf_sdk_logger_helper')->disableOriginalConstructor()->getMock();
         $this->bepadoProduct = $this->getMockBuilder('mfBepadoProduct')->disableOriginalConstructor()->getMock();
 
@@ -70,18 +69,21 @@ class oxidProductToShopTest extends BaseTestCase
             ->expects($this->once())
             ->method('generate')
             ->will($this->returnValue('article-number'));
-        $this->convertedOxArticle
+        $this->oxArticle
             ->expects($this->once())
             ->method('assign')
             ->with($this->equalTo(array(
                 'oxarticles__oxactive' => 0,
                 'oxarticles__oxstockflag' => 3,
                 'oxarticles__oxartnum'    => 'article-number',
-            )));
-        $this->convertedOxArticle->expects($this->once())->method('save');
+            )))
+            ->will($this->returnCallback(function() {
+            }))
+        ;
+        $this->oxArticle->expects($this->once())->method('save');
 
         // create an entry for the state
-        $this->convertedOxArticle->expects($this->any())->method('getId')->will($this->returnValue('test-id'));
+        $this->oxArticle->expects($this->any())->method('getId')->will($this->returnValue('test-id'));
         $this->bepadoProduct
             ->expects($this->once())
             ->method('assign')
@@ -130,11 +132,11 @@ class oxidProductToShopTest extends BaseTestCase
         // expected methods on the existing oxArticle
         $this->oxArticle->expects($this->once())->method('load')->with($this->equalTo('test-id'));
         $this->oxArticle->expects($this->once())->method('isLoaded')->will($this->returnValue(true));
-        $this->convertedOxArticle
+        $this->oxArticle
             ->expects($this->once())
             ->method('getFieldNames')
             ->will($this->returnValue(array('oxid', 'oxtitle')));
-        $this->convertedOxArticle
+        $this->oxArticle
             ->expects($this->any())
             ->method('getFieldData')
             ->will($this->returnValue('some-value'));
@@ -290,9 +292,9 @@ class oxidProductToShopTest extends BaseTestCase
     protected function getObjectMapping()
     {
         return array(
-            'mfBepadoProduct'                      => $this->bepadoProduct,
+            'mfBepadoProduct'             => $this->bepadoProduct,
             'oxArticle'                   => $this->oxArticle,
-            'mf_sdk_converter'            => $this->converter,
+            'mfProductConverterChain'            => $this->converter,
             'mf_sdk_helper'               => $this->sdkHelper,
             'mf_article_number_generator' => $this->articleNumberGenerator,
             'mf_sdk_logger_helper'        => $this->logger,

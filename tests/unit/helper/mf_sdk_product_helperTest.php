@@ -43,12 +43,12 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->oxArticle = $this->getMockBuilder('mf_bepado_oxarticle')->disableOriginalConstructor()->getMock();
         $this->sdkHelper = $this->getMockBuilder('mf_sdk_helper')->disableOriginalConstructor()->getMock();
         $this->sdk = $this->getMockBuilder('sdkMock')->disableOriginalConstructor()->getMock();
-        $this->orderConverter = $this->getMockBuilder('mf_sdk_order_converter')->disableOriginalConstructor()->getMock();
+        $this->orderConverter = $this->getMockBuilder('mfOrderConverter')->disableOriginalConstructor()->getMock();
         $this->oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
         $this->articleHelper = $this->getMockBuilder('mf_sdk_article_helper')->disableOriginalConstructor()->getMock();
         $this->loggerHelper = $this->getMockBuilder('mf_sdk_logger_helper')->disableOriginalConstructor()->getMock();
         $this->oxUser = $this->getMockBuilder('oxUser')->disableOriginalConstructor()->getMock();
-        $this->addressConverter = $this->getMockBuilder('mf_sdk_address_converter')->disableOriginalConstructor()->getMock();
+        $this->addressConverter = $this->getMockBuilder('mfAddressConverter')->disableOriginalConstructor()->getMock();
         $this->bepadoConfiguration = $this->getMockBuilder('mfBepadoConfiguration')->disableOriginalConstructor()->getMock();
 
         $this->sdkHelper
@@ -423,7 +423,10 @@ class mf_sdk_product_helperTest extends BaseTestCase
             ->expects($this->once())
             ->method('fromShopToBepado')
             ->with($this->equalTo($oxOrder))
-            ->will($this->returnValue($sdkOrder));
+            ->will($this->returnCallback(function($oxOrder, $order) {
+                $orderItem = new Struct\OrderItem();
+                $order->orderItems = array($orderItem);
+            }));
         $this->sdk
             ->expects($this->once())
             ->method('reserveProducts')
@@ -432,7 +435,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->addressConverter
             ->expects($this->any())
             ->method('fromShopToBepado')
-            ->with($this->equalTo($this->oxUser), $this->equalTo('oxuser__ox'));
+            ->with($this->equalTo($this->oxUser), $this->equalTo(new Struct\Address()), $this->equalTo('oxuser__ox'));
 
         $this->helper->reserveProductsInOrder($oxOrder, $this->oxUser);
     }
@@ -446,8 +449,7 @@ class mf_sdk_product_helperTest extends BaseTestCase
         $this->orderConverter
             ->expects($this->once())
             ->method('fromShopToBepado')
-            ->with($this->equalTo($oxOrder))
-            ->will($this->returnValue($sdkOrder));
+            ->with($this->equalTo($oxOrder), $this->equalTo($sdkOrder));
 
         $result = $this->helper->reserveProductsInOrder($oxOrder, $this->oxUser);
 
@@ -477,11 +479,11 @@ class mf_sdk_product_helperTest extends BaseTestCase
         return array(
             'mfBepadoConfiguration'    => $this->bepadoConfiguration,
             'mf_sdk_helper'            => $this->sdkHelper,
-            'mf_sdk_order_converter'   => $this->orderConverter,
+            'mfOrderConverter'   => $this->orderConverter,
             'oxorder'                  => $this->oxOrder,
             'mf_sdk_article_helper'    => $this->articleHelper,
             'mf_sdk_logger_helper'     => $this->loggerHelper,
-            'mf_sdk_address_converter' => $this->addressConverter,
+            'mfAddressConverter' => $this->addressConverter,
         );
     }
 }

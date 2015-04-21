@@ -7,10 +7,10 @@ use Bepado\SDK\Struct as Struct;
 /**
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
-class mf_sdk_order_converterTest extends BaseTestCase
+class mfOrderConverterTest extends BaseTestCase
 {
     /**
-     * @var mf_sdk_order_converter
+     * @var mfOrderConverter
      */
     protected $converter;
 
@@ -78,7 +78,7 @@ class mf_sdk_order_converterTest extends BaseTestCase
     {
         parent::prepareVersionLayerWithConfig();
 
-        $this->converter = new mf_sdk_order_converter();
+        $this->converter = new mfOrderConverter();
         $this->converter->setVersionLayer($this->versionLayer);
 
 
@@ -114,7 +114,8 @@ class mf_sdk_order_converterTest extends BaseTestCase
         /** @var oxOrder $oxOrder */
         $oxOrder = oxNew('oxorder');
         $oxOrder->assign($this->oxOrderValues);
-        $sdkOrder = $this->converter->fromShopToBepado($oxOrder, array('reservationId' => 'some-reservation-id'));
+        $sdkOrder = new Struct\Order();
+        $this->converter->fromShopToBepado($oxOrder, $sdkOrder, array('reservationId' => 'some-reservation-id'));
 
         if ($testable) {
             $this->assertEquals($orderValue, $sdkOrder->$orderProperty);
@@ -178,7 +179,8 @@ class mf_sdk_order_converterTest extends BaseTestCase
         $oxArticlesList->add($uselessOrderArticle);
         $oxOrder->setOrderArticleList($oxArticlesList);
 
-        $order = $this->converter->fromShopToBepado($oxOrder);
+        $order = new Struct\Order();
+        $this->converter->fromShopToBepado($oxOrder, $order);
         $orderItem = array_shift($order->orderItems);
         $actualProduct = $orderItem->product;
 
@@ -198,8 +200,8 @@ class mf_sdk_order_converterTest extends BaseTestCase
             }
             $sdkOrder->$property = $value;
         }
-
-        $oxOrder = $this->converter->fromBepadoToShop($sdkOrder);
+        $oxOrder = oxNew('oxOrder');
+        $this->converter->fromBepadoToShop($sdkOrder, $oxOrder);
 
         if ($testable) {
             $this->assertEquals($orderFieldValue, $oxOrder->getFieldData($orderFieldName));

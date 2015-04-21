@@ -225,9 +225,10 @@ class mf_sdk_article_helper extends mf_abstract_helper
             throw new Exception("Article is not managed for bepado. Neither exported to a remote shop nor imported.");
         }
 
-        /** @var mf_sdk_converter $converter */
-        $converter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
-        $sdkProduct = $converter->fromShopToBepado($oxArticle);
+        /** @var mfProductConverter $converter */
+        $converter = $this->getVersionLayer()->createNewObject('mfProductConverterChain');
+        $sdkProduct = new Product();
+        $converter->fromShopToBepado($oxArticle, $sdkProduct);
         $sdkProduct->shopId = $oBepadoProduct->getShopId();
         $sdkProduct->sourceId = $oBepadoProduct->getProductSourceId();
 

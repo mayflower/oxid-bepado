@@ -46,7 +46,7 @@ class oxidProductFromShopTest extends BaseTestCase
         $this->oxPrice = $this->getMockBuilder('oxPrice')->disableOriginalConstructor()->getMock();
         $this->oxOrder = $this->getMockBuilder('oxOrder')->disableOriginalConstructor()->getMock();
         $this->oxArticle = $this->getMockBuilder('mf_bepado_oxarticle')->disableOriginalConstructor()->getMock();
-        $this->converter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
+        $this->converter = $this->getMockBuilder('mfProductConverterChain')->disableOriginalConstructor()->getMock();
         $this->articleHelper = $this->getMockBuilder('mf_sdk_article_helper')->disableOriginalConstructor()->getMock();
         $this->sdk = $this->getMockBuilder('sdkMock')->disableOriginalConstructor()->getMock();
 
@@ -377,16 +377,16 @@ class oxidProductFromShopTest extends BaseTestCase
     protected function getObjectMapping()
     {
         return array(
-            'oxuser'                => $this->oxUser,
-            'oxgroups'              => $this->oxGroup,
-            'oxbasket'              => $this->oxBasket,
-            'oxpayment'             => $this->oxPayment,
-            'oxprice'               => $this->oxPrice,
-            'oxorder'               => $this->oxOrder,
-            'mf_sdk_converter'      => $this->converter,
-            'oxarticle'             => $this->oxArticle,
-            'mf_sdk_helper'         => $this->sdkHelper,
-            'mf_sdk_article_helper' => $this->articleHelper,
+            'oxuser'                  => $this->oxUser,
+            'oxgroups'                => $this->oxGroup,
+            'oxbasket'                => $this->oxBasket,
+            'oxpayment'               => $this->oxPayment,
+            'oxprice'                 => $this->oxPrice,
+            'oxorder'                 => $this->oxOrder,
+            'mfProductConverterChain' => $this->converter,
+            'oxarticle'               => $this->oxArticle,
+            'mf_sdk_helper'           => $this->sdkHelper,
+            'mf_sdk_article_helper'   => $this->articleHelper,
         );
     }
 }

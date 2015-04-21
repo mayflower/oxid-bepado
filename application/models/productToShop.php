@@ -57,11 +57,13 @@ class oxidProductToShop implements ProductToShop
      */
     public function insertOrUpdate(Struct\Product $product)
     {
-        /** @var mf_sdk_converter $productConverter */
-        $productConverter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
+        /** @var mfProductConverter $productConverter */
+        $productConverter = $this->getVersionLayer()->createNewObject('mfProductConverterChain');
         /** @var mf_sdk_logger_helper $logger */
         $logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
-        $oxArticle = $productConverter->fromBepadoToShop($product);
+
+        $oxArticle = $this->getVersionLayer()->createNewObject('oxArticle');
+        $productConverter->fromBepadoToShop($product, $oxArticle);
         /** @var mfBepadoProduct $oBepadoProduct */
         $oBepadoProduct = $this->getVersionLayer()->createNewObject('mfBepadoProduct');
         $select = $oBepadoProduct->buildSelectString(array(
