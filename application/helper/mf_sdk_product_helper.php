@@ -171,19 +171,22 @@ class mf_sdk_product_helper extends mf_abstract_helper
      */
     public function reserveProductsInOrder(oxOrder $oxOrder, oxUser $oxUser)
     {
-        /** @var mf_sdk_order_converter $converter */
-        $converter = $this->getVersionLayer()->createNewObject('mf_sdk_order_converter');
-        /** @var mf_sdk_address_converter $addressConverter */
-        $addressConverter = $this->getVersionLayer()->createNewObject('mf_sdk_address_converter');
+        /** @var mfOrderConverter $converter */
+        $converter = $this->getVersionLayer()->createNewObject('mfOrderConverter');
+        /** @var mfAddressConverter $addressConverter */
+        $addressConverter = $this->getVersionLayer()->createNewObject('mfAddressConverter');
 
-        $sdkOrder = $converter->fromShopToBepado($oxOrder);
+        $sdkOrder = new Struct\Order();
+        $converter->fromShopToBepado($oxOrder, $sdkOrder);
         if (null == $sdkOrder->deliveryAddress || null == $sdkOrder->deliveryAddress->firstName) {
-            $sdkOrder->deliveryAddress = $addressConverter->fromShopToBepado($oxUser, 'oxuser__ox');
+            $sdkAddress = new Struct\Address();
+            $sdkOrder->deliveryAddress = $addressConverter->fromShopToBepado($oxUser, $sdkAddress, 'oxuser__ox');
         }
 
         if (null == $sdkOrder->billingAddress || null == $sdkOrder->billingAddress->firstName) {
             // todo use a persisted (session -> delivery id) address when exists
-            $sdkOrder->billingAddress = $addressConverter->fromShopToBepado($oxUser, 'oxuser__ox');
+            $sdkAddress = new Struct\Address();
+            $sdkOrder->billingAddress = $addressConverter->fromShopToBepado($oxUser, $sdkAddress, 'oxuser__ox');
         }
 
         if (count($sdkOrder->orderItems) === 0) {

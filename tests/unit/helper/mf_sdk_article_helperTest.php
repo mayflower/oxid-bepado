@@ -48,7 +48,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
 
         $this->oxDb = $this->getMockBuilder('oxLegacyDb')->disableOriginalConstructor()->getMock();
         $this->sdkHelper = $this->getMockBuilder('mf_sdk_helper')->disableOriginalConstructor()->getMock();
-        $this->productConverter = $this->getMockBuilder('mf_sdk_converter')->disableOriginalConstructor()->getMock();
+        $this->productConverter = $this->getMockBuilder('mfProductConverterChain')->disableOriginalConstructor()->getMock();
         $this->versionLayer->expects($this->any())->method('getDb')->will($this->returnValue($this->oxDb));
         $this->sdk = $this->getMockBuilder('sdkMock')->disableOriginalConstructor()->getMock();
         $this->sdkHelper
@@ -461,7 +461,7 @@ class mf_sdk_article_helperTest extends BaseTestCase
     {
         return array(
             'mf_sdk_helper'         => $this->sdkHelper,
-            'mf_sdk_converter'      => $this->productConverter,
+            'mfProductConverterChain'      => $this->productConverter,
             'mfBepadoConfiguration' => $this->bepadoConfiguration,
             'mf_sdk_logger_helper'  => $this->loggerHelper,
             'mfBepadoProduct'       => $this->bepadoProduct,

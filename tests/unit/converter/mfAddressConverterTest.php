@@ -7,14 +7,14 @@ use Bepado\SDK\Struct as Struct;
 /**
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
-class mf_sdk_address_converterTest extends BaseTestCase
+class mfAddressConverterTest extends BaseTestCase
 {
 
     protected $oxState;
     protected $oxCountry;
 
     /**
-     * @var mf_sdk_address_converter
+     * @var mfAddressConverter
      */
     protected $converter;
     protected $oxDb;
@@ -50,7 +50,7 @@ class mf_sdk_address_converterTest extends BaseTestCase
     {
         parent::prepareVersionLayerWithConfig();
 
-        $this->converter = new mf_sdk_address_converter();
+        $this->converter = new mfAddressConverter();
         $this->converter->setVersionLayer($this->versionLayer);
 
         // mocks of oxid classes
@@ -88,8 +88,9 @@ class mf_sdk_address_converterTest extends BaseTestCase
         /** @var oxOrder $oxAddress */
         $oxAddress = oxNew('oxAddress');
         $oxAddress->assign($this->oxAddressValues);
+        $address = new Struct\Address();
 
-        $address = $this->converter->fromShopToBepado($oxAddress);
+        $this->converter->fromShopToBepado($oxAddress, $address);
 
         if ($testable) {
             $this->assertEquals($addressValue, $address->$addressProperty);
@@ -124,7 +125,8 @@ class mf_sdk_address_converterTest extends BaseTestCase
         }
 
         /** @var oxAddress $oxAddress */
-        $oxAddress = $this->converter->fromBepadoToShop($sdkAddress);
+        $oxAddress = oxNew('oxAddress');
+        $this->converter->fromBepadoToShop($sdkAddress, $oxAddress, mfAddressConverter::DEFAULT_ADDRESS_FIELD_PREFIX);
 
         if ($testable) {
             $this->assertEquals($addressFieldValue, $oxAddress->getFieldData($addressFieldName));
@@ -163,8 +165,8 @@ class mf_sdk_address_converterTest extends BaseTestCase
         foreach ($this->sdkAddressValues as $property => $value) {
             $expectedAddress->$property = $value;
         }
-
-        $actualAddress = $this->converter->fromShopToBepado($oxOrder, 'oxorder__oxbill');
+        $actualAddress = new Struct\Address();
+        $this->converter->fromShopToBepado($oxOrder, $actualAddress, 'oxorder__oxbill');
 
         $this->assertEquals($expectedAddress, $actualAddress);
     }
@@ -182,7 +184,7 @@ class mf_sdk_address_converterTest extends BaseTestCase
             $expectedParameters[str_replace('oxaddress__ox', 'oxorder__oxbill', $fieldname)] = $fieldValue;
         }
 
-        $actualParemeters = $this->converter->fromBepadoToShop($sdkAddress, 'oxorder__oxbill');
+        $actualParemeters = $this->converter->fromBepadoToShop($sdkAddress, null, 'oxorder__oxbill');
 
         $this->assertEquals($expectedParameters, $actualParemeters);
     }

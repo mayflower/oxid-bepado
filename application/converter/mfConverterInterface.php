@@ -21,7 +21,7 @@
  *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
-interface mf_converter_interface
+interface mfConverterInterface
 {
     /**
      * Method to convert from a model in the OXID eShop for example
@@ -36,11 +36,10 @@ interface mf_converter_interface
      * - Order
      * - OrderItem
      *
-     * @param object $object
-     *
-     * @return object
+     * @param object $shopObject
+     * @param object $bepadoObject
      */
-    public function fromShopToBepado($object);
+    public function fromShopToBepado($shopObject, $bepadoObject);
 
     /**
      * Method to convert from a model in the bepado SDK for example
@@ -55,9 +54,8 @@ interface mf_converter_interface
      * - oxAddress
      * - oxOrder
      *
-     * @param object $object
-     *
-     * @return object
+     * @param object $bepadoObject
+     * @param object $shopObject
      */
-    public function fromBepadoToShop($object);
+    public function fromBepadoToShop($bepadoObject, $shopObject);
 }

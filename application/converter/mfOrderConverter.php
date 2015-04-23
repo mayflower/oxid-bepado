@@ -21,22 +21,22 @@ use Bepado\SDK\Struct as Struct;
  *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
-class mf_sdk_order_converter extends mf_abstract_converter implements mf_converter_interface
+class mfOrderConverter extends mfAbstractConverter implements mfConverterInterface
 {
     /**
-     * @var mf_sdk_address_converter
+     * @var mfAddressConverter
      */
     protected $addressConverter;
 
     /**
-     * @var mf_sdk_converter
+     * @var mfProductConverter
      */
     protected $productConverter;
 
     public function __construct()
     {
-        $this->addressConverter = $this->getVersionLayer()->createNewObject('mf_sdk_address_converter');
-        $this->productConverter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
+        $this->addressConverter = $this->getVersionLayer()->createNewObject('mfAddressConverter');
+        $this->productConverter = $this->getVersionLayer()->createNewObject('mfProductConverterChain');
     }
 
     /**
@@ -44,27 +44,27 @@ class mf_sdk_order_converter extends mf_abstract_converter implements mf_convert
      *
      * Creates a bepado order object from the information given by a oxOrder.
      *
-     * @param oxOrder $object
-     *
-     * @return Struct\Order
+     * @param oxOrder      $shopObject
+     * @param Struct\Order $bepadoObject
      */
-    public function fromShopToBepado($object, $parameters = array())
+    public function fromShopToBepado($shopObject, $bepadoObject, $parameters = array())
     {
-        $sdkOrder = new Struct\Order();
-        $sdkOrder->billingAddress = $this->addressConverter->fromShopToBepado($object, 'oxorder__oxbill');
-        $sdkOrder->deliveryAddress = $this->addressConverter->fromShopToBepado($object, 'oxorder__oxdel');
-        if (!$sdkOrder->deliveryAddress->firstName) {
-            $sdkOrder->deliveryAddress = $sdkOrder->billingAddress;
+        $address = new Struct\Address();
+        $bepadoObject->billingAddress = $this->addressConverter->fromShopToBepado($shopObject, $address, 'oxorder__oxbill');
+        $address = new Struct\Address();
+        $bepadoObject->deliveryAddress = $this->addressConverter->fromShopToBepado($shopObject, $address, 'oxorder__oxdel');
+
+        if (!$bepadoObject->deliveryAddress->firstName) {
+            $bepadoObject->deliveryAddress = $bepadoObject->billingAddress;
         }
-        $sdkOrder->localOrderId = $object->getId();
-        $sdkOrder->paymentType = $this->createSDKPaymentType($object);
-        $sdkOrder->orderItems = $this->createOrderItems($object);
+
+        $bepadoObject->localOrderId = $shopObject->getId();
+        $bepadoObject->paymentType = $this->createSDKPaymentType($shopObject);
+        $bepadoObject->orderItems = $this->createOrderItems($shopObject);
 
         foreach ($parameters as $property => $value) {
-            $sdkOrder->$property = $value;
+            $bepadoObject->$property = $value;
         }
-
-        return $sdkOrder;
     }
 
     /**
@@ -74,19 +74,15 @@ class mf_sdk_order_converter extends mf_abstract_converter implements mf_convert
      *  - userId, cause this one will be created while checking out in the local shop
      *  - all delivery address stuff, cause it is created out of the user details
      *
-     * @param Struct\Order $object
-     *
-     * @return oxOrder
+     * @param Struct\Order $bepadoObject
+     * @param oxOrder      $shopObject
      */
-    public function fromBepadoToShop($object)
+    public function fromBepadoToShop($bepadoObject, $shopObject)
     {
-        $oxOrder = oxNew('oxOrder');
         $parameters = array('oxorder__oxid' => null);
-        $parameters = array_merge($parameters, $this->addressConverter->fromBepadoToShop($object->billingAddress, 'oxorder__oxbill'));
-        $parameters['oxorder__oxpaymentid'] = $this->createOxidPaymentId($object);
-        $oxOrder->assign($parameters);
-
-        return $oxOrder;
+        $parameters = array_merge($parameters, $this->addressConverter->fromBepadoToShop($bepadoObject->billingAddress, $shopObject, 'oxorder__oxbill'));
+        $parameters['oxorder__oxpaymentid'] = $this->createOxidPaymentId($bepadoObject);
+        $shopObject->assign($parameters);
     }
 
     /**

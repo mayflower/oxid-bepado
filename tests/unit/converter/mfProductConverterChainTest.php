@@ -5,12 +5,14 @@ require_once __DIR__ . '/../BaseTestCase.php';
 use Bepado\SDK\Struct as Struct;
 
 /**
+ * This test is more like an integration test as it iterates over all converters at once.
+ *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
-class mf_sdk_converterTest extends BaseTestCase
+class mfProductConverterChainTest extends BaseTestCase
 {
     /**
-     * @var mf_sdk_converter
+     * @var mfProductConverter
      */
     protected $converter;
     protected $oxShop;
@@ -75,7 +77,7 @@ class mf_sdk_converterTest extends BaseTestCase
     {
         $this->prepareVersionLayerWithConfig();
 
-        $this->converter = new mf_sdk_converter();
+        $this->converter = new mfProductConverterChain();
         $this->converter->setVersionLayer($this->versionLayer);
 
         // oxid objects
@@ -123,7 +125,8 @@ class mf_sdk_converterTest extends BaseTestCase
         $oxArticle = oxNew('oxarticle');
         $oxArticle->assign($this->articleValues);
 
-        $product = $this->converter->fromShopToBepado($oxArticle);
+        $product = new Struct\Product();
+        $this->converter->fromShopToBepado($oxArticle, $product);
 
         if ($testable) {
             $this->assertEquals($productValue, $product->$productProperty);
@@ -185,7 +188,9 @@ class mf_sdk_converterTest extends BaseTestCase
             ->with($this->equalTo('imgage-url-1'), $this->equalTo(1))
             ->will($this->returnValue(array('oxarticles__oxpic1', 'imgage-url-1')))
         ;
-        $oxArticle = $this->converter->fromBepadoToShop($product);
+
+        $oxArticle = oxNew('oxArticle');
+        $this->converter->fromBepadoToShop($product, $oxArticle);
 
         if ($testable) {
             $actualValue = $oxArticle->getFieldData($field);
@@ -233,7 +238,8 @@ class mf_sdk_converterTest extends BaseTestCase
         $oxArticle = oxNew('oxarticle');
         $oxArticle->assign($this->articleValues);
 
-        $product = $this->converter->fromShopToBepado($oxArticle);
+        $product = new Struct\Product();
+        $this->converter->fromShopToBepado($oxArticle, $product);
 
         $this->assertEquals($product->price, $product->purchasePrice);
     }
@@ -249,7 +255,8 @@ class mf_sdk_converterTest extends BaseTestCase
         $oxArticle = oxNew('oxarticle');
         $oxArticle->assign($this->articleValues);
 
-        $product = $this->converter->fromShopToBepado($oxArticle);
+        $product = new Struct\Product();
+        $this->converter->fromShopToBepado($oxArticle, $product);
 
         $this->assertEquals($product->price, $product->purchasePrice);
     }
@@ -260,19 +267,20 @@ class mf_sdk_converterTest extends BaseTestCase
         $product->deliveryWorkDays = null;
         $product->deliveryDate  = null;
 
-        $oArticle = $this->converter->fromBepadoToShop($product);
+        $oxArticle = oxNew('oxArticle');
+        $this->converter->fromBepadoToShop($product, $oxArticle);
 
-        $this->assertNull($oArticle->getFieldData('oxdelivery'));
-        $this->assertNull($oArticle->getFieldData('oxmaxdeltime'));
-        $this->assertNull($oArticle->getFieldData('oxdeltimeunit'));
+        $this->assertNull($oxArticle->getFieldData('oxdelivery'));
+        $this->assertNull($oxArticle->getFieldData('oxmaxdeltime'));
+        $this->assertNull($oxArticle->getFieldData('oxdeltimeunit'));
     }
 
     protected function getObjectMapping()
     {
         return array(
-            'oxshop'                => $this->oxShop,
+            'oxShop'                => $this->oxShop,
             'mf_sdk_helper'         => $this->sdkHelper,
-            'oxlist'                => $this->oxList,
+            'oxList'                => $this->oxList,
             'mf_module_helper'      => oxNew('mf_module_helper'),
             'mfBepadoConfiguration' => $this->bepadoConfiguration
         );

@@ -20,6 +20,7 @@ use Bepado\SDK\SecurityException;
 use Bepado\SDK\Struct\Address;
 use Bepado\SDK\Struct\Order;
 use Bepado\SDK\Struct\OrderItem;
+use Bepado\SDK\Struct\Product;
 
 /**
  * Implementation of one of the base SDK models.
@@ -45,13 +46,13 @@ class oxidProductFromShop implements ProductFromShop
     /**
      * @param array $ids
      *
-     * @return array|\Bepado\SDK\Struct\Product[]
+     * @return array|Product[]
      */
     public function getProducts(array $ids)
     {
         $sdkProducts = array();
-        /** @var mf_sdk_converter $oModuleSDKConverter */
-        $oModuleSDKConverter = $this->getVersionLayer()->createNewObject('mf_sdk_converter');
+        /** @var mfProductConverter $oModuleSDKConverter */
+        $oModuleSDKConverter = $this->getVersionLayer()->createNewObject('mfProductConverterChain');
         /** @var mf_sdk_article_helper $articleHelper */
         $articleHelper = $this->getVersionLayer()->createNewObject('mf_sdk_article_helper');
         foreach ($ids as $id) {
@@ -63,7 +64,9 @@ class oxidProductFromShop implements ProductFromShop
                 continue;
             }
 
-            $sdkProducts[] = $oModuleSDKConverter->fromShopToBepado($oxArticle);
+            $sdkProduct = new Product();
+            $oModuleSDKConverter->fromShopToBepado($oxArticle, $sdkProduct);
+            $sdkProducts[] = $sdkProduct;
         }
 
         return $sdkProducts;

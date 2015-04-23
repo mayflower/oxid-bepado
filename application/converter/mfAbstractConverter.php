@@ -19,12 +19,17 @@
  *
  * @author Maximilian Berghoff <Maximilian.Berghoff@gmx.de>
  */
-abstract class mf_abstract_converter
+abstract class mfAbstractConverter
 {
     /**
      * @var VersionLayerInterface
      */
     protected $_oVersionLayer;
+
+    /**
+     * @var mf_sdk_logger_helper
+     */
+    protected $logger;
 
     /**
      * Create and/or returns the VersionLayer.
@@ -48,5 +53,19 @@ abstract class mf_abstract_converter
     public function setVersionLayer(VersionLayerInterface $versionLayer)
     {
         $this->_oVersionLayer = $versionLayer;
+    }
+
+    /**
+     * Creates or passes the logger.
+     *
+     * @return mf_sdk_logger_helper|object
+     */
+    public function getLogger()
+    {
+        if (null === $this->logger) {
+            $this->logger = $this->getVersionLayer()->createNewObject('mf_sdk_logger_helper');
+        }
+
+        return $this->logger;
     }
 }
