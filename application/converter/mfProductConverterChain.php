@@ -30,7 +30,6 @@ class mfProductConverterChain extends mfAbstractConvertChain implements mfConver
     protected function initializeChain()
     {
         $this->converters = array(
-            $this->getVersionLayer()->createNewObject('mfProductConverter'),
             $this->getVersionLayer()->createNewObject('mfProductBaseConverter'),
             $this->getVersionLayer()->createNewObject('mfProductPricingConverter'),
             $this->getVersionLayer()->createNewObject('mfProductAttributesConverter'),

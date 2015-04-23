@@ -80,7 +80,6 @@ $aModule = array(
         'mfProductVendorConverter'     => $aPaths['converter'] . '/mfProductVendorConverter.php',
         'mfProductDeliveryConverter'   => $aPaths['converter'] . '/mfProductDeliveryConverter.php',
         'mfAbstractConverter'          => $aPaths['converter'] . '/mfAbstractConverter.php',
-        'mfProductConverter'           => $aPaths['converter'] . '/mfProductConverter.php',
         'mfOrderConverter'             => $aPaths['converter'] . '/mfOrderConverter.php',
         'mfAddressConverter'           => $aPaths['converter'] . '/mfAddressConverter.php',
 
